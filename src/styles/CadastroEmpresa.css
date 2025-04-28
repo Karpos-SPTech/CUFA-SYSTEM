@@ -1,0 +1,126 @@
+:root {
+  --light-green: #E5EEE3;
+  --dark-green:  #006916;
+  --white:       #F1F1F1;
+  --text-dark:   #333333;
+}
+
+/* Reset + corpo */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+
+/* Ajuste na largura e altura do container */
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;  /* Aumenta a largura do card */
+  height: auto;      /* Ajusta a altura automaticamente */
+  margin: auto;
+  padding: 50px 40px; /* Ajuste no padding para dar mais espaço */
+  background-color: var(--light-green);
+  border-radius: 30px;
+  text-align: center;
+}
+
+.mensagem-erro {
+  color: var(--dark-green);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Banner “CUFA” */
+.header-banner {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -1%);
+  background-color: var(--dark-green);
+  color: var(--white);
+  padding: 10px 40px;
+  border-radius: 0 0 20px 20px;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+/* Subtítulo */
+h2 {
+  margin-top: 20px;
+  margin-bottom: 30px;
+  color: var(--dark-green);
+  font-size: 1.1rem;
+}
+
+/* Formulário geral */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Linhas de dois inputs */
+.linha {
+  display: flex;
+  gap: 16px;
+}
+
+/* Inputs estilo “gordinho” */
+.linha input,
+input.full {
+  flex: 1;
+  height: 50px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 25px;
+  background-color: var(--white);
+  font-size: 1rem;
+  color: var(--dark-green);
+}
+
+input{
+  flex: 1;
+  height: 50px;
+  padding: 17px 20px;
+  border: none;
+  border-radius: 25px;
+  background-color: var(--white);
+  font-size: 1rem;
+  color: var(--dark-green);
+}
+
+/* Botão */
+.botao-cadastrar {
+  margin-top: 10px;
+  height: 50px;
+  width: 100%;
+  background-color: var(--dark-green);
+  color: var(--white);
+  border: none;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.botao-cadastrar:hover {
+  background-color: #00550f;
+}
+
+/* Link de login */
+.login-link {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+.login-link a {
+  color: var(--dark-green);
+  font-weight: bold;
+  text-decoration: none;
+}
+.login-link a:hover {
+  text-decoration: underline;
+}
