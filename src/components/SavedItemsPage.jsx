@@ -3,6 +3,7 @@ import { useSavedItems } from "./SavedItemsContext";
 import JobCard from "./JobCard";
 import "./App.css"; // Importando o CSS global
 import Header from "./Header";
+import mcdonaldsLogo from '../assets/mcdonalds-logo.png';
 
 const SavedItemsPage = () => {
     const { savedItems } = useSavedItems();
@@ -25,19 +26,28 @@ const SavedItemsPage = () => {
                 <div className="saved-items-counter">
                     <h3>Meus itens</h3>
                     <p>Vagas salvas</p>
-                    <span>{savedItems.length}</span>
+                    <span>1</span>
                 </div>
 
                 {/* Div para os cards salvos */}
                 <div className="saved-items-list">
                     <h2>Publicações Salvas</h2>
-                    {savedItems.length === 0 ? (
-                        <p>Você ainda não salvou nenhuma publicação.</p>
-                    ) : (
-                        savedItems.map((item, index) => (
-                            <JobCard key={index} {...item} customClass="saved-job-card" />
-                        ))
-                    )}
+                    <div className="job-section">
+                        <JobCard
+                            logo={mcdonaldsLogo} // Passa a logo como prop
+                            company="Mc Donald's"
+                            type="Fast Food | CLT"
+                            time="Há 7 horas"
+                            title="🍟 Vem Trabalhar no Méqui!"
+                            description="📋 Descrição da vaga: Atue na preparação dos lanches na chapa, com qualidade e agilidade. 🍔🔥."
+                            functions={["Preparar lanches", "Manter a chapa em ordem", "Seguir padrão de qualidade"]}
+                            benefits={[
+                                "🍽 Vale-refeição/alimentação",
+                                "🩺 Plano de saúde e odontológico",
+                                "🚌 Vale-transporte",
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

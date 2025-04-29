@@ -1060,7 +1060,7 @@ body::-webkit-scrollbar {
 
 .form-group input.full-width {
     flex: none; /* Remove o comportamento de flex */
-    width: 100%; /* Faz o input ocupar toda a largura */
+    width: 93%; /* Faz o input ocupar toda a largura */
     padding: 10px; /* Ajusta o espaçamento interno */
     border: 1px solid #ccc; /* Mantém a borda */
     border-radius: 5px; /* Bordas arredondadas */
@@ -1143,7 +1143,7 @@ body::-webkit-scrollbar {
     color: #006916;
     border-top: 5px solid #006916; /* Linha verde no topo */
     position: relative; /* Ou absolute, dependendo do layout */
-    top: 85px; /* Move para baixo */
+    top: 94px; /* Move para baixo */
     left: 350px; /* Move para a direita */
 }
 
