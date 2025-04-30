@@ -1,35 +1,151 @@
 import React from 'react';
-import '../styles/EscolhaPerfil.css';
+import { Box, Typography, Button, Card, CardMedia, CardContent } from '@mui/material';
 import { Link } from 'react-router-dom';
-
-// Importa as imagens
 import usuarioImage from '../assets/usuario.png';
 import empresaImage from '../assets/empresa.png';
 
 export default function EscolherPerfil() {
     return (
-        <div className="perfil-container">
-            <div className="perfil-header-banner">
+        <Box 
+            sx={{ 
+                backgroundColor: 'white', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'flex-start', 
+                paddingTop: '40px', 
+                height: '500px', 
+                borderRadius: '30px', 
+                padding: '30px' 
+            }}
+        >
+            <Box 
+                sx={{ 
+                    backgroundColor: '#006916', 
+                    transform: 'translate(0, -63%)', 
+                    padding: '10px 50px', 
+                    color: 'white', 
+                    fontWeight: 'bold', 
+                    fontSize: '1.5rem', 
+                    borderBottomLeftRadius: '25px', 
+                    borderBottomRightRadius: '25px', 
+                    marginBottom: '20px' 
+                }}
+            >
                 CUFA
-            </div>
+            </Box>
 
-            <h2>Escolha seu perfil e comece agora!</h2>
+            <Typography 
+                variant="h2" 
+                sx={{ 
+                    color: 'var(--dark-green)', 
+                    fontWeight: 'bold', 
+                    marginBottom: '40px', 
+                    textAlign: 'center', 
+                    fontSize: '1.5rem' 
+                }}
+            >
+                Escolha seu perfil e comece agora!
+            </Typography>
 
-            <div className="perfil-opcoes">
-                <div className="perfil-card">
-                    <img src={usuarioImage} alt="Usuário" className="perfil-imagem1" />
-                    <Link to="/cadastroUsuario">
-                        <button className="perfil-botao">USUARIO</button>
+            <Box 
+                sx={{ 
+                    display: 'flex', 
+                    gap: '50px', 
+                    flexWrap: 'wrap', 
+                    justifyContent: 'center' 
+                }}
+            >
+                <Card 
+                    sx={{ 
+                        backgroundColor: '#006916', 
+                        padding: '20px', 
+                        borderRadius: '30px', 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' 
+                    }}
+                >
+                    <CardMedia 
+                        component="img" 
+                        image={usuarioImage} 
+                        alt="Usuário" 
+                        sx={{ 
+                            width: '180px', 
+                            height: '180px', 
+                            objectFit: 'contain', 
+                            borderRadius: '20px', 
+                            marginBottom: '20px' 
+                        }}
+                    />
+                    <Link to="/cadastroUsuario" style={{ textDecoration: 'none' }}>
+                        <Button 
+                            sx={{ 
+                                backgroundColor: 'white', 
+                                color: 'var(--dark-green)', 
+                                fontWeight: 'bold', 
+                                padding: '10px 30px', 
+                                borderRadius: '10px', 
+                                cursor: 'pointer', 
+                                boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.3)', 
+                                fontSize: '1rem', 
+                                '&:hover': {
+                                    backgroundColor: '#005f00', 
+                                    color: 'white' 
+                                } 
+                            }}
+                        >
+                            USUARIO
+                        </Button>
                     </Link>
-                </div>
+                </Card>
 
-                <div className="perfil-card">
-                    <img src={empresaImage} alt="Empresa" className="perfil-imagem1" />
-                    <Link to="/cadastroEmpresa">
-                        <button className="perfil-botao">EMPRESA</button>
+                <Card 
+                    sx={{ 
+                        backgroundColor: '#006916', 
+                        padding: '20px', 
+                        borderRadius: '30px', 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' 
+                    }}
+                >
+                    <CardMedia 
+                        component="img" 
+                        image={empresaImage} 
+                        alt="Empresa" 
+                        sx={{ 
+                            width: '180px', 
+                            height: '180px', 
+                            objectFit: 'contain', 
+                            borderRadius: '20px', 
+                            marginBottom: '20px' 
+                        }}
+                    />
+                    <Link to="/cadastroEmpresa" style={{ textDecoration: 'none' }}>
+                        <Button 
+                            sx={{ 
+                                backgroundColor: 'white', 
+                                color: 'var(--dark-green)', 
+                                fontWeight: 'bold', 
+                                padding: '10px 30px', 
+                                borderRadius: '10px', 
+                                cursor: 'pointer', 
+                                boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.3)', 
+                                fontSize: '1rem', 
+                                '&:hover': {
+                                    backgroundColor: '#005f00', 
+                                    color: 'white' 
+                                } 
+                            }}
+                        >
+                            EMPRESA
+                        </Button>
                     </Link>
-                </div>
-            </div>
-        </div>
+                </Card>
+            </Box>
+        </Box>
     );
 }

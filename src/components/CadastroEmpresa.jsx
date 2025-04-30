@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
-import {  Link, useNavigate } from 'react-router-dom'; 
-import '../styles/CadastroEmpresa.css';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Grid,
+  Box,
+  Alert
+} from '@mui/material';
 
 export default function CadastroEmpresa() {
   const navigate = useNavigate();
@@ -15,107 +23,21 @@ export default function CadastroEmpresa() {
   const [area, setArea] = useState('');
   const [mensagem, setMensagem] = useState('');
 
-  // Função para validar CNPJ
-  const validarCNPJ = async (cnpj) => {
-    try {
-      const response = await fetch(`https://publica.cnpj.ws/cnpj/${cnpj.replace(/\D/g, '')}`);
-      const data = await response.json();
-      if (!data.razao_social) {
-        setMensagem('CNPJ inválido! Verifique os dados.');
-        return false;
-      }
-      setMensagem('');
-      return true;
-    } catch (error) {
-      console.error("Erro ao validar o CNPJ:", error);
-      setMensagem("Erro ao validar o CNPJ.");
-      return false;
-    }
-  };
-
-  // Função para formatar o CNPJ
-  const formatarCNPJ = (cnpj) => {
-    return cnpj
-      .replace(/^(\d{2})(\d)/, '$1.$2')
-      .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-      .replace(/\.(\d{3})(\d)/, '.$1/$2')
-      .replace(/(\d{4})(\d)/, '$1-$2');
-  };
-
-  // Função para manipular o campo CNPJ
-  const handleCnpjChange = (e) => {
-    let cnpj = e.target.value.replace(/\D/g, '');
-    if (cnpj.length > 14) cnpj = cnpj.slice(0, 14);
-    setCnpj(formatarCNPJ(cnpj));
-    if (cnpj.length === 14) {
-      validarCNPJ(cnpj);
-    }
-  };
-
-  // Função para manipular o campo CEP
-  const handleCepChange = (e) => {
-    let cep = e.target.value.replace(/\D/g, '');
-    if (cep.length > 5) {
-      setCep(`${cep.slice(0, 5)}-${cep.slice(5, 8)}`);
-    } else {
-      setCep(cep);
-    }
-  };
-
-  const handleBlurCep = async () => {
-    let cepValue = cep.replace(/\D/g, '');
-    if (cepValue.length !== 8) {
-      setMensagem("CEP inválido! Deve conter 8 dígitos.");
-      return;
-    }
-
-    try {
-      const response = await fetch(`https://viacep.com.br/ws/${cepValue}/json/`);
-      const data = await response.json();
-      if (data.erro) {
-        setEndereco("CEP não encontrado!");
-        return;
-      }
-      const enderecoFormatado = `${data.logradouro} - ${data.bairro}, ${data.localidade} - ${data.uf}`;
-      setEndereco(enderecoFormatado);
-    } catch (error) {
-      console.error("Erro ao buscar CEP:", error);
-      setEndereco("Erro ao buscar o endereço. Tente novamente.");
-    }
-  };
-
   const validarCadastroEmpresa = async () => {
-   
     if (!nome || !email || !cep || !senha || !numero || !endereco || !cnpj || !area || !confirmarSenha) {
-      setMensagem("Todos os campos devem ser preenchidos.");
+      setMensagem('Todos os campos devem ser preenchidos.');
       return false;
     }
-    if (!email.includes("@") || !email.includes(".com")) {
-      setMensagem("Por favor, insira um email válido.");
+    if (!email.includes('@') || !email.includes('.com')) {
+      setMensagem('Por favor, insira um email válido.');
       return false;
     }
     if (senha.length < 8) {
-      setMensagem("A senha deve ter pelo menos 8 caracteres.");
-      return false;
-    }
-    if (!/[A-Z]/.test(senha)) {
-      setMensagem("A senha deve conter pelo menos uma letra maiúscula.");
-      return false;
-    }
-    if (!/\d/.test(senha)) {
-      setMensagem("A senha deve conter pelo menos um número.");
-      return false;
-    }
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)) {
-      setMensagem("A senha deve conter pelo menos um caractere especial.");
+      setMensagem('A senha deve ter pelo menos 8 caracteres.');
       return false;
     }
     if (senha !== confirmarSenha) {
-      setMensagem("As senhas não são iguais.");
-      return false;
-    }
-    if (cnpj.replace(/\D/g, '').length !== 14) {
-      setMensagem("CNPJ inválido! Deve conter 14 dígitos.");
+      setMensagem('As senhas não são iguais.');
       return false;
     }
     return true;
@@ -128,57 +50,213 @@ export default function CadastroEmpresa() {
 
     const dados = { nome, email, senha, cep, numero, endereco, cnpj, area };
     try {
-      const response = await fetch("http://localhost:8080/empresas", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados)
+      const response = await fetch('http://localhost:8080/empresas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados),
       });
-      if (!response.ok) throw new Error("Erro ao cadastrar usuário.");
-      navigate("/");
+      if (!response.ok) throw new Error('Erro ao cadastrar usuário.');
+      navigate('/');
     } catch (error) {
-      console.error("Erro ao cadastrar:", error);
-      setMensagem("Erro ao cadastrar usuário.");
+      console.error('Erro ao cadastrar:', error);
+      setMensagem('Erro ao cadastrar usuário.');
     }
   };
 
   return (
-    <div className="container">
-      <div className="header-banner">
-        <h1>CUFA</h1>
-      </div>
+    <Container
+      maxWidth="sm"
+      sx={{
+        '--light-green': '#E5EEE3',
+        '--dark-green': '#006916',
+        '--white': '#F1F1F1',
+        '--text-dark': '#333333',
+        backgroundColor: 'var(--light-green)',
+        padding: '50px 40px',
+        borderRadius: '30px',
+        textAlign: 'center',
+        mt: 5,
+        position: 'relative',
+      }}
+    >
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translate(-50%, -1%)',
+          backgroundColor: 'var(--dark-green)',
+          color: 'var(--white)',
+          padding: '10px 40px',
+          borderRadius: '0 0 20px 20px',
+          fontSize: '1.25rem',
+          fontWeight: 'bold',
+        }}
+      >
+        CUFA
+      </Box>
 
-      <h2>Cadastre a sua empresa</h2>
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ color: 'var(--dark-green)', mt: 6 }}
+      >
+        Cadastre a sua empresa
+      </Typography>
 
-      <form className="formulario" onSubmit={handleSubmit}>
-        <div className="linha">
-          <input type="text" placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} />
-          <input type="email" placeholder="E-mail" value={email} onChange={(e) => setEmail(e.target.value)} />
-        </div>
+      <form onSubmit={handleSubmit}>
+        <Grid container spacing={2}>
+          {[['Nome', nome, setNome], ['E-mail', email, setEmail, 'email']].map(
+            ([label, value, setter, type = 'text'], index) => (
+              <Grid item xs={12} key={index}>
+                <TextField
+                  fullWidth
+                  label={label}
+                  type={type}
+                  value={value}
+                  onChange={(e) => setter(e.target.value)}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      height: '50px',
+                      borderRadius: '25px',
+                      backgroundColor: 'var(--white)',
+                      padding: '0 20px',
+                      color: 'var(--dark-green)',
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: 'var(--dark-green)',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                  }}
+                />
+              </Grid>
+            )
+          )}
 
-        <div className="linha">
-          <input type="password" placeholder="Senha" value={senha} onChange={(e) => setSenha(e.target.value)} />
-          <input type="password" placeholder="Confirmação de senha" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} />
-        </div>
+          {[['Senha', senha, setSenha], ['Confirmação de senha', confirmarSenha, setConfirmarSenha]].map(
+            ([label, value, setter], index) => (
+              <Grid item xs={12} sm={6} key={index}>
+                <TextField
+                  fullWidth
+                  label={label}
+                  type="password"
+                  value={value}
+                  onChange={(e) => setter(e.target.value)}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      height: '50px',
+                      borderRadius: '25px',
+                      backgroundColor: 'var(--white)',
+                      padding: '0 20px',
+                      color: 'var(--dark-green)',
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: 'var(--dark-green)',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                  }}
+                />
+              </Grid>
+            )
+          )}
 
-        <div className="linha">
-          <input type="text" placeholder="CEP" value={cep} onChange={handleCepChange} onBlur={handleBlurCep} />
-          <input type="text" placeholder="Número" value={numero} onChange={(e) => setNumero(e.target.value)} />
-        </div>
+          {[['CEP', cep, setCep], ['Número', numero, setNumero]].map(
+            ([label, value, setter], index) => (
+              <Grid item xs={12} sm={6} key={index}>
+                <TextField
+                  fullWidth
+                  label={label}
+                  value={value}
+                  onChange={(e) => setter(e.target.value)}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      height: '50px',
+                      borderRadius: '25px',
+                      backgroundColor: 'var(--white)',
+                      padding: '0 20px',
+                      color: 'var(--dark-green)',
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: 'var(--dark-green)',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                  }}
+                />
+              </Grid>
+            )
+          )}
 
-        <input type="text" placeholder="Endereço" value={endereco} onChange={(e) => setEndereco(e.target.value)} />
-        <input type="text" placeholder="CNPJ" value={cnpj} onChange={handleCnpjChange} />
-        <input type="text" placeholder="Área" value={area} onChange={(e) => setArea(e.target.value)} />
+          {[['Endereço', endereco, setEndereco], ['CNPJ', cnpj, setCnpj], ['Área', area, setArea]].map(
+            ([label, value, setter], index) => (
+              <Grid item xs={12} key={index}>
+                <TextField
+                  fullWidth
+                  label={label}
+                  value={value}
+                  onChange={(e) => setter(e.target.value)}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      height: '50px',
+                      borderRadius: '25px',
+                      backgroundColor: 'var(--white)',
+                      padding: '0 20px',
+                      color: 'var(--dark-green)',
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: 'var(--dark-green)',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                  }}
+                />
+              </Grid>
+            )
+          )}
+        </Grid>
 
-        <button type="submit" className="botao-cadastrar">Cadastrar</button>
+        <Box mt={2}>
+          <Button
+            type="submit"
+            fullWidth
+            sx={{
+              mt: 1,
+              height: '50px',
+              backgroundColor: 'var(--dark-green)',
+              color: 'var(--white)',
+              fontWeight: 'bold',
+              fontSize: '1.2rem',
+              borderRadius: '25px',
+              '&:hover': { backgroundColor: '#00550f' },
+            }}
+          >
+            Cadastrar
+          </Button>
+        </Box>
 
-        {mensagem && <p className="mensagem-erro">{mensagem}</p>}
+        {mensagem && (
+          <Box mt={2}>
+            <Alert severity="error" sx={{ fontWeight: 'bold', color: 'var(--dark-green)' }}>
+              {mensagem}
+            </Alert>
+          </Box>
+        )}
 
-        <p className="login-link">
-          Você já possui uma conta? <Link to="/">Login</Link>
-        </p>
+        <Box mt={2} textAlign="center">
+          <Typography variant="body2" sx={{ color: 'var(--text-dark)' }}>
+            Você já possui uma conta?{' '}
+            <Link to="/" style={{ color: 'var(--dark-green)', fontWeight: 'bold', textDecoration: 'none' }}>
+              Login
+            </Link>
+          </Typography>
+        </Box>
       </form>
-    </div>
+    </Container>
   );
 }

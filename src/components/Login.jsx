@@ -1,170 +1,234 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Login.css';
 import { Link } from 'react-router-dom';
-// IMPORTA as imagens
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  Stack,
+  InputAdornment,
+  IconButton,
+  Divider
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import googleLogo from '../assets/google-logo.png';
 import microsoftLogo from '../assets/microsoft-logo.png';
-import emailLogo from '../assets/Icon-Email.png';
-import passwordLogo from '../assets/Icon-Senha.png';
+import emailIcon from '../assets/Icon-Email.png';
+import passwordIcon from '../assets/Icon-Senha.png';
 
 export default function Login() {
-    const navigate = useNavigate(); // Navegação com React Router
-    const [email, setEmail] = useState('');
-    const [senha, setSenha] = useState('');
-    const [divMensagem, setDivMensagem] = useState('');
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [showSenha, setShowSenha] = useState(false);
 
-    const [showSenha, setShowSenha] = useState(false); // Para alternar a visibilidade da senha
+  const toggleSenha = () => {
+    setShowSenha(!showSenha);
+  };
 
-    // Função para alternar a visibilidade da senha
-    const toggleSenha = () => {
-        setShowSenha(!showSenha);
-    };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    navigate('/cufaSistema');
+  };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+  return (
+    <Box
+      sx={{
+        '--light-green': '#E5EEE3',
+        '--dark-green': '#006916',
+        '--white': '#FFFFFF',
+        '--text-dark': '#333333',
+        '--text-gray': '#888888',
+        backgroundColor: 'var(--light-green)',
+        padding: '60px 40px 40px',
+        borderRadius: '30px',
+        width: '100%',
+        maxWidth: '400px',
+        position: 'relative',
+        boxShadow: '0px 4px 10px rgba(0,0,0,0.25)',
+        textAlign: 'center',
+        mx: 'auto',
+      }}
+    >
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'var(--dark-green)',
+          color: 'var(--white)',
+          padding: '15px 50px',
+          borderRadius: '0 0 30px 30px',
+          fontSize: '1.25rem',
+          fontWeight: 'bold',
+        }}
+      >
+        CUFA
+      </Box>
 
-        if (!email || !senha) {
-            setDivMensagem("Por favor, preencha todos os campos.");
-            return;
-        }
+      <Typography
+        variant="h6"
+        component="h2"
+        sx={{
+          marginTop: '80px',
+          marginBottom: '30px',
+          fontSize: '1.5rem',
+          color: 'var(--dark-green)',
+          fontFamily: 'Paytone One, sans-serif',
+        }}
+      >
+        Acesse sua conta
+      </Typography>
 
-        if (!email.includes("@") || !email.includes(".com")) {
-            setDivMensagem("Por favor, insira um email válido.");
-            return;
-        }
+      <form onSubmit={handleSubmit}>
+        <Stack spacing={2}>
+          <TextField
+            fullWidth
+            label="E-mail"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start" sx={{ marginLeft: '10px' }}>
+                  <img src={emailIcon} alt="Email Icon" style={{ width: 20, height: 20 }} />
+                </InputAdornment>
+              ),
+              sx: {
+                height: '50px',
+                borderRadius: '15px',
+                backgroundColor: 'var(--white)',
+                boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)',
+                paddingLeft: '0px',
+              },
+            }}
+          />
 
-        const loginData = { email, senha };
+          <TextField
+            fullWidth
+            label="Senha"
+            type={showSenha ? 'text' : 'password'}
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            required
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start" sx={{ marginLeft: '10px' }}>
+                  <img src={passwordIcon} alt="Password Icon" style={{ width: 20, height: 20 }} />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={toggleSenha} edge="end">
+                    {showSenha ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+              sx: {
+                height: '50px',
+                borderRadius: '15px',
+                backgroundColor: 'var(--white)',
+                boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)',
+                paddingLeft: '0px',
+              },
+            }}
+          />
 
-        try {
-            let response = await fetch("http://localhost:8080/usuarios/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(loginData)
-            });
+          <Typography
+            variant="body2"
+            sx={{
+              textAlign: 'right',
+              fontSize: '0.85rem',
+              color: 'var(--text-gray)',
+              marginTop: '5px',
+            }}
+          >
+            <Link to="#" style={{ textDecoration: 'none', color: 'var(--text-gray)' }}>
+              Esqueceu sua senha?
+            </Link>
+          </Typography>
 
-            if (response.ok) {
-                const user = await response.json();
-                console.log("Usuário logado com sucesso:", user);
-                navigate("/cufaSistema");
-                return;
-            }
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              marginTop: '10px',
+              width: '100%',
+              height: '50px',
+              backgroundColor: 'var(--dark-green)',
+              color: 'var(--white)',
+              fontWeight: 'bold',
+              fontSize: '1.1rem',
+              borderRadius: '12px',
+              boxShadow: '0px 4px 6px rgba(0,0,0,0.3)',
+              '&:hover': {
+                backgroundColor: '#00550f',
+              },
+            }}
+          >
+            Entrar
+          </Button>
 
-            response = await fetch("http://localhost:8080/empresas/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(loginData)
-            });
+          <Typography
+            variant="body2"
+            sx={{
+              marginTop: '15px',
+              fontSize: '0.85rem',
+              color: 'var(--text-gray)',
+              textAlign: 'center',
+            }}
+          >
+            Não tem uma conta?{' '}
+            <Link to="/escolha" style={{ color: 'var(--dark-green)', fontWeight: 'bold' }}>
+              Cadastre-se
+            </Link>
+          </Typography>
 
-            if (response.ok) {
-                const empresa = await response.json();
-                console.log("Empresa logada com sucesso:", empresa);
-                navigate("/cufaSistema");
-                return;
-            }
+          <Divider sx={{ marginTop: '20px', fontSize: '0.85rem', color: 'var(--text-gray)' }}>
+            Ou entre com
+          </Divider>
 
-            setDivMensagem("Email ou senha incorretos.");
-
-        } catch (error) {
-            console.error("Erro ao realizar o login:", error);
-            setDivMensagem("Erro ao tentar fazer login. Tente novamente.");
-        }
-    };
-
-    return (
-        <div className="login-container">
-            <div className="login-header-banner">CUFA</div>
-
-            <h2>Acesse sua conta</h2>
-
-            <form className="login-formulario" onSubmit={handleSubmit}>
-                <input
-                    className="login-full login-input-email"
-                    type="email"
-                    placeholder="E-mail"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    
-                />
-                
-                <div className="password-container">
-                    <input
-                        className="login-full"
-                        type={showSenha ? "text" : "password"}
-                        placeholder="Senha"
-                        value={senha}
-                        onChange={(e) => setSenha(e.target.value)}
-                        required
-                    />
-                    {/* <button type="button" onClick={toggleSenha} className="toggle-senha">
-                        {showSenha ? "Ocultar" : "Mostrar"}
-                    </button> */}
-                </div>
-
-                {divMensagem && <div className="div-mensagem">{divMensagem}</div>}
-
-                <div style={{ textAlign: 'right', marginTop: '10px', fontSize: '0.9rem' }}>
-                    <a href="#" style={{ color: 'var(--dark-green)', fontWeight: 'bold', textDecoration: 'none' }}>
-                        Esqueceu sua senha?
-                    </a>
-                </div>
-
-                <button type="submit" className="login-botao-entrar">
-                    Entrar
-                </button>
-
-                <p className="login-link">
-                    Não tem uma conta? <Link to="/escolha">Cadastre-se</Link>
-                </p>
-
-                <div style={{ marginTop: '30px', fontSize: '0.9rem', color: 'var(--text-dark)' }}>
-                    Ou entre com
-                </div>
-
-                <div className="login-linha" style={{ marginTop: '10px' }}>
-                    <button
-                        type="button"
-                        className="login-botao-social"
-                        style={{
-                            backgroundColor: 'var(--white)',
-                            color: 'var(--dark-green)',
-                            border: '1px solid var(--dark-green)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                        }}
-                    >
-                        <img
-                            src={googleLogo}
-                            alt="Google logo"
-                            style={{ width: '20px', height: '20px' }}
-                        />
-                        Google
-                    </button>
-                    <button
-                        type="button"
-                        className="login-botao-social"
-                        style={{
-                            backgroundColor: 'var(--white)',
-                            color: 'var(--dark-green)',
-                            border: '1px solid var(--dark-green)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '10px',
-                        }}
-                    >
-                        <img
-                            src={microsoftLogo}
-                            alt="Microsoft logo"
-                            style={{ width: '20px', height: '20px' }}
-                        />
-                        Microsoft
-                    </button>
-                </div>
-            </form>
-        </div>
-    );
+          <Stack direction="row" spacing={2} sx={{ marginTop: '10px' }}>
+            <Button
+              variant="outlined"
+              startIcon={<img src={googleLogo} alt="Google" style={{ width: 20, height: 20 }} />}
+              sx={{
+                flex: 1,
+                height: '45px',
+                borderRadius: '12px',
+                fontWeight: 'bold',
+                color: 'var(--text-dark)',
+                fontSize: '0.95rem',
+                '&:hover': {
+                  backgroundColor: '#f0f0f0',
+                },
+              }}
+            >
+              Google
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<img src={microsoftLogo} alt="Microsoft" style={{ width: 20, height: 20 }} />}
+              sx={{
+                flex: 1,
+                height: '45px',
+                borderRadius: '12px',
+                fontWeight: 'bold',
+                color: 'var(--text-dark)',
+                fontSize: '0.95rem',
+                '&:hover': {
+                  backgroundColor: '#f0f0f0',
+                },
+              }}
+            >
+              Microsoft
+            </Button>
+          </Stack>
+        </Stack>
+      </form>
+    </Box>
+  );
 }

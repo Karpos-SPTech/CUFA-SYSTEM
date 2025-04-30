@@ -1,61 +1,163 @@
 import React, { useState } from "react";
-import "./App.css";
+import { Box, Typography, Checkbox, Slider, FormControlLabel, Switch } from "@mui/material";
 
 const Filters = () => {
-    const [distance, setDistance] = useState(100);
-    const [flexibleHours, setFlexibleHours] = useState(false);
-    const [dressCode, setDressCode] = useState(false);
+  const [distance, setDistance] = useState(100);
+  const [flexibleHours, setFlexibleHours] = useState(false);
+  const [dressCode, setDressCode] = useState(false);
 
-    return (
-        <div className="filters-card">
-            <h3 className="filters-title">Filtros</h3>
-            <div className="filters-options">
-                <label><input type="checkbox" /> CLT</label>
-                <label><input type="checkbox" /> PJ</label>
-                <label><input type="checkbox" /> FreeLancer</label>
-                <label><input type="checkbox" /> Estágio</label>
-            </div>
+  return (
+    <Box
+      sx={{
+        backgroundColor: "white",
+        padding: "16px",
+        borderRadius: "10px",
+        boxShadow: "2px 2px 5px rgba(0, 0, 0, 0.2)",
+        textAlign: "center",
+        marginLeft: "80px",
+        width: "130%",
+      }}
+    >
+      <Typography
+        variant="h6"
+        sx={{
+          color: "green",
+          marginBottom: "10px",
+          fontWeight: "bold",
+        }}
+      >
+        Filtros
+      </Typography>
 
-            <div className="filters-distance">
-                <span>Distância</span>
-                <input 
-                    type="range" 
-                    min="0" 
-                    max="100" 
-                    value={distance} 
-                    onChange={(e) => setDistance(e.target.value)} 
-                    className="distance-slider"
-                />
-                <span className="distance-value">{distance} Km</span>
-            </div>
+      {/* Opções de tipo de contrato */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "15px",
+        }}
+      >
+        {["CLT", "PJ", "FreeLancer", "Estágio"].map((label) => (
+          <FormControlLabel
+            key={label}
+            control={
+              <Checkbox
+                sx={{
+                  "&.Mui-checked": {
+                    color: "#006916",
+                  },
+                }}
+              />
+            }
+            label={label}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontWeight: "normal",
+              fontSize: "14px",
+            }}
+          />
+        ))}
+      </Box>
 
-            <div className="filters-toggles">
-                <div className="toggle-option">
-                    <label>Horário Flexível</label>
-                    <label className="switch">
-                        <input 
-                            type="checkbox" 
-                            checked={flexibleHours} 
-                            onChange={() => setFlexibleHours(!flexibleHours)}
-                        />
-                        <span className="slider"></span>
-                    </label>
-                </div>
+      {/* Controle de distância */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "10px",
+          marginBottom: "15px",
+          fontWeight: "normal",
+        }}
+      >
+        <Typography>Distância</Typography>
+        <Slider
+          value={distance}
+          onChange={(e, newValue) => setDistance(newValue)}
+          min={0}
+          max={100}
+          sx={{
+            width: "150px",
+            color: "#006916",
+            "& .MuiSlider-thumb": {
+              backgroundColor: "#006916",
+            },
+            "& .MuiSlider-track": {
+              backgroundColor: "#006916",
+            },
+            "& .MuiSlider-rail": {
+              backgroundColor: "#ccc",
+            },
+          }}
+        />
+        <Typography
+          sx={{
+            color: "#006916",
+            fontWeight: "bold",
+          }}
+        >
+          {distance} Km
+        </Typography>
+      </Box>
 
-                <div className="toggle-option">
-                    <label>Vestimenta Livre</label>
-                    <label className="switch">
-                        <input 
-                            type="checkbox" 
-                            checked={dressCode} 
-                            onChange={() => setDressCode(!dressCode)}
-                        />
-                        <span className="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-    );
+      {/* Alternativas de horário flexível e vestimenta livre */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-around",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            color: "black",
+            fontWeight: "normal",
+          }}
+        >
+          <Typography>Horário Flexível</Typography>
+          <Switch
+            checked={flexibleHours}
+            onChange={() => setFlexibleHours(!flexibleHours)}
+            sx={{
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: "green",
+              },
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: "green",
+              },
+            }}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            color: "black",
+            fontWeight: "normal",
+          }}
+        >
+          <Typography>Vestimenta Livre</Typography>
+          <Switch
+            checked={dressCode}
+            onChange={() => setDressCode(!dressCode)}
+            sx={{
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: "green",
+              },
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: "green",
+              },
+            }}
+          />
+        </Box>
+      </Box>
+    </Box>
+  );
 };
 
 export default Filters;
