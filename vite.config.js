@@ -1,8 +1,22 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-})
-import { defineConfig } from 'vite'
+  server: {
+    port: 5173, // Porta do servidor
+    open: true, // Abre o navegador automaticamente
+    hmr: true,  // Hot Module Replacement
+    historyApiFallback: true, // Redireciona todas as rotas para o index.html
+  },
+  resolve: {
+    alias: {
+      '@': '/src', // Alias para facilitar importações
+    },
+  },
+  build: {
+    rollupOptions: {
+      input: './index.html', // Caminho para o arquivo HTML principal
+    },
+  },
+});

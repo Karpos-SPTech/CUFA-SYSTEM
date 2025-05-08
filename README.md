@@ -7,18 +7,18 @@ This project is a React application for registering companies, titled "Cadastro 
 ```
 cufa-karpos-react
 ├── public
-│   ├── index.html          # Main HTML file serving as the entry point
-│   └── favicon.ico         # Favicon for the application
+│   ├── index.html          # Main HTML file serving as the
+│   ├── favicon.ico.html
+│
 ├── src
 │   ├── components
-│   │   └── CadastroEmpresa.jsx  # Registration form component
-│   ├── styles
-│   │   └── CadastroEmpresa.css   # CSS styles for the registration form
-│   ├── App.jsx               # Main application component
-│   ├── index.js              # Entry point for the React application
-│   └── theme.js              # Material-UI theme configuration
+│   ├─── CadastroEmpresa.jsx  # Registration form component
+│   ├─── CadastroUsuario.jsx  # Registration form component
+│   ├─── TelaEmpresa.jsx  # Registration form component
+│   ├─── TelaUsuario.jsx  # Registration form component
+│
 ├── package.json              # npm configuration file
-├── .gitignore                # Files and directories to be ignored by Git
+├── .gitignore                # Files and directories to be 
 └── README.md                 # Documentation for the project
 ```
 
