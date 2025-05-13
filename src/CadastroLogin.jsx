@@ -6,13 +6,17 @@ import CadastroEmpresa from './components/CadastroEmpresa';
 import TelaUsuario from './TelaUsuario';
 import TelaEmpresa from './TelaEmpresa';
 import Escolha from './components/Escolha';
+import AtualizarSenha from './components/AtualizarSenha';
+import AtualizarSenhaPage from './components/AtualizarSenhaPage';
 
 const CadastroLogin = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Escolha />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/Escolha" element={<Escolha />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/AtualizarSenha" element={<AtualizarSenha />} />
+        <Route path="/AtualizarSenhaPage" element={<AtualizarSenhaPage />} />
         <Route path="/cadastroUsuario" element={<CadastroUsuario />} />
         <Route path="/cadastroEmpresa" element={<CadastroEmpresa />} />
         <Route path="/telaUsuario" element={<TelaUsuario />} />

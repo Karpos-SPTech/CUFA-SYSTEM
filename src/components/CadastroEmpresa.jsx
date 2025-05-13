@@ -394,7 +394,7 @@ export default function CadastroEmpresa() {
           <Typography variant="body2" sx={{ color: "var(--text-dark)" }}>
             Você já possui uma conta?{" "}
             <Link
-              to="/login"
+              to="/"
               style={{ color: "var(--dark-green)", fontWeight: "bold" }}
             >
               Login
