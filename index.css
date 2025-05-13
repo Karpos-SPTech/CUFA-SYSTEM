@@ -1,0 +1,18 @@
+/* Remove margens e garante que o body ocupe toda a tela */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* Remove barras de rolagem */
+}
+
+/* Garante que o #root ocupe toda a tela */
+#root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background-color: #006916; /* Cor de fundo global */
+}

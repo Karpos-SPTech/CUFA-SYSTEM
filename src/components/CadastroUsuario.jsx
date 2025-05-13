@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Box, TextField, Button, Typography } from '@mui/material';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Box, TextField, Button, Typography, Grid, Alert } from "@mui/material";
 
 export default function CadastroUsuario() {
   const navigate = useNavigate();
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [mensagem, setMensagem] = useState('');
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [mensagem, setMensagem] = useState("");
 
   const validarCadastroUsuario = () => {
     if (!nome || !email || !senha || !confirmarSenha) {
@@ -23,23 +23,11 @@ export default function CadastroUsuario() {
       setMensagem("A senha deve ter pelo menos 8 caracteres.");
       return false;
     }
-    if (!/[A-Z]/.test(senha)) {
-      setMensagem("A senha deve conter pelo menos uma letra maiúscula.");
-      return false;
-    }
-    if (!/\d/.test(senha)) {
-      setMensagem("A senha deve conter pelo menos um número.");
-      return false;
-    }
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)) {
-      setMensagem("A senha deve conter pelo menos um caractere especial.");
-      return false;
-    }
     if (senha !== confirmarSenha) {
       setMensagem("As senhas não são iguais.");
       return false;
     }
-    setMensagem('');
+    setMensagem("");
     return true;
   };
 
@@ -52,11 +40,11 @@ export default function CadastroUsuario() {
       const response = await fetch("http://localhost:8080/usuarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados)
+        body: JSON.stringify(dados),
       });
 
       if (!response.ok) throw new Error("Erro ao cadastrar usuário.");
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       console.error("Erro ao cadastrar:", error);
       setMensagem("Erro ao cadastrar usuário.");
@@ -66,174 +54,204 @@ export default function CadastroUsuario() {
   return (
     <Box
       sx={{
-        '--light-green': '#E5EEE3',
-        '--dark-green': '#006916',
-        '--white': '#F1F1F1',
-        '--text-dark': '#333333',
-        fontFamily: 'Arial, sans-serif',
-        position: 'relative',
-        width: '100%',
-        maxWidth: '600px',
-        margin: 'auto',
-        padding: '50px 40px',
-        backgroundColor: 'var(--light-green)',
-        borderRadius: '30px',
-        textAlign: 'center',
+        "--light-green": "#E5EEE3",
+        "--dark-green": "#006916",
+        "--white": "#F1F1F1",
+        "--text-dark": "#333333",
+        backgroundColor: "var(--light-green)",
+        padding: "50px 40px",
+        borderRadius: "30px",
+        textAlign: "center",
+        mt: 5,
+        position: "relative",
+        maxWidth: "600px",
+        margin: "auto",
       }}
     >
       <Box
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
-          left: '50%',
-          transform: 'translate(-50%, -1%)',
-          backgroundColor: 'var(--dark-green)',
-          color: 'var(--white)',
-          padding: '10px 40px',
-          borderRadius: '0 0 20px 20px',
-          fontSize: '1.25rem',
-          fontWeight: 'bold',
+          left: "50%",
+          transform: "translate(-50%, -1%)",
+          backgroundColor: "var(--dark-green)",
+          color: "var(--white)",
+          padding: "10px 40px",
+          borderRadius: "0 0 20px 20px",
+          fontSize: "1.25rem",
+          fontWeight: "bold",
+          fontFamily: "Paytone One, sans-serif",
         }}
       >
         CUFA
       </Box>
 
       <Typography
-        variant="h2"
+        variant="h6"
+        component="h2"
         sx={{
-          marginTop: '20px',
-          marginBottom: '30px',
-          color: 'var(--dark-green)',
-          fontSize: '1.1rem',
+          marginTop: "30px",
+          marginBottom: "30px",
+          fontSize: "1.5rem",
+          color: "var(--dark-green)",
+          fontFamily: "Paytone One, sans-serif",
+          fontWeight: "bold",
         }}
       >
-        Crie a sua conta
+        Acesse sua conta
       </Typography>
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
-      >
-        <Box sx={{ display: 'flex', gap: '16px' }}>
-          <TextField
-            fullWidth
-            placeholder="Nome"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            InputProps={{
-              style: {
-                height: '50px',
-                padding: '0 20px',
-                borderRadius: '25px',
-                backgroundColor: 'var(--white)',
-                fontSize: '1rem',
-                color: 'var(--dark-green)',
-              },
-            }}
-          />
-          <TextField
-            fullWidth
-            placeholder="E-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            InputProps={{
-              style: {
-                height: '50px',
-                padding: '0 20px',
-                borderRadius: '25px',
-                backgroundColor: 'var(--white)',
-                fontSize: '1rem',
-                color: 'var(--dark-green)',
-              },
-            }}
-          />
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: '16px' }}>
-          <TextField
-            fullWidth
-            type="password"
-            placeholder="Senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            InputProps={{
-              style: {
-                height: '50px',
-                padding: '0 20px',
-                borderRadius: '25px',
-                backgroundColor: 'var(--white)',
-                fontSize: '1rem',
-                color: 'var(--dark-green)',
-              },
-            }}
-          />
-          <TextField
-            fullWidth
-            type="password"
-            placeholder="Confirmação de senha"
-            value={confirmarSenha}
-            onChange={(e) => setConfirmarSenha(e.target.value)}
-            InputProps={{
-              style: {
-                height: '50px',
-                padding: '0 20px',
-                borderRadius: '25px',
-                backgroundColor: 'var(--white)',
-                fontSize: '1rem',
-                color: 'var(--dark-green)',
-              },
-            }}
-          />
-        </Box>
-
-        <Button
-          type="submit"
-          sx={{
-            marginTop: '10px',
-            height: '50px',
-            width: '100%',
-            backgroundColor: 'var(--dark-green)',
-            color: 'var(--white)',
-            borderRadius: '25px',
-            fontSize: '1.2rem',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            transition: 'background-color 0.3s',
-            '&:hover': {
-              backgroundColor: '#00550f',
-            },
-          }}
+      <form onSubmit={handleSubmit}>
+        <Grid
+          container
+          spacing={2}
+          justifyContent="center"
+          alignItems="center"
+          sx={{ width: "100%" }}
         >
-          Cadastrar
-        </Button>
+          {/* Nome e Email lado a lado */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Nome"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "50px",
+                  borderRadius: "25px",
+                  backgroundColor: "var(--white)",
+                  padding: "0 20px",
+                  color: "var(--dark-green)",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "var(--dark-green)",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="E-mail"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "50px",
+                  borderRadius: "25px",
+                  backgroundColor: "var(--white)",
+                  padding: "0 20px",
+                  color: "var(--dark-green)",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "var(--dark-green)",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            />
+          </Grid>
 
-        {mensagem && (
-          <Typography sx={{ color: 'red', marginTop: '10px' }}>
-            {mensagem}
-          </Typography>
-        )}
+          {/* Senha e Confirmação lado a lado */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Senha"
+              type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "50px",
+                  borderRadius: "25px",
+                  backgroundColor: "var(--white)",
+                  padding: "0 20px",
+                  color: "var(--dark-green)",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "var(--dark-green)",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Confirmação de senha"
+              type="password"
+              value={confirmarSenha}
+              onChange={(e) => setConfirmarSenha(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "50px",
+                  borderRadius: "25px",
+                  backgroundColor: "var(--white)",
+                  padding: "0 20px",
+                  color: "var(--dark-green)",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "var(--dark-green)",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            />
+          </Grid>
+        </Grid>
 
-        <Typography
-          sx={{
-            marginTop: '15px',
-            fontSize: '0.9rem',
-            color: 'var(--text-dark)',
-          }}
-        >
-          Você já possui uma conta?{' '}
-          <Link
-            to="/"
-            style={{
-              color: 'var(--dark-green)',
-              fontWeight: 'bold',
-              textDecoration: 'none',
+        <Box mt={2}>
+          <Button
+            type="submit"
+            fullWidth
+            sx={{
+              mt: 1,
+              height: "50px",
+              width: "88%",
+              backgroundColor: "var(--dark-green)",
+              color: "var(--white)",
+              fontWeight: "bold",
+              fontSize: "1.2rem",
+              borderRadius: "25px",
+              "&:hover": { backgroundColor: "#00550f" },
             }}
           >
-            Login
-          </Link>
-        </Typography>
-      </Box>
+            Cadastrar
+          </Button>
+        </Box>
+
+        {mensagem && (
+          <Box mt={2}>
+            <Alert
+              severity="error"
+              sx={{ fontWeight: "bold", color: "var(--dark-green)" }}
+            >
+              {mensagem}
+            </Alert>
+          </Box>
+        )}
+
+        <Box mt={2} textAlign="center">
+          <Typography variant="body2" sx={{ color: "var(--text-dark)" }}>
+            Você já possui uma conta?{" "}
+            <Link
+              to="/login"
+              style={{ color: "var(--dark-green)", fontWeight: "bold" }}
+            >
+              Login
+            </Link>
+          </Typography>
+        </Box>
+      </form>
     </Box>
   );
 }

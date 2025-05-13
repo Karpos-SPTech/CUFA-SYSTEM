@@ -61,7 +61,7 @@ export default function Login() {
           color: 'var(--white)',
           padding: '15px 50px',
           borderRadius: '0 0 30px 30px',
-          fontSize: '1.25rem',
+          fontFamily: 'Paytone One, sans-serif',
           fontWeight: 'bold',
         }}
       >
@@ -72,11 +72,12 @@ export default function Login() {
         variant="h6"
         component="h2"
         sx={{
-          marginTop: '80px',
+          marginTop: '30px',
           marginBottom: '30px',
           fontSize: '1.5rem',
           color: 'var(--dark-green)',
           fontFamily: 'Paytone One, sans-serif',
+          fontWeight: 'bold',
         }}
       >
         Acesse sua conta
@@ -118,13 +119,6 @@ export default function Login() {
               startAdornment: (
                 <InputAdornment position="start" sx={{ marginLeft: '10px' }}>
                   <img src={passwordIcon} alt="Password Icon" style={{ width: 20, height: 20 }} />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={toggleSenha} edge="end">
-                    {showSenha ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
                 </InputAdornment>
               ),
               sx: {
@@ -182,7 +176,7 @@ export default function Login() {
             }}
           >
             Não tem uma conta?{' '}
-            <Link to="/escolha" style={{ color: 'var(--dark-green)', fontWeight: 'bold' }}>
+            <Link to="/" style={{ color: 'var(--dark-green)', fontWeight: 'bold' }}>
               Cadastre-se
             </Link>
           </Typography>
