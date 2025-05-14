@@ -30,7 +30,7 @@ export default function Login() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    navigate("/cufaSistema");
+    navigate("/DashboardCufa");
   };
 
   return (
