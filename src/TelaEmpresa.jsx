@@ -1,13 +1,12 @@
-import React from 'react';
 import Header from './components/Header';
 import { Box } from '@mui/material';
+import '../src/telaEmpresa.css';
 
 const TelaEmpresa = () => {
   return (
-    <Box sx={{ backgroundColor: '#E5EEE3', minHeight: '100vh',
-    }}>
+    <Box className="tela-empresa-container">
       <Header />
-      <div>
+      <div className="tela-empresa-content">
         <h1>Tela Empresa</h1>
         <p>Esta é a tela de cadastro ou visualização de empresas.</p>
       </div>
