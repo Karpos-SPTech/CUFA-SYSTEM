@@ -75,17 +75,16 @@ const Notifications = () => {
             alt="Notificações"
             sx={{
               width: 24,
-              height: 24,
+              height: 23,
               objectFit: "contain"
             }}
           />
-        </Badge>
-        <Typography
+        </Badge>        <Typography
           sx={{
             fontSize: { xs: 12, sm: 13, md: 14 },
-            fontWeight: "bold",
             color: "#006916",
             mt: 0.5,
+            fontFamily: "'Paytone One', sans-serif",
             "&:hover": {
               textDecoration: "underline",
             },
@@ -122,15 +121,14 @@ const Notifications = () => {
           }}
         >
           <Box sx={{ p: 1.5, borderBottom: "2px solid #006916" }}>
-            <Typography
-              variant="h6"
+            <Typography              variant="h6"
               sx={{
                 fontSize: { xs: 16, sm: 18 },
                 color: "#006916",
-                fontWeight: "bold",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                fontFamily: "'Paytone One', sans-serif",
               }}
             >
               Notificações
