@@ -11,7 +11,7 @@ const data = [
 
 export default function DashboardPieChart() {
   return (
-    <Box sx={{ width: '100%', height: 300, background: '#fff', borderRadius: 3, p: 3 }}>
+    <Box sx={{ width: '250px', height: 350, background: '#E5EEE3', borderRadius: 3, p: 3, mt: 3, ml: 1, boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' }}>
       <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Visitas atuais</Typography>
       <ResponsiveContainer width="100%" height={220}>
         <PieChart>

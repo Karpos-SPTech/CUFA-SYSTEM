@@ -28,9 +28,53 @@ export default function Login() {
     setShowSenha(!showSenha);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    navigate("/DashboardCufa");
+
+    if (!email || !senha) {
+      setDivMensagem("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    if (!email.includes("@") || !email.includes(".com")) {
+      setDivMensagem("Por favor, insira um email válido.");
+      return;
+    }
+
+    const loginData = { email, senha };
+
+    try {
+      let response = await fetch("http://localhost:8080/usuarios/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData),
+      });
+
+      if (response.ok) {
+        const user = await response.json();
+        console.log("Usuário logado com sucesso:", user);
+        navigate("/cufaSistema");
+        return;
+      }
+
+      response = await fetch("http://localhost:8080/empresas/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData),
+      });
+
+      if (response.ok) {
+        const empresa = await response.json();
+        console.log("Empresa logada com sucesso:", empresa);
+        navigate("/cufaSistema");
+        return;
+      }
+
+      setDivMensagem("Email ou senha incorretos.");
+    } catch (error) {
+      console.error("Erro ao realizar o login:", error);
+      setDivMensagem("Erro ao tentar fazer login. Tente novamente.");
+    }
   };
 
   return (
@@ -196,7 +240,7 @@ export default function Login() {
           >
             Não tem uma conta?{" "}
             <Link
-              component={RouterLink} // Usa o Link do React Router como base
+              component={RouterLink}
               to="/Escolha"
               style={{ color: "var(--dark-green)", fontWeight: "bold" }}
             >
