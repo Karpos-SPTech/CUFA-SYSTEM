@@ -9,6 +9,7 @@ import Escolha from './components/Escolha';
 import AtualizarSenha from './components/AtualizarSenha';
 import AtualizarSenhaPage from './components/AtualizarSenhaPage';
 import DashboardCufa from './DashboardCufa';
+import PerfilEmpresa from './PerfilEmpresa';
 
 const CadastroLogin = () => {
   return (
@@ -23,6 +24,7 @@ const CadastroLogin = () => {
         <Route path="/telaUsuario" element={<TelaUsuario />} />
         <Route path="/telaEmpresa" element={<TelaEmpresa />} />
         <Route path="/DashboardCufa" element={<DashboardCufa />} />
+        <Route path="/perfilEmpresa" element={<PerfilEmpresa />} />
       </Routes>
     </Router>
   );
