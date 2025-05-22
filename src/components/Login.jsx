@@ -53,7 +53,7 @@ export default function Login() {
       if (response.ok) {
         const user = await response.json();
         console.log("Usuário logado com sucesso:", user);
-        navigate("/cufaSistema");
+        navigate("/telaUsuario");
         return;
       }
 
@@ -66,7 +66,7 @@ export default function Login() {
       if (response.ok) {
         const empresa = await response.json();
         console.log("Empresa logada com sucesso:", empresa);
-        navigate("/cufaSistema");
+        navigate("/telaEmpresa");
         return;
       }
 
