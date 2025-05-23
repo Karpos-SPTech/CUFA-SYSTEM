@@ -39,8 +39,7 @@ const ageData = [
 
 const COLORS = ["#006916", "#4caf50", "#8bc34a"];
 
-const DashboardUsuario = () => {
-  return (
+const DashboardUsuario = () => {  return (
     <Box
       sx={{
         flex: 1,
@@ -57,8 +56,7 @@ const DashboardUsuario = () => {
             icon={<PersonIcon sx={{ color: "#006916" }} />}
             title="Usuários Totais"
             value="28,5 mil"
-          />
-        </Grid>{" "}
+          />        </Grid>
         <Grid item xs={12} md={3}>
           <DashboardSummaryCard
             color="#E5EEE3"
@@ -80,8 +78,7 @@ const DashboardUsuario = () => {
             color="#E5EEE3"
             icon={<DescriptionIcon sx={{ color: "#006916" }} />}
             title="Curriculos feitos"
-            value="1,2 mil"
-          />{" "}
+            value="1,2 mil"          />
         </Grid>
       </Grid>
       <Grid container spacing={3}>
@@ -140,9 +137,8 @@ const DashboardUsuario = () => {
                   dataKey="ativos"
                   stroke="#8bc34a"
                   strokeWidth={2}
-                />
-              </LineChart>
-            </ResponsiveContainer>{" "}
+                />              </LineChart>
+            </ResponsiveContainer>
           </Paper>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -156,9 +152,7 @@ const DashboardUsuario = () => {
               p: 3,
               mt: 3,
               boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
-            }}
-          >
-            {" "}
+            }}          >
             <Typography
               variant="h6"
               sx={{ mb: 2, fontWeight: "bold", color: "#333" }}
@@ -166,7 +160,8 @@ const DashboardUsuario = () => {
               Distribuição por Idade
             </Typography>
             <ResponsiveContainer width="100%" height={220}>
-              <PieChart>                <Pie
+              <PieChart>
+                <Pie
                   data={ageData}
                   cx="50%"
                   cy="50%"

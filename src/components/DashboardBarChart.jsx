@@ -33,11 +33,10 @@ export default function DashboardBarChart() {
       </Typography>
       <Typography variant="body2" sx={{ mb: 2, color: '#666' }}>
         (+43%) do que no ano passado
-      </Typography>
-      <ResponsiveContainer width="100%" height={250}>
+      </Typography>      <ResponsiveContainer width="100%" height={250}>
         <BarChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-          <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#fff' }} />
+          <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#666' }} />
           <YAxis tick={{ fontSize: 12, fill: '#666' }} />
           <Tooltip
             contentStyle={{

@@ -14,6 +14,7 @@ import homeIcon from '../assets/home-icon.png';
 import searchIcon from "../assets/search-icon.png";
 import profilePic from "../assets/profile-icon.png";
 import logo from "../assets/cufaLogo.png";
+import Notifications from "./Notifications";
 
 const Header = ({ hideNotifications }) => {
   const navigate = useNavigate();
@@ -67,7 +68,7 @@ const Header = ({ hideNotifications }) => {
               justifyContent: "center",
               gap: 0.5
             }}
-            onClick={() => navigate("/cufaSistema")}
+            onClick={() => navigate("/DashboardCufa")}
           >          <Box
             component="img"
             src={homeIcon}
