@@ -11,18 +11,21 @@ import {
   InputAdornment,
   IconButton,
   Divider,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import googleLogo from "../assets/google-logo.png";
 import microsoftLogo from "../assets/microsoft-logo.png";
 import emailIcon from "../assets/Icon-Email.png";
 import passwordIcon from "../assets/Icon-Senha.png";
+import empresaService from '../services/empresaService';
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [showSenha, setShowSenha] = useState(false);
+  const [mensagem, setMensagem] = useState("");
 
   const toggleSenha = () => {
     setShowSenha(!showSenha);
@@ -32,48 +35,48 @@ export default function Login() {
     event.preventDefault();
 
     if (!email || !senha) {
-      setDivMensagem("Por favor, preencha todos os campos.");
+      setMensagem("Por favor, preencha todos os campos.");
       return;
     }
 
     if (!email.includes("@") || !email.includes(".com")) {
-      setDivMensagem("Por favor, insira um email válido.");
+      setMensagem("Por favor, insira um email válido.");
       return;
     }
 
     const loginData = { email, senha };
 
     try {
-      let response = await fetch("http://localhost:8080/usuarios/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData),
-      });
+      // Primeiro tenta login como usuário
+      try {
+        let response = await fetch("http://localhost:8080/usuarios/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(loginData),
+        });
 
-      if (response.ok) {
-        const user = await response.json();
-        console.log("Usuário logado com sucesso:", user);
-        navigate("/cufaSistema");
-        return;
+        if (response.ok) {
+          const user = await response.json();
+          console.log("Usuário logado com sucesso:", user);
+          navigate("/cufaSistema");
+          return;
+        }
+      } catch (userError) {
+        console.error("Erro no login de usuário, tentando como empresa:", userError);
       }
 
-      response = await fetch("http://localhost:8080/empresas/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData),
-      });
-
-      if (response.ok) {
-        const empresa = await response.json();
-        console.log("Empresa logada com sucesso:", empresa);
-        navigate("/cufaSistema");
-        return;
+      // Se não for usuário, tenta como empresa
+      try {
+        const empresaResponse = await empresaService.login(loginData);
+        console.log("Empresa logada com sucesso:", empresaResponse);
+        navigate("/telaEmpresa");
+      } catch (empresaError) {
+        console.error("Erro no login de empresa:", empresaError);
+        setMensagem("Email ou senha incorretos.");
       }
-
-      setDivMensagem("Email ou senha incorretos.");
     } catch (error) {
       console.error("Erro ao realizar o login:", error);
-      setDivMensagem("Erro ao tentar fazer login. Tente novamente.");
+      setMensagem("Erro ao tentar fazer login. Tente novamente.");
     }
   };
 
@@ -130,6 +133,11 @@ export default function Login() {
 
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
+          {mensagem && (
+            <Alert severity="error" sx={{ fontWeight: "bold", color: "var(--dark-green)" }}>
+              {mensagem}
+            </Alert>
+          )}
           <TextField
             fullWidth
             label="E-mail"
