@@ -36,17 +36,19 @@ const Header = () => {
   return (
     <>
       <Box
-        component="header"
+            component="header"
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           backgroundColor: "#fff",
           width: "100%",
-          boxSizing: "border-box",
-          position: "relative",
+          position: "fixed",
+          top: 0,
+          zIndex: 1000,
           height: { xs: "70px", sm: "80px", md: "90px" },
-          px: { xs: 2, sm: 3, md: 4 }
+          px: { xs: 2, sm: 3, md: 4 },
+          boxShadow: 1
         }}
       >
         {/* Esquerda */}
@@ -67,7 +69,7 @@ const Header = () => {
               height: "100%",
               justifyContent: "center",
             }}
-            onClick={() => navigate("/cufaSistema")}
+            onClick={() => navigate("/telaUsuario")}
           >
             <Box
               component="img"
@@ -219,7 +221,7 @@ const Header = () => {
                       backgroundColor: "#f0f0f0",
                     },
                   }}
-                  onClick={() => { setIsProfileMenuOpen(false); navigate("/profile"); }}
+                  onClick={() => { setIsProfileMenuOpen(false); navigate("/telaPerfilUsuario"); }}
                 >
                   <i className="fas fa-user"></i> Perfil
                 </Box>
