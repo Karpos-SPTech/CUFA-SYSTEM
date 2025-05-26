@@ -10,6 +10,9 @@ import {
   Avatar,
   Divider,
 } from "@mui/material";
+import PersonIcon from '@mui/icons-material/Person';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 import homeIcon from '../assets/home-icon.png';
 import searchIcon from "../assets/search-icon.png";
 import profilePic from "../assets/profile-icon.png";
@@ -156,7 +159,7 @@ const Header = ({ hideNotifications }) => {
               />
             </IconButton>
           </Box>
-          <Divider orientation="vertical" flexItem sx={{ height: { xs: 30, sm: 40 }, borderColor: '#006916' }} />
+          <Divider orientation="vertical" flexItem sx={{ height: { xs: 60, sm: 60 }, borderColor: '#006916' }} />
           <Box sx={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <Avatar
               src={profilePic}
@@ -215,6 +218,7 @@ const Header = ({ hideNotifications }) => {
                     fontSize: "14px",
                     color: "#006916",
                     cursor: "pointer",
+                    fontFamily: "'Paytone One', sans-serif",
                     transition: "background-color 0.2s",
                     '&:hover': {
                       backgroundColor: "#f0f0f0",
@@ -222,7 +226,7 @@ const Header = ({ hideNotifications }) => {
                   }}
                   onClick={() => { setIsProfileMenuOpen(false); navigate("/profile"); }}
                 >
-                  <i className="fas fa-user"></i> Perfil
+                  <PersonIcon fontSize="small" /> Perfil
                 </Box>
                 <Box
                   sx={{
@@ -233,6 +237,7 @@ const Header = ({ hideNotifications }) => {
                     fontSize: "14px",
                     color: "#006916",
                     cursor: "pointer",
+                    fontFamily: "'Paytone One', sans-serif",
                     transition: "background-color 0.2s",
                     '&:hover': {
                       backgroundColor: "#f0f0f0",
@@ -240,7 +245,7 @@ const Header = ({ hideNotifications }) => {
                   }}
                   onClick={() => { setIsProfileMenuOpen(false); openSettingsModal(); }}
                 >
-                  <i className="fas fa-cog"></i> Ajustes
+                  <SettingsIcon fontSize="small" /> Ajustes
                 </Box>
                 <Box
                   sx={{
@@ -251,6 +256,7 @@ const Header = ({ hideNotifications }) => {
                     fontSize: "14px",
                     color: "#006916",
                     cursor: "pointer",
+                    fontFamily: "'Paytone One', sans-serif",
                     transition: "background-color 0.2s",
                     '&:hover': {
                       backgroundColor: "#f0f0f0",
@@ -258,7 +264,7 @@ const Header = ({ hideNotifications }) => {
                   }}
                   onClick={() => { setIsProfileMenuOpen(false); navigate("/"); }}
                 >
-                  <i className="fas fa-sign-out-alt"></i> Sair
+                  <LogoutIcon fontSize="small" /> Sair
                 </Box>
               </Box>
             )}

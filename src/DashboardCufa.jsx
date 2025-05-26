@@ -6,7 +6,7 @@ import DashboardPieChart from "./components/DashboardPieChart";
 import DashboardBarChart from "./components/DashboardBarChart";
 import PersonIcon from "@mui/icons-material/Person";
 import MessageIcon from "@mui/icons-material/Email";
-import Header from "./components/Header";
+import HeaderDashboard from "./components/HeaderDashboard";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import BusinessIcon from "@mui/icons-material/Business";
 import DashboardUsuario from "./components/DashboardUsuario";
@@ -89,8 +89,7 @@ export default function DashboardCufa({ initialView = "Painel" }) {
         position: "relative",
         flexDirection: "column",
       }}
-    >
-      <Header />
+    >      <HeaderDashboard />
       <Box
         sx={{
           display: "flex",
