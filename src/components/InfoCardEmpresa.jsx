@@ -8,7 +8,8 @@ const InfoCardEmpresa = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {    const fetchEmpresaData = async () => {
+  useEffect(() => {
+    const fetchEmpresaData = async () => {
       try {
         const empresaData = await empresaService.getEmpresaLogada();
         if (empresaData) {
@@ -104,10 +105,9 @@ const InfoCardEmpresa = () => {
               objectFit: 'contain'
             }}
           />
-        </Box>
-
-        {/* Informações da empresa */}
-        <Box sx={{ ml: 12 }}>          <Typography
+        </Box>        {/* Informações da empresa */}
+        <Box sx={{ ml: 12 }}>
+          <Typography
             variant="h6"
             sx={{
               color: '#006916',
@@ -135,6 +135,7 @@ const InfoCardEmpresa = () => {
             }}
           >
             {empresa?.cnpj || 'CNPJ da empresa'}
+          </Typography>
         </Box>
       </Box>
     </Paper>

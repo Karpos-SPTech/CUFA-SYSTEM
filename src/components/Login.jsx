@@ -30,7 +30,6 @@ export default function Login() {
   const toggleSenha = () => {
     setShowSenha(!showSenha);
   };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -47,11 +46,24 @@ export default function Login() {
     const loginData = { email, senha };
 
     try {
-      // Primeiro tenta login como usuário
+      // Primeiro tenta login como empresa
       try {
-        let response = await fetch("http://localhost:8080/usuarios/login", {
+        const empresaResponse = await empresaService.login(loginData);
+        console.log("Empresa logada com sucesso:", empresaResponse);
+        navigate("/telaEmpresa"); // A navegação acontece após o login bem-sucedido
+        return;
+      } catch (empresaError) {
+        console.error("Erro no login de empresa, tentando como usuário:", empresaError);
+      }
+
+      // Se não for empresa, tenta como usuário
+      try {
+        const response = await fetch("http://localhost:5174/usuarios/login", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json"
+          },
+          credentials: 'include', // Importante para o gerenciamento de cookies
           body: JSON.stringify(loginData),
         });
 
@@ -62,18 +74,11 @@ export default function Login() {
           return;
         }
       } catch (userError) {
-        console.error("Erro no login de usuário, tentando como empresa:", userError);
+        console.error("Erro no login de usuário:", userError);
       }
 
-      // Se não for usuário, tenta como empresa
-      try {
-        const empresaResponse = await empresaService.login(loginData);
-        console.log("Empresa logada com sucesso:", empresaResponse);
-        navigate("/telaEmpresa");
-      } catch (empresaError) {
-        console.error("Erro no login de empresa:", empresaError);
-        setMensagem("Email ou senha incorretos.");
-      }
+      // Se chegou aqui, ambos os logins falharam
+      setMensagem("Email ou senha incorretos.");
     } catch (error) {
       console.error("Erro ao realizar o login:", error);
       setMensagem("Erro ao tentar fazer login. Tente novamente.");
