@@ -9,6 +9,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
+import empresaService from '../services/empresaService';
 
 export default function CadastroEmpresa() {
   const navigate = useNavigate();
@@ -123,21 +124,30 @@ export default function CadastroEmpresa() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const valido = await validarCadastroEmpresa();
-    if (!valido) return;
+    
+    if (!validarCadastroEmpresa()) {
+      return;
+    }
 
-    const dados = { nome, email, senha, cep, numero, endereco, cnpj };
     try {
-      const response = await fetch("http://localhost:8080/empresas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados),
-      });
-      if (!response.ok) throw new Error("Erro ao cadastrar usuário.");
-      navigate("/login");
+      const empresaData = {
+        nome,
+        email,
+        senha,
+        endereco: {
+          cep: cep.replace(/\D/g, ""),
+          logradouro: endereco,
+          numero
+        },
+        cnpj: cnpj.replace(/\D/g, "")
+      };
+
+      await empresaService.cadastrarEmpresa(empresaData);
+      setMensagem("Empresa cadastrada com sucesso!");
+      navigate("/login"); // Redirect to login page after successful registration
     } catch (error) {
-      console.error("Erro ao cadastrar:", error);
-      setMensagem("Erro ao cadastrar usuário.");
+      console.error("Erro ao cadastrar empresa:", error);
+      setMensagem(error.response?.data?.message || "Erro ao cadastrar empresa. Tente novamente.");
     }
   };
 

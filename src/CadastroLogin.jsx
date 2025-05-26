@@ -9,7 +9,7 @@ import Escolha from './components/Escolha';
 import AtualizarSenha from './components/AtualizarSenha';
 import AtualizarSenhaPage from './components/AtualizarSenhaPage';
 import DashboardCufa from './DashboardCufa';
-import PerfilEmpresa from './PerfilEmpresa';
+import PerfilEmpresa from './perfilEmpresa';
 
 const CadastroLogin = () => {
   return (

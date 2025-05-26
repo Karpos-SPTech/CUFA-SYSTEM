@@ -14,9 +14,8 @@ import homeIcon from '../assets/home-icon.png';
 import searchIcon from "../assets/search-icon.png";
 import profilePic from "../assets/profile-icon.png";
 import logo from "../assets/cufaLogo.png";
-import Notifications from "../components/Notifications";
 
-const Header = () => {
+const Header = ({ hideNotifications }) => {
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -68,14 +67,13 @@ const Header = () => {
               justifyContent: "center",
               gap: 0.5
             }}
-            onClick={() => navigate("/cufaSistema")}
-          >
-            <Box
-              component="img"
-              src={homeIcon}
-              alt="Início"
-              sx={{ width: { xs: 22, sm: 28, md: 24 }, height: { xs: 22, sm: 28, md: 24 }, }}
-            />
+            onClick={() => navigate("/telaEmpresa")}
+          >          <Box
+            component="img"
+            src={homeIcon}
+            alt="Início"
+            sx={{ width: { xs: 22, sm: 28, md: 24 }, height: { xs: 22, sm: 28, md: 24 }, }}
+          />
             <Typography
               sx={{
                 fontSize: { xs: 10, sm: 12, md: 15 },
@@ -92,7 +90,7 @@ const Header = () => {
               Início
             </Typography>
           </Box>
-          <Notifications />
+          {!hideNotifications && <Notifications />}
         </Box>
 
         {/* Centro */}
@@ -221,7 +219,7 @@ const Header = () => {
                       backgroundColor: "#f0f0f0",
                     },
                   }}
-                  onClick={() => { setIsProfileMenuOpen(false); navigate("/profile"); }}
+                  onClick={() => { setIsProfileMenuOpen(false); navigate("/perfilEmpresa"); }}
                 >
                   <i className="fas fa-user"></i> Perfil
                 </Box>

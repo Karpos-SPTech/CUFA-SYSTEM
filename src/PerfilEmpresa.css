@@ -1,0 +1,17 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.perfil-empresa-container {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #E5EEE3;
+}
+
+.perfil-empresa-content {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
