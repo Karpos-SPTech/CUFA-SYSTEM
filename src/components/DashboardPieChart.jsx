@@ -22,8 +22,8 @@ export default function DashboardPieChart() {
   return (
     <Box
       sx={{
-        width: 250,
-        height: 350,
+        width: 280,
+        height: 390,
         background: "#fff",
         borderRadius: 3,
         p: 3,

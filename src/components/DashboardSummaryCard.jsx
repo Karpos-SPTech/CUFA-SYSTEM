@@ -7,7 +7,7 @@ export default function DashboardSummaryCard({ color, icon, title, value, percen
       p: 2.5,
       borderRadius: 3,
       background: color,
-      minWidth: 250,
+      minWidth: 280,
       minHeight: 120,
       boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
       display: 'flex',

@@ -30,7 +30,7 @@ export default function SidebarDashboard({ onSelect }) {
       sx={{
         width: 200,
         background: "#fff",
-        height: "calc(100% - 70px)",
+        height: "calc(100% - 99px)",
         p: 1.5,
         borderRadius: 2,
         mt: 4,

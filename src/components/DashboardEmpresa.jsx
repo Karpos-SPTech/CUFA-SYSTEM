@@ -84,13 +84,11 @@ const DashboardEmpresa = () => {
         </Grid>
       </Grid>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Paper
+        <Grid item xs={12} md={6}>          <Paper
             elevation={2}
             sx={{
-              width: "800px",
-              maxWidth: "800px",
-              height: 350,
+              width: 888,
+              height: 390,
               background: "#fff",
               borderRadius: "12px",
               boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
@@ -146,12 +144,11 @@ const DashboardEmpresa = () => {
             </ResponsiveContainer>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper
+        <Grid item xs={12} md={6}>          <Paper
             elevation={2}
             sx={{
-              width: 250,
-              height: 350,
+              width: 280,
+              height: 390,
               background: '#fff',
               borderRadius: 3,
               p: 3,

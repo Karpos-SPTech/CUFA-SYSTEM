@@ -18,9 +18,8 @@ export default function DashboardBarChart() {
   return (
     <Box
       sx={{
-        width: '800px',
-        maxWidth: '800px',
-        height: 350,
+        width: 888,
+        height: 390,
         background: '#fff',
         borderRadius: '12px',
         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',

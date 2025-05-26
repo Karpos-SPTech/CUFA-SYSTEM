@@ -39,7 +39,8 @@ const ageData = [
 
 const COLORS = ["#006916", "#4caf50", "#8bc34a"];
 
-const DashboardUsuario = () => {  return (
+const DashboardUsuario = () => {
+  return (
     <Box
       sx={{
         flex: 1,
@@ -54,9 +55,9 @@ const DashboardUsuario = () => {  return (
           <DashboardSummaryCard
             color="#E5EEE3"
             icon={<PersonIcon sx={{ color: "#006916" }} />}
-            title="Usuários Totais"
-            value="28,5 mil"
-          />        </Grid>
+            title="Usuários Totais"            value="28,5 mil"
+          />
+        </Grid>
         <Grid item xs={12} md={3}>
           <DashboardSummaryCard
             color="#E5EEE3"
@@ -78,17 +79,16 @@ const DashboardUsuario = () => {  return (
             color="#E5EEE3"
             icon={<DescriptionIcon sx={{ color: "#006916" }} />}
             title="Curriculos feitos"
-            value="1,2 mil"          />
+            value="1,2 mil"
+          />
         </Grid>
       </Grid>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Paper
+        <Grid item xs={12} md={6}>          <Paper
             elevation={2}
             sx={{
-              width: "800px",
-              maxWidth: "800px",
-              height: 350,
+              width: 888,
+              height: 390,
               background: "#fff",
               borderRadius: "12px",
               boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
@@ -134,25 +134,25 @@ const DashboardUsuario = () => {  return (
                 />
                 <Line
                   type="monotone"
-                  dataKey="ativos"
-                  stroke="#8bc34a"
+                  dataKey="ativos"                  stroke="#8bc34a"
                   strokeWidth={2}
-                />              </LineChart>
+                />
+              </LineChart>
             </ResponsiveContainer>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper
+        <Grid item xs={12} md={6}>          <Paper
             elevation={2}
             sx={{
-              width: 250,
-              height: 350,
+              width: 280,
+              height: 390,
               background: "#fff",
               borderRadius: 3,
               p: 3,
               mt: 3,
               boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
-            }}          >
+            }}
+          >
             <Typography
               variant="h6"
               sx={{ mb: 2, fontWeight: "bold", color: "#333" }}
@@ -178,7 +178,8 @@ const DashboardUsuario = () => {  return (
                       fill={COLORS[index % COLORS.length]}
                     />
                   ))}
-                </Pie>                <Tooltip formatter={(value, name) => [`${name}`, `${value}`]} />
+                </Pie>
+                <Tooltip formatter={(value, name) => [`${name}`, `${value}`]} />
                 <Legend 
                   verticalAlign="bottom" 
                   iconType="circle"
