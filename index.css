@@ -1,23 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Asap:wght@400;500;700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Paytone+One&display=swap');
+
+/* Reset global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Configurações globais */
 
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
-  font-family: 'Asap', Arial, Helvetica, sans-serif !important;
-  /* Permite rolagem normal */
-  overflow: auto;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
 }
 
+/* Configuração do root */
 #root {
-  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
   width: 100%;
-  display: block;
-  /* Removido align-items/justify-content/height para não centralizar tudo verticalmente */
-  background: none;
-}
+  background-color: #006916;
 
-* {
-  font-family: 'Asap', Arial, Helvetica, sans-serif !important;
 }

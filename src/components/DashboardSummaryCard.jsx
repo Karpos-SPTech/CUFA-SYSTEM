@@ -7,14 +7,15 @@ export default function DashboardSummaryCard({ color, icon, title, value, percen
       p: 2.5,
       borderRadius: 3,
       background: color,
-      minWidth: 220,
+      minWidth: 280,
       minHeight: 120,
-      boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)',
+      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
       position: 'relative',
       overflow: 'hidden',
+      backgroundColor: '#fff',
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         {icon && <Box sx={{ mr: 1 }}>{icon}</Box>}

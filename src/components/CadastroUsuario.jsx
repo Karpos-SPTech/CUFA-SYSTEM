@@ -23,6 +23,19 @@ export default function CadastroUsuario() {
       setMensagem("A senha deve ter pelo menos 8 caracteres.");
       return false;
     }
+    if (!/[A-Za-z]/.test(senha)) {
+      setMensagem("A senha deve conter pelo menos uma letra.");
+      return false;
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>_\-+=~`[\]\\\/]/.test(senha)) {
+      setMensagem("A senha deve conter pelo menos um caractere especial.");
+      return false;
+    }
+        if (/\d/.test(nome)) {
+      setMensagem("O nome não pode conter números.");
+      return false;
+    }
+
     if (senha !== confirmarSenha) {
       setMensagem("As senhas não são iguais.");
       return false;
@@ -44,7 +57,7 @@ export default function CadastroUsuario() {
       });
 
       if (!response.ok) throw new Error("Erro ao cadastrar usuário.");
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       console.error("Erro ao cadastrar:", error);
       setMensagem("Erro ao cadastrar usuário.");

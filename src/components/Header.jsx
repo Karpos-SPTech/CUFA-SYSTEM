@@ -14,9 +14,9 @@ import homeIcon from '../assets/home-icon.png';
 import searchIcon from "../assets/search-icon.png";
 import profilePic from "../assets/profile-icon.png";
 import logo from "../assets/cufaLogo.png";
-import Notifications from "../components/Notifications";
+import Notifications from "./Notifications";
 
-const Header = () => {
+const Header = ({ hideNotifications }) => {
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -68,19 +68,21 @@ const Header = () => {
               cursor: "pointer",
               height: "100%",
               justifyContent: "center",
+              gap: 0.5
             }}
-            onClick={() => navigate("/telaUsuario")}
-          >
-            <Box
-              component="img"
-              src={homeIcon}
-              alt="Início"
-              sx={{ width: { xs: 22, sm: 28, md: 24 }, height: { xs: 22, sm: 28, md: 24 }, }}
-            />
+
+            onClick={() => navigate("/DashboardCufa/TelaEmpresa")}
+          >          <Box
+            component="img"
+            src={homeIcon}
+            alt="Início"
+            sx={{ width: { xs: 22, sm: 28, md: 24 }, height: { xs: 22, sm: 28, md: 24 }, }}
+          />
+
             <Typography
               sx={{
                 fontSize: { xs: 10, sm: 12, md: 15 },
-                fontWeight: "bold",
+                fontFamily: "'Paytone One', sans-serif",
                 color: "#006916",
                 textDecoration: "none",
                 transition: "text-decoration 0.2s",
@@ -93,7 +95,7 @@ const Header = () => {
               Início
             </Typography>
           </Box>
-          <Notifications />
+          {!hideNotifications && <Notifications />}
         </Box>
 
         {/* Centro */}
@@ -146,6 +148,7 @@ const Header = () => {
                 flex: 1,
                 fontSize: { xs: 12, sm: 14 },
                 ml: 1,
+                fontFamily: "'Paytone One', sans-serif",
               }}
             />
             <IconButton size="small">
@@ -179,7 +182,7 @@ const Header = () => {
               onClick={toggleProfileMenu}
               sx={{
                 fontSize: { xs: 10, sm: 12, md: 15 },
-                fontWeight: "bold",
+                fontFamily: "'Paytone One', sans-serif",
                 color: "#006916",
                 textDecoration: "none",
                 transition: "text-decoration 0.2s",
@@ -304,13 +307,13 @@ const Header = () => {
           >
             &times;
           </Button>
-          <Typography
-            sx={{
+          <Typography            sx={{
               fontSize: { xs: 18, sm: 22, md: 24 },
               color: "#006916",
               marginBottom: "10px",
               fontWeight: "bold",
               textAlign: "center",
+              fontFamily: "'Paytone One', sans-serif",
             }}
           >
             Atualize seu Perfil
@@ -324,13 +327,14 @@ const Header = () => {
             }}
           >
             <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase placeholder="Nome" sx={{
+              <InputBase              placeholder="Nome" sx={{
                 width: "100%",
                 padding: "10px",
                 border: "1px solid #ccc",
                 borderRadius: "5px",
                 backgroundColor: "#f1f8f4",
                 color: "#555",
+                fontFamily: "'Paytone One', sans-serif",
               }} />
               <InputBase placeholder="Sobrenome" sx={{
                 width: "100%",
@@ -339,6 +343,7 @@ const Header = () => {
                 borderRadius: "5px",
                 backgroundColor: "#f1f8f4",
                 color: "#555",
+                fontFamily: "'Paytone One', sans-serif",
               }} />
             </Box>
             <Box sx={{ display: "flex", gap: "20px" }}>
@@ -349,6 +354,7 @@ const Header = () => {
                 borderRadius: "5px",
                 backgroundColor: "#f1f8f4",
                 color: "#555",
+                fontFamily: "'Paytone One', sans-serif",
               }} />
               <InputBase placeholder="Telefone" sx={{
                 width: "100%",
@@ -357,6 +363,7 @@ const Header = () => {
                 borderRadius: "5px",
                 backgroundColor: "#f1f8f4",
                 color: "#555",
+                fontFamily: "'Paytone One', sans-serif",
               }} />
             </Box>
             <Box sx={{ display: "flex", gap: "20px" }}>
@@ -367,6 +374,7 @@ const Header = () => {
                 borderRadius: "5px",
                 backgroundColor: "#f1f8f4",
                 color: "#555",
+                fontFamily: "'Paytone One', sans-serif",
               }} />
               <InputBase placeholder="CEP" sx={{
                 width: "100%",
@@ -375,6 +383,7 @@ const Header = () => {
                 borderRadius: "5px",
                 backgroundColor: "#f1f8f4",
                 color: "#555",
+                fontFamily: "'Paytone One', sans-serif",
               }} />
             </Box>
             <Box sx={{ display: "flex", gap: "20px" }}>
@@ -385,6 +394,7 @@ const Header = () => {
                 borderRadius: "5px",
                 backgroundColor: "#f1f8f4",
                 color: "#555",
+                fontFamily: "'Paytone One', sans-serif",
               }} />
               <InputBase placeholder="Número" sx={{
                 width: "100%",
@@ -393,6 +403,7 @@ const Header = () => {
                 borderRadius: "5px",
                 backgroundColor: "#f1f8f4",
                 color: "#555",
+                fontFamily: "'Paytone One', sans-serif",
               }} />
             </Box>
             <InputBase
@@ -404,10 +415,10 @@ const Header = () => {
                 borderRadius: "5px",
                 backgroundColor: "#f1f8f4",
                 color: "#555",
+                fontFamily: "'Paytone One', sans-serif",
               }}
             />
-            <Button
-              type="submit"
+            <Button              type="submit"
               sx={{
                 backgroundColor: "#006916",
                 color: "white",
@@ -416,6 +427,7 @@ const Header = () => {
                 fontSize: "18px",
                 fontWeight: "bold",
                 marginTop: "20px",
+                fontFamily: "'Paytone One', sans-serif",
                 '&:hover': {
                   backgroundColor: "#004d12",
                 },
