@@ -34,20 +34,20 @@ export default function SidebarDashboard({ onSelect }) {
         p: 1.5,
         borderRadius: 2,
         mt: 4,
-        ml: 2,
+        ml: 6 ,
         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
         display: "flex",
         flexDirection: "column",}}
     >      <Box sx={{ mb: 2 }}>
         <Typography
           variant="subtitle2"
-          sx={{ fontWeight: "bold", color: "#333", mb: 0.5 }}
+          sx={{ml:2 , fontWeight: "bold", color: "#333", mb: 0.2 }}
         >
-          Cufa conecta{" "}
+          CUFA{" "}
           <Chip
             label="Dashboard"
             size="small"
-            sx={{ ml: 0.5, background: "#E5EEE3", color: "#006916" }}
+            sx={{ ml: 4, background: "#E5EEE3", color: "#006916" }}
           />
         </Typography>
       </Box>

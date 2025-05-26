@@ -68,7 +68,7 @@ const Header = ({ hideNotifications }) => {
               justifyContent: "center",
               gap: 0.5
             }}
-            onClick={() => navigate("/DashboardCufa")}
+            onClick={() => navigate("/DashboardCufa/TelaEmpresa")}
           >          <Box
             component="img"
             src={homeIcon}

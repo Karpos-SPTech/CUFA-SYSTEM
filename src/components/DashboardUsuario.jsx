@@ -124,13 +124,13 @@ const DashboardUsuario = () => {
                     color: "#666",
                     fontWeight: "bold",
                   }}
-                />
-                <Line
+                />                <Line
                   type="monotone"
                   dataKey="usuarios"
                   stroke="#006916"
                   strokeWidth={2}
                   activeDot={{ r: 8 }}
+                  name="Usuários Cadastrados"
                 />
                 <Line
                   type="monotone"

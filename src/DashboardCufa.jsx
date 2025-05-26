@@ -11,16 +11,17 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import BusinessIcon from "@mui/icons-material/Business";
 import DashboardUsuario from "./components/DashboardUsuario";
 import DashboardEmpresa from "./components/DashboardEmpresa";
+import TelaEmpresa from "./TelaEmpresa";
 
-export default function DashboardCufa() {
-  const [selectedDashboard, setSelectedDashboard] = useState("Painel");
-
+export default function DashboardCufa({ initialView = "Painel" }) {
+  const [selectedDashboard, setSelectedDashboard] = useState(initialView);
   const renderDashboard = () => {
-    switch (selectedDashboard) {
-      case "Usuario":
+    switch (selectedDashboard) {      case "Usuario":
         return <DashboardUsuario />;
       case "Empresa":
         return <DashboardEmpresa />;
+      case "GerenciarVagas":
+        return <TelaEmpresa showHeader={false} />;
       default:
         return (
           <Box
