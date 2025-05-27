@@ -1,9 +1,9 @@
 import React from 'react';
-import { Box, Paper, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import Header from './components/Header';
-import editIcon from './assets/edit-icon.png';
 import InfoCardEmpresa from './components/InfoCardEmpresa';
 import SobreEmpresa from './components/SobreEmpresa';
+import MembroCard from './components/MembroCard';
 import './PerfilEmpresa.css';
 
 const PerfilEmpresa = () => {
@@ -11,8 +11,14 @@ const PerfilEmpresa = () => {
     <Box className="perfil-empresa-container">
       <Header hideNotifications={true} />
       <div className="perfil-empresa-content">
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>          <InfoCardEmpresa />
-          <SobreEmpresa />
+        <Box sx={{ display: 'flex', gap: 3, maxWidth: '1400px', mx: 'auto', p: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1 }}>
+            <InfoCardEmpresa />
+            <SobreEmpresa />
+          </Box>
+          <Box sx={{ width: '280px' }}>
+            <MembroCard />
+          </Box>
         </Box>
       </div>
     </Box>
