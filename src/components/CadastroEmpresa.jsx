@@ -20,6 +20,7 @@ export default function CadastroEmpresa() {
   const [numero, setNumero] = useState("");
   const [endereco, setEndereco] = useState("");
   const [cnpj, setCnpj] = useState("");
+  const [area, setArea] = useState("");
   const [mensagem, setMensagem] = useState("");
 
   const validarCNPJ = async (cnpj) => {
@@ -101,6 +102,7 @@ export default function CadastroEmpresa() {
       !numero ||
       !endereco ||
       !cnpj ||
+      !area ||
       !confirmarSenha
     ) {
       setMensagem("Todos os campos devem ser preenchidos.");
@@ -139,7 +141,7 @@ export default function CadastroEmpresa() {
     const valido = await validarCadastroEmpresa();
     if (!valido) return;
 
-    const dados = { nome, email, senha, cep, numero, endereco, cnpj };
+    const dados = { nome, email, senha, cep, numero, endereco, cnpj, area };
     try {
       const response = await fetch("http://localhost:8080/empresas", {
         method: "POST",
@@ -287,12 +289,14 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          {/* CNPJ já foi movido para outra posição */}
+
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label="CNPJ"
-              value={cnpj}
-              onChange={handleCnpjChange} // Uses handleCnpjChange function
+              label="Área de Atuação"
+              value={area}
+              onChange={(e) => setArea(e.target.value)}
               sx={{
                 "& .MuiInputBase-root": {
                   height: "50px",
@@ -312,66 +316,108 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          {[["Endereço", endereco, setEndereco]].map(
-            ([label, value, setter], index) => (
-              <Grid item xs={12} key={index}>
-                <TextField
-                  fullWidth
-                  label={label}
-                  value={value}
-                  onChange={(e) => setter(e.target.value)}
-                  sx={{
-                    "& .MuiInputBase-root": {
-                      height: "50px",
-                      marginLeft: "5px",
-                      borderRadius: "25px",
-                      backgroundColor: "var(--white)",
-                      padding: "0 20px",
-                      color: "var(--dark-green)",
-                    },
-                    "& .MuiInputLabel-root": {
-                      color: "var(--dark-green)",
-                    },
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      border: "none",
-                    },
-                  }}
-                />
-              </Grid>
-            )
-          )}
-          {[
-            ["Senha", senha, setSenha],
-            ["Confirmação de senha", confirmarSenha, setConfirmarSenha],
-          ].map(([label, value, setter], index) => (
-            <Grid item xs={12} sm={6} key={index}>
-              <TextField
-                fullWidth
-                label={label}
-                type="password"
-                value={value}
-                onChange={(e) => setter(e.target.value)}
-                sx={{
-                  "& .MuiInputBase-root": {
-                    height: "50px",
-                    marginLeft: "5px",
-                    borderRadius: "25px",
-                    backgroundColor: "var(--white)",
-                    padding: "0 20px",
-                    color: "var(--dark-green)",
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: "var(--dark-green)",
-                  },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    border: "none",
-                  },
-                }}
-              />
-            </Grid>
-          ))}
-        </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="CNPJ"
+              value={cnpj}
+              onChange={handleCnpjChange}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "50px",
+                  marginLeft: "5px",
+                  borderRadius: "25px",
+                  backgroundColor: "var(--white)",
+                  padding: "0 20px",
+                  color: "var(--dark-green)",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "var(--dark-green)",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            />
+          </Grid>
 
+          <Grid item sx={{ width: '95%' }}>
+            <TextField
+              fullWidth
+              label="Endereço"
+              value={endereco}
+              onChange={(e) => setEndereco(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "50px",
+                  marginLeft: "5px",
+                  borderRadius: "25px",
+                  backgroundColor: "var(--white)",
+                  padding: "0 20px",
+                  color: "var(--dark-green)",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "var(--dark-green)",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Senha"
+              type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "50px",
+                  marginLeft: "5px",
+                  borderRadius: "25px",
+                  backgroundColor: "var(--white)",
+                  padding: "0 20px",
+                  color: "var(--dark-green)",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "var(--dark-green)",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Confirmação de senha"
+              type="password"
+              value={confirmarSenha}
+              onChange={(e) => setConfirmarSenha(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "50px",
+                  marginLeft: "5px",
+                  borderRadius: "25px",
+                  backgroundColor: "var(--white)",
+                  padding: "0 20px",
+                  color: "var(--dark-green)",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "var(--dark-green)",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            />
+          </Grid>
+        </Grid>
         <Box mt={2}>
           <Button
             type="submit"

@@ -282,29 +282,6 @@ export default function Login() {
             >
               Google
             </Button>
-            <Button
-              variant="outlined"
-              startIcon={
-                <img
-                  src={microsoftLogo}
-                  alt="Microsoft"
-                  style={{ width: 20, height: 20 }}
-                />
-              }
-              sx={{
-                flex: 1,
-                height: "45px",
-                borderRadius: "12px",
-                fontWeight: "bold",
-                color: "var(--text-dark)",
-                fontSize: "0.95rem",
-                "&:hover": {
-                  backgroundColor: "#f0f0f0",
-                },
-              }}
-            >
-              Microsoft
-            </Button>
           </Stack>
         </Stack>
       </form>

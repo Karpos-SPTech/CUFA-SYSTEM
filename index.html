@@ -1,13 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="index.css" />
-    <link rel="icon" type="image/png" href="/favicon.ico" />
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />    <link rel="stylesheet" href="index.css" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>CUFA System</title>
   </head>
   <body>
     <div id="root"></div>
+    <!-- Estrutura necessária para o VLibras -->
+    <div vw class="enabled">
+      <div vw-access-button class="active"></div>
+      <div vw-plugin-wrapper>
+        <div class="vw-plugin-top-wrapper"></div>
+      </div>
+    </div>
     <script type="module" src="/src/index.jsx"></script>
+    <script src="/vlibras-init.js"></script>
   </body>
 </html>
