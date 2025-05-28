@@ -1,9 +1,20 @@
-import React from 'react';
-import { Box, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import { 
+  Box, 
+  Paper, 
+  Modal, 
+  Typography, 
+  TextField, 
+  Button,
+  Alert,
+  IconButton
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import mcdonaldsLogo from '../assets/microsoft-logo.png';
 import fotoIcon from '../assets/foto-icon.png';
 import videoIcon from '../assets/video-icon.png';
 import textoIcon from '../assets/text-icon.png';
+import publicacaoService from '../services/publicacaoService';
 
 const ButtonOption = ({ icon, label }) => (
   <Box
@@ -29,7 +40,56 @@ const ButtonOption = ({ icon, label }) => (
 );
 
 const AnunciarVaga = () => {
-  return (    <Paper      sx={{
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [publicacao, setPublicacao] = useState({
+    titulo: '',
+    descricao: '',
+    requisitos: '',
+    beneficios: '',
+    salario: ''
+  });
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setOpen(false);
+    setError('');
+    setSuccess('');
+    setPublicacao({
+      titulo: '',
+      descricao: '',
+      requisitos: '',
+      beneficios: '',
+      salario: ''
+    });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPublicacao(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await publicacaoService.criarPublicacao(publicacao);
+      setSuccess('Vaga publicada com sucesso!');
+      setTimeout(handleClose, 2000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erro ao publicar vaga. Tente novamente.');
+    }
+  };
+
+  return (
+    <>
+      <Paper sx={{
         backgroundColor: '#fff',
         borderRadius: '10px',
         p: 2,
@@ -57,7 +117,10 @@ const AnunciarVaga = () => {
           }}
         />
         <Box
-          component="button"          sx={{            background: '#e9f1e7',
+          component="button"
+          onClick={handleOpen}
+          sx={{
+            background: '#e9f1e7',
             border: 'none',
             borderRadius: '15px',
             padding: '12px 16px',
@@ -87,8 +150,128 @@ const AnunciarVaga = () => {
         <ButtonOption icon={fotoIcon} label="Foto" />
         <ButtonOption icon={videoIcon} label="Vídeo" />
         <ButtonOption icon={textoIcon} label="Texto" />
-      </Box>
-    </Paper>
+      </Box>    </Paper>
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-publicar-vaga"
+        aria-describedby="modal-publicar-nova-vaga"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 600,
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}
+        >
+          <IconButton
+            aria-label="close"
+            onClick={handleClose}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500]
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+
+          <Typography variant="h6" component="h2" sx={{ mb: 3, color: '#006916' }}>
+            Publicar Nova Vaga
+          </Typography>
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {success}
+            </Alert>
+          )}
+
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              required
+              fullWidth
+              label="Título da Vaga"
+              name="titulo"
+              value={publicacao.titulo}
+              onChange={handleChange}
+            />
+            
+            <TextField
+              required
+              fullWidth
+              multiline
+              rows={4}
+              label="Descrição da Vaga"
+              name="descricao"
+              value={publicacao.descricao}
+              onChange={handleChange}
+            />
+
+            <TextField
+              required
+              fullWidth
+              multiline
+              rows={3}
+              label="Requisitos"
+              name="requisitos"
+              value={publicacao.requisitos}
+              onChange={handleChange}
+            />
+
+            <TextField
+              required
+              fullWidth
+              multiline
+              rows={3}
+              label="Benefícios"
+              name="beneficios"
+              value={publicacao.beneficios}
+              onChange={handleChange}
+            />
+
+            <TextField
+              required
+              fullWidth
+              label="Salário"
+              name="salario"
+              value={publicacao.salario}
+              onChange={handleChange}
+              placeholder="Ex: R$ 2.500,00"
+            />
+
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                mt: 2,
+                bgcolor: '#006916',
+                '&:hover': {
+                  bgcolor: '#005713'
+                }
+              }}
+            >
+              Publicar Vaga
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+    </>
   );
 };
 

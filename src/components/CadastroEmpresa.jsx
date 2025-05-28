@@ -9,6 +9,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
+import empresaService from '../services/empresaService';
 
 export default function CadastroEmpresa() {
   const navigate = useNavigate();
@@ -138,8 +139,11 @@ export default function CadastroEmpresa() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const valido = await validarCadastroEmpresa();
-    if (!valido) return;
+    
+    if (!validarCadastroEmpresa()) {
+      return;
+    }
+
 
     const dados = { nome, email, senha, cep, numero, endereco, cnpj, area };
     try {
@@ -151,8 +155,8 @@ export default function CadastroEmpresa() {
       if (!response.ok) throw new Error("Erro ao cadastrar usuário.");
       navigate("/");
     } catch (error) {
-      console.error("Erro ao cadastrar:", error);
-      setMensagem("Erro ao cadastrar usuário.");
+      console.error("Erro ao cadastrar empresa:", error);
+      setMensagem(error.response?.data?.message || "Erro ao cadastrar empresa. Tente novamente.");
     }
   };
 

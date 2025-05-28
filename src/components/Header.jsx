@@ -71,7 +71,11 @@ const Header = ({ hideNotifications }) => {
               justifyContent: "center",
               gap: 0.5
             }}
+
+            onClick={() => navigate("/telaEmpresa")}
+
             onClick={() => navigate("/DashboardCufa/TelaEmpresa")}
+
           >          <Box
             component="img"
             src={homeIcon}
@@ -224,7 +228,7 @@ const Header = ({ hideNotifications }) => {
                       backgroundColor: "#f0f0f0",
                     },
                   }}
-                  onClick={() => { setIsProfileMenuOpen(false); navigate("/profile"); }}
+                  onClick={() => { setIsProfileMenuOpen(false); navigate("/perfilEmpresa"); }}
                 >
                   <PersonIcon fontSize="small" /> Perfil
                 </Box>
