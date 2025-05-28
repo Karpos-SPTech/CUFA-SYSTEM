@@ -74,8 +74,6 @@ const Header = ({ hideNotifications }) => {
 
             onClick={() => navigate("/telaEmpresa")}
 
-            onClick={() => navigate("/DashboardCufa/TelaEmpresa")}
-
           >          <Box
             component="img"
             src={homeIcon}

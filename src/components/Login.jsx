@@ -18,7 +18,7 @@ import googleLogo from "../assets/google-logo.png";
 import microsoftLogo from "../assets/microsoft-logo.png";
 import emailIcon from "../assets/Icon-Email.png";
 import passwordIcon from "../assets/Icon-Senha.png";
-import empresaService from '../services/empresaService';
+import empresaService from "../services/empresaService";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -30,6 +30,7 @@ export default function Login() {
   const toggleSenha = () => {
     setShowSenha(!showSenha);
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -46,7 +47,6 @@ export default function Login() {
     const loginData = { email, senha };
 
     try {
-
       let response = await fetch("http://localhost:8080/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,38 +57,42 @@ export default function Login() {
         const user = await response.json();
         console.log("Usuário logado com sucesso:", user);
         navigate("/telaUsuario");
-        
         return;
-      } catch (empresaError) {
-        console.error("Erro no login de empresa, tentando como usuário:", empresaError);
       }
 
-      // Se não for empresa, tenta como usuário
       try {
         const response = await fetch("http://localhost:5174/usuarios/login", {
           method: "POST",
-          headers: { 
-            "Content-Type": "application/json"
+          headers: {
+            "Content-Type": "application/json",
           },
-          credentials: 'include', // Importante para o gerenciamento de cookies
+          credentials: "include", // Importante para o gerenciamento de cookies
           body: JSON.stringify(loginData),
         });
 
-      if (response.ok) {
-        const empresa = await response.json();
-        console.log("Empresa logada com sucesso:", empresa);
-        navigate("/telaEmpresa");
-        return;
-      }
+        if (response.ok) {
+          const empresa = await response.json();
+          console.log("Empresa logada com sucesso:", empresa);
+          navigate("/telaEmpresa");
+          return;
+        }
 
-      // Se chegou aqui, ambos os logins falharam
-      setMensagem("Email ou senha incorretos.");
-    } catch (error) {
-      console.error("Erro ao realizar o login:", error);
+        // Se chegou aqui, ambos os logins falharam
+        setMensagem("Email ou senha incorretos.");
+      } catch (error) {
+        console.error("Erro ao realizar o login:", error);
+        setMensagem("Erro ao tentar fazer login. Tente novamente.");
+      }
+    } catch (empresaError) {
+      console.error(
+        "Erro no login de empresa, tentando como usuário:",
+        empresaError
+      );
       setMensagem("Erro ao tentar fazer login. Tente novamente.");
     }
   };
 
+  // O retorno do JSX deve estar FORA da função handleSubmit
   return (
     <Box
       sx={{
@@ -143,7 +147,10 @@ export default function Login() {
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
           {mensagem && (
-            <Alert severity="error" sx={{ fontWeight: "bold", color: "var(--dark-green)" }}>
+            <Alert
+              severity="error"
+              sx={{ fontWeight: "bold", color: "var(--dark-green)" }}
+            >
               {mensagem}
             </Alert>
           )}
@@ -189,6 +196,13 @@ export default function Login() {
                     alt="Password Icon"
                     style={{ width: 20, height: 20 }}
                   />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={toggleSenha} edge="end">
+                    {showSenha ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
                 </InputAdornment>
               ),
               sx: {
@@ -264,42 +278,6 @@ export default function Login() {
               Cadastre-se
             </Link>
           </Typography>
-
-          <Divider
-            sx={{
-              marginTop: "20px",
-              fontSize: "0.85rem",
-              color: "var(--text-gray)",
-            }}
-          >
-            Ou entre com
-          </Divider>
-
-          <Stack direction="row" spacing={2} sx={{ marginTop: "10px" }}>
-            <Button
-              variant="outlined"
-              startIcon={
-                <img
-                  src={googleLogo}
-                  alt="Google"
-                  style={{ width: 20, height: 20 }}
-                />
-              }
-              sx={{
-                flex: 1,
-                height: "45px",
-                borderRadius: "12px",
-                fontWeight: "bold",
-                color: "var(--text-dark)",
-                fontSize: "0.95rem",
-                "&:hover": {
-                  backgroundColor: "#f0f0f0",
-                },
-              }}
-            >
-              Google
-            </Button>
-          </Stack>
         </Stack>
       </form>
     </Box>

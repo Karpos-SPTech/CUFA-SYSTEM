@@ -13,9 +13,6 @@
         new window.VLibras.Widget('https://vlibras.gov.br/app');
         console.log('VLibras inicializado com sucesso!');
 
-        corrigirPosicionamento();
-        setTimeout(corrigirPosicionamento, 1500);
-
       } catch (error) {
         console.error('Erro ao inicializar VLibras Widget:', error);
       }

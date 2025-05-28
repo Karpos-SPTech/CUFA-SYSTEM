@@ -61,7 +61,7 @@ body {
 .perfil-empresa-side-column {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 38px; /* Aumentado de 24px para 40px para criar mais espaço entre os componentes */
   width: 450px;
   min-width: 450px;
 }
@@ -71,6 +71,16 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
   border: none !important;
 }
+
+/* Estilo específico para o card de membros */
+.membro-card-container .MuiPaper-root {
+  height: 250px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Adicionando espaço extra acima do card de vagas */
+
 
 @media (max-width: 1200px) {
   .perfil-empresa-content {

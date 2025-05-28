@@ -18,8 +18,12 @@ const PerfilEmpresa = () => {
             <SobreEmpresa />
           </div>
           <div className="perfil-empresa-side-column">
-            <MembroCard />
-            <VagaCard />
+            <div className="membro-card-container">
+              <MembroCard />
+            </div>
+            <div className="vaga-card-container">
+              <VagaCard />
+            </div>
           </div>
         </div>
       </div>

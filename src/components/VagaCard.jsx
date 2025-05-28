@@ -119,7 +119,7 @@ const VagaCard = () => {
           mb: 2,
           display: 'flex',
           flexWrap: 'nowrap',
-          gap: 1,
+          gap: 4,
           justifyContent: 'space-between',
           px: 1,
         }}

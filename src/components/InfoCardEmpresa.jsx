@@ -108,7 +108,7 @@ const InfoCardEmpresa = () => {
               cursor: 'pointer',
               width: 20,
               height: 20,
-              filter: 'brightness(0) invert(1)',
+              filter: 'brightness(0) invert(1)',  
               '&:hover': {
                 opacity: 0.8
               }

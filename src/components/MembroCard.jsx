@@ -110,6 +110,7 @@ const MembroCard = () => {
   const members = [
     { id: 1, name: 'Nome membro', image: null },
     { id: 2, name: 'Nome membro', image: null },
+    { id: 3, name: 'Nome membro', image: null },
   ];
 
   return (
@@ -123,6 +124,9 @@ const MembroCard = () => {
           width: '100%',
           minWidth: '400px',
           boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.08)',
+          height: '200px',
+          maxHeight: '400px',
+          overflowY: 'auto',
         }}
       >
         <Box

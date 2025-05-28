@@ -1,9 +1,15 @@
 import React from 'react';
 import { Box, Paper, Typography, Button, List, ListItem } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import mcdonaldsLogo from '../assets/microsoft-logo.png';
 import editIcon from '../assets/edit-icon.png';
 
-const VagaPublicada = () => {
+const VagaPublicada = ({ vagaId = 1 }) => {
+  const navigate = useNavigate();
+  
+  const handleVerCandidatos = () => {
+    navigate(`/telaCandidatos?vagaId=${vagaId}`);
+  };
   return (
     <Paper
       sx={{
@@ -195,6 +201,7 @@ const VagaPublicada = () => {
         <Button
           fullWidth
           variant="contained"
+          onClick={handleVerCandidatos}
           sx={{
             backgroundColor: '#006916',
             color: '#fff',

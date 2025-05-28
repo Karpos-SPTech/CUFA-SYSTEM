@@ -28,21 +28,6 @@ const TelaEmpresa = () => {
     setEmpresaData((prev) => ({ ...prev, ...updatedData }));
   };
 
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   return (
     <Box className="tela-empresa-container">
       <Header
