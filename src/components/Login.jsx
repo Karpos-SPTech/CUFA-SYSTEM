@@ -46,11 +46,18 @@ export default function Login() {
     const loginData = { email, senha };
 
     try {
-      // Primeiro tenta login como empresa
-      try {
-        const empresaResponse = await empresaService.login(loginData);
-        console.log("Empresa logada com sucesso:", empresaResponse);
-        navigate("/telaEmpresa"); // A navegação acontece após o login bem-sucedido
+
+      let response = await fetch("http://localhost:8080/usuarios/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData),
+      });
+
+      if (response.ok) {
+        const user = await response.json();
+        console.log("Usuário logado com sucesso:", user);
+        navigate("/telaUsuario");
+        
         return;
       } catch (empresaError) {
         console.error("Erro no login de empresa, tentando como usuário:", empresaError);
@@ -67,14 +74,11 @@ export default function Login() {
           body: JSON.stringify(loginData),
         });
 
-        if (response.ok) {
-          const user = await response.json();
-          console.log("Usuário logado com sucesso:", user);
-          navigate("/cufaSistema");
-          return;
-        }
-      } catch (userError) {
-        console.error("Erro no login de usuário:", userError);
+      if (response.ok) {
+        const empresa = await response.json();
+        console.log("Empresa logada com sucesso:", empresa);
+        navigate("/telaEmpresa");
+        return;
       }
 
       // Se chegou aqui, ambos os logins falharam
@@ -294,29 +298,6 @@ export default function Login() {
               }}
             >
               Google
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={
-                <img
-                  src={microsoftLogo}
-                  alt="Microsoft"
-                  style={{ width: 20, height: 20 }}
-                />
-              }
-              sx={{
-                flex: 1,
-                height: "45px",
-                borderRadius: "12px",
-                fontWeight: "bold",
-                color: "var(--text-dark)",
-                fontSize: "0.95rem",
-                "&:hover": {
-                  backgroundColor: "#f0f0f0",
-                },
-              }}
-            >
-              Microsoft
             </Button>
           </Stack>
         </Stack>
