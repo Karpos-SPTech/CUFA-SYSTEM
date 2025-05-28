@@ -2,16 +2,115 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+}
+
+*::-webkit-scrollbar {
+  display: none; 
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 .perfil-empresa-container {
   min-height: 100vh;
   width: 100%;
+  height: 100vh;
   background-color: #E5EEE3;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .perfil-empresa-content {
-  padding: 20px;
-  max-width: 800px;
+  width: 100%;
   margin: 0 auto;
+  padding: 16px 16px;
+  min-height: calc(100vh - 90px);
+}
+
+.perfil-empresa-layout {
+  display: flex;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.perfil-empresa-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  flex: 1;
+  min-width: 0;
+}
+
+.perfil-empresa-side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 450px;
+  min-width: 450px;
+}
+
+.perfil-empresa-container .MuiPaper-root {
+  border-radius: 15px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border: none !important;
+}
+
+@media (max-width: 1200px) {
+  .perfil-empresa-content {
+    padding: 16px 24px;
+  }
+  
+  .perfil-empresa-layout {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+
+  .perfil-empresa-content {
+    padding: 16px;
+  }
+
+  .perfil-empresa-layout {
+    flex-direction: column;
+  }
+
+  .perfil-empresa-main-column,
+  .perfil-empresa-side-column {
+    width: 100%;
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .perfil-empresa-content {
+    padding: 12px;
+  }
+
+  .perfil-empresa-layout {
+    gap: 16px;
+  }
+
+  .perfil-empresa-main-column,
+  .perfil-empresa-side-column {
+    gap: 16px;
+  }
 }
