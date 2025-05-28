@@ -4,6 +4,7 @@ import { Box, CircularProgress } from '@mui/material';
 import AnunciarVaga from './components/AnunciarVaga';
 import VagaPublicada from './components/VagaPublicada';
 import NotificationsPanel from './components/NotificationsPanel';
+import EstatisticasCandidatos from './components/EstatisticasCandidatos';
 import empresaService from './services/empresaService';
 import '../src/telaEmpresa.css';
 
