@@ -8,10 +8,12 @@ import {
   Modal,
   TextField,
   Button,
+  CircularProgress
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import profileIcon from '../assets/profile-icon.png';
+import funcionarioService from '../services/funcionarioService';
 
 const MemberRow = ({ image, name }) => (
   <Box
@@ -49,6 +51,8 @@ const MemberRow = ({ image, name }) => (
 
 const MembroCard = () => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     nome: '',
     sobrenome: '',
@@ -77,11 +81,29 @@ const MembroCard = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
     
-    console.log('Form submitted:', formData);
-    handleClose();
+    try {
+      const funcionarioData = {
+        nome: formData.nome,
+        sobrenome: formData.sobrenome,
+        email: formData.email,
+        cpf: formData.cpf,
+        funcao: formData.funcao
+      };
+
+      await funcionarioService.criarFuncionario(funcionarioData);
+      handleClose();
+      // Aqui você pode adicionar uma função para recarregar a lista de membros
+    } catch (err) {
+      console.error('Erro ao cadastrar funcionário:', err);
+      setError('Não foi possível cadastrar o funcionário. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
  
@@ -186,6 +208,12 @@ const MembroCard = () => {
             Dados pessoais
           </Typography>
 
+          {error && (
+            <Typography color="error" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+          )}
+
           <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <Box sx={{ display: 'flex', gap: 3 }}>
               <TextField
@@ -288,19 +316,24 @@ const MembroCard = () => {
               type="submit"
               variant="contained"
               fullWidth
+              disabled={loading}
               sx={{
                 mt: 2,
                 height: '48px',
                 bgcolor: '#006916',
                 color: 'white',
                 borderRadius: '12px',
-                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.5)',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
                 '&:hover': {
                   bgcolor: '#005713',
                 },
               }}
             >
-              Finalizar Cadastro
+              {loading ? (
+                <CircularProgress size={24} sx={{ color: 'white' }} />
+              ) : (
+                'Finalizar Cadastro'
+              )}
             </Button>
           </Box>
         </Box>

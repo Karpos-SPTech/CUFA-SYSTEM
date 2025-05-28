@@ -99,7 +99,6 @@ const VagaCard = () => {
         borderRadius: '15px',
         p: 2,
         width: '100%',
-        minWidth: '400px',
         boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.08)',
       }}
     >
