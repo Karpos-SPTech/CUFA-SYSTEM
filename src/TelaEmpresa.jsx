@@ -46,8 +46,9 @@ const TelaEmpresa = () => {
             maxWidth: '1400px',
             mx: 'auto',
           }}
-        >
-          <Box sx={{ width: 250 }} />
+        >          <Box sx={{ width: 350 }}>
+            <EstatisticasCandidatos />
+          </Box>
 
           <Box
             sx={{
