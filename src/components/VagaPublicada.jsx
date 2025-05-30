@@ -1,222 +1,164 @@
-import React from 'react';
-import { Box, Paper, Typography, Button, List, ListItem } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Paper, Typography, Button, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import mcdonaldsLogo from '../assets/microsoft-logo.png';
 import editIcon from '../assets/edit-icon.png';
+import publicacaoService from '../services/publicacaoService';
 
-const VagaPublicada = ({ vagaId = 1 }) => {
+const VagaPublicada = () => {
   const navigate = useNavigate();
-  
-  const handleVerCandidatos = () => {
+  const [vagas, setVagas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    carregarVagas();
+  }, []);
+
+  const carregarVagas = async () => {
+    try {
+      const response = await publicacaoService.listarPublicacoes();
+      setVagas(response);
+    } catch (err) {
+      console.error('Erro ao carregar vagas:', err);
+      setError('Erro ao carregar as vagas publicadas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerCandidatos = (vagaId) => {
     navigate(`/telaCandidatos?vagaId=${vagaId}`);
   };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" p={3}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box p={2}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
+  if (vagas.length === 0) {
+    return (
+      <Box p={2}>
+        <Typography align="center" color="textSecondary">
+          Nenhuma vaga publicada ainda
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Paper
-      sx={{
-        backgroundColor: '#fff',
-        borderRadius: '10px',
-        p: 2,
-        width: '100%',
-        border: '1px solid #ddd',
-        position: 'relative'
-      }}
-    >
-      {/* Header com Logo e Informações */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-        <Box
-          component="img"
-          src={mcdonaldsLogo}
-          alt="MC Donald's Logo"
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {vagas.map((vaga) => (
+        <Paper
+          key={vaga.id}
           sx={{
-            width: 50,
-            height: 50,
-            borderRadius: '50%'
+            backgroundColor: '#fff',
+            borderRadius: '10px',
+            p: 2,
+            width: '100%',
+            border: '1px solid #ddd',
+            position: 'relative'
           }}
-        />
-        <Box>
-          <Typography
-            variant="h6"
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+            <Box
+              component="img"
+              src={mcdonaldsLogo}
+              alt="Logo da Empresa"
+              sx={{
+                width: 50,
+                height: 50,
+                borderRadius: '50%'
+              }}
+            />
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: '#006916',
+                  fontSize: '16px',
+                  fontWeight: 'bold'
+                }}
+              >
+                {vaga.titulo}
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#666', fontSize: '12px' }}>
+                {vaga.descricao}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+            <img
+              src={editIcon}
+              alt="Editar"
+              style={{
+                cursor: 'pointer',
+                width: 24,
+                height: 24
+              }}
+              onClick={() => {/* Implementar edição */}}
+            />
+          </Box>
+
+          <Box
             sx={{
-              color: '#006916',
-              fontSize: '16px',
-              fontWeight: 'bold'
+              backgroundColor: '#f5f5f5',
+              borderRadius: '8px',
+              p: 2,
+              mt: 2
             }}
           >
-            MC Donald's
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: '#666', fontSize: '12px' }}
-          >
-            Fast Food
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: '#666', fontSize: '12px' }}
-          >
-            CLT
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: '#666', fontSize: '12px' }}
-          >
-            Há 7 horas
-          </Typography>
-        </Box>
-        {/* Ícone de Editar */}        <Box
-          component="img"
-          src={editIcon}
-          alt="Editar"
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            cursor: 'pointer',
-            width: 24,
-            height: 24
-          }}
-        />
-      </Box>
-
-      {/* Conteúdo Principal */}      <Typography
-        variant="h6"
-        align="center"
-        sx={{
-          color: '#006916',
-          fontSize: '16px',
-          fontWeight: 'bold',
-          mb: 2,
-          mt: 2,
-          width: '100%'
-        }}
-      >
-        Título da publicação
-      </Typography>
-
-      <Box
-        sx={{
-          backgroundColor: '#f5f5f5',
-          borderRadius: '8px',
-          p: 2
-        }}
-      >
-        <Typography
-          variant="subtitle1"
-          sx={{
-            color: '#444',
-            fontSize: '14px',
-            fontWeight: 'bold',
-            mb: 1
-          }}
-        >
-          • Vaga oferecida pela empresa
-        </Typography>
-
-        <Typography
-          variant="body2"
-          sx={{
-            color: '#666',
-            fontSize: '14px',
-            mb: 2
-          }}
-        >
-          Descrição da empresa - Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae provident unde accusantium quidem eos non explicabo suscipit. Quidem, quisquam obcaecati, sunt magnam repellendus libero itaque nihil eaque architecto, cum pariatur?
-        </Typography>
-
-        <Typography
-          variant="subtitle1"
-          sx={{
-            color: '#444',
-            fontSize: '14px',
-            fontWeight: 'bold',
-            mb: 1
-          }}
-        >
-          • O que o usuário irá realizar:
-        </Typography>
-
-        <List sx={{ pl: 4, mb: 2 }}>
-          <ListItem sx={{ display: 'list-item', py: 0 }}>
-            <Typography variant="body2" sx={{ color: '#666' }}>
-              Função 1
+            <Typography variant="subtitle1" sx={{ color: '#006916', mb: 1 }}>
+              Requisitos:
             </Typography>
-          </ListItem>
-          <ListItem sx={{ display: 'list-item', py: 0 }}>
-            <Typography variant="body2" sx={{ color: '#666' }}>
-              Função 2
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {vaga.requisitos}
             </Typography>
-          </ListItem>
-          <ListItem sx={{ display: 'list-item', py: 0 }}>
-            <Typography variant="body2" sx={{ color: '#666' }}>
-              Função 3
-            </Typography>
-          </ListItem>
-        </List>
 
-        <Typography
-          variant="subtitle1"
-          sx={{
-            color: '#444',
-            fontSize: '14px',
-            fontWeight: 'bold',
-            mb: 1
-          }}
-        >
-          • Benefícios:
-        </Typography>
-
-        <List sx={{ pl: 4, mb: 2 }}>
-          <ListItem sx={{ display: 'list-item', py: 0 }}>
-            <Typography variant="body2" sx={{ color: '#666' }}>
-              Vale-refeição ou alimentação
+            <Typography variant="subtitle1" sx={{ color: '#006916', mb: 1 }}>
+              Benefícios:
             </Typography>
-          </ListItem>
-          <ListItem sx={{ display: 'list-item', py: 0 }}>
-            <Typography variant="body2" sx={{ color: '#666' }}>
-              Plano de saúde e odontológico
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {vaga.beneficios}
             </Typography>
-          </ListItem>
-          <ListItem sx={{ display: 'list-item', py: 0 }}>
-            <Typography variant="body2" sx={{ color: '#666' }}>
-              Vale transporte
+
+            <Typography variant="subtitle1" sx={{ color: '#006916', mb: 1 }}>
+              Salário:
             </Typography>
-          </ListItem>
-        </List>
+            <Typography variant="body2">
+              {vaga.salario}
+            </Typography>
+          </Box>
 
-        <Typography
-          variant="body2"
-          sx={{
-            color: '#666',
-            fontSize: '14px',
-            fontStyle: 'italic',
-            mb: 2
-          }}
-        >
-          Frase atrativa para chamar a atenção do usuário !!
-        </Typography>
-      </Box>
-
-      {/* Botão Ver Candidatos */}
-      <Box sx={{ mt: 2 }}>
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={handleVerCandidatos}
-          sx={{
-            backgroundColor: '#006916',
-            color: '#fff',
-            borderRadius: '8px',
-            textTransform: 'none',
-            fontWeight: 'bold',
-            '&:hover': {
-              backgroundColor: '#005713'
-            }
-          }}
-        >
-          VER CANDIDATOS
-        </Button>
-      </Box>
-    </Paper>
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              onClick={() => handleVerCandidatos(vaga.id)}
+              sx={{
+                backgroundColor: '#006916',
+                '&:hover': {
+                  backgroundColor: '#005713'
+                }
+              }}
+            >
+              Ver Candidatos
+            </Button>
+          </Box>
+        </Paper>
+      ))}
+    </Box>
   );
 };
 

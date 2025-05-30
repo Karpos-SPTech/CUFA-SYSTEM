@@ -53,6 +53,7 @@ const MembroCard = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     sobrenome: '',
@@ -85,6 +86,7 @@ const MembroCard = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(false);
     
     try {
       const funcionarioData = {
@@ -96,11 +98,13 @@ const MembroCard = () => {
       };
 
       await funcionarioService.criarFuncionario(funcionarioData);
-      handleClose();
-      // Aqui você pode adicionar uma função para recarregar a lista de membros
+      setSuccess(true);
+      setTimeout(() => {
+        handleClose();
+        setSuccess(false);
+      }, 2000);
     } catch (err) {
-      console.error('Erro ao cadastrar funcionário:', err);
-      setError('Não foi possível cadastrar o funcionário. Tente novamente.');
+      setError(err.response?.data?.message || 'Erro ao criar funcionário');
     } finally {
       setLoading(false);
     }
@@ -215,6 +219,12 @@ const MembroCard = () => {
           {error && (
             <Typography color="error" sx={{ mb: 2 }}>
               {error}
+            </Typography>
+          )}
+
+          {success && (
+            <Typography color="success.main" sx={{ mb: 2 }}>
+              Funcionário cadastrado com sucesso!
             </Typography>
           )}
 
