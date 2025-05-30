@@ -12,6 +12,7 @@ import AtualizarSenhaPage from './components/AtualizarSenhaPage';
 import DashboardCufa from './DashboardCufa';
 import PerfilEmpresa from './PerfilEmpresa';
 import TelaCandidatos from './TelaCandidatos';
+import TelaPerfilUsuario from './TelaPerfilUsuario';
 import './index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -26,6 +27,7 @@ root.render(
         <Route path="/cadastroUsuario" element={<CadastroUsuario />} />
         <Route path="/cadastroEmpresa" element={<CadastroEmpresa />} />
         <Route path="/telaUsuario" element={<TelaUsuario />} />
+        <Route path="/telaPerfilUsuario" element={<TelaPerfilUsuario />} />
         <Route path="/telaEmpresa" element={<TelaEmpresa />} />
         <Route path="/perfilEmpresa" element={<PerfilEmpresa />} />
         <Route path="/telaCandidatos" element={<TelaCandidatos />} />
