@@ -1,23 +1,12 @@
-import axios from "axios";
-
-const API_BASE_URL = "http://localhost:8080";
-
-axios.defaults.withCredentials = true;
+import api from "./api";
 
 const funcionarioService = {
   criarFuncionario: async (funcionarioData) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/funcionarios`,
-        funcionarioData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.post("/funcionarios", funcionarioData);
       return response.data;
     } catch (error) {
+      console.error("Erro ao criar funcionário:", error.response || error);
       throw error;
     }
   },

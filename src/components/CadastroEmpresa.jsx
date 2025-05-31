@@ -23,23 +23,27 @@ export default function CadastroEmpresa() {
   const [cnpj, setCnpj] = useState("");
   const [area, setArea] = useState("");
   const [mensagem, setMensagem] = useState("");
-
   const validarCNPJ = async (cnpj) => {
     try {
-      const response = await fetch(
-        `https://publica.cnpj.ws/cnpj/${cnpj.replace(/\D/g, "")}`
-      );
-      const data = await response.json();
-      if (!data || !data.razao_social) {
-        // Verifica se o CNPJ é inválido ou não existe
-        setMensagem("CNPJ inválido! O CNPJ não existe.");
+      // Validação básica do CNPJ
+      const cnpjLimpo = cnpj.replace(/\D/g, "");
+      if (cnpjLimpo.length !== 14) {
+        setMensagem("CNPJ inválido! Deve conter 14 dígitos.");
         return false;
       }
+      
+      // Validação do formato do CNPJ
+      const regex = /^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$/;
+      if (!regex.test(cnpj)) {
+        setMensagem("Formato de CNPJ inválido! Use: XX.XXX.XXX/XXXX-XX");
+        return false;
+      }
+      
       setMensagem("");
       return true;
     } catch (error) {
       console.error("Erro ao validar o CNPJ:", error);
-      setMensagem("Erro ao validar o CNPJ.");
+      setMensagem("Não foi possível validar o CNPJ. Tente novamente.");
       return false;
     }
   };
@@ -136,27 +140,18 @@ export default function CadastroEmpresa() {
     }
     return true;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validarCadastroEmpresa()) {
       return;
-    }
-
-
-    const dados = { nome, email, senha, cep, numero, endereco, cnpj, area };
+    }    const dados = { nome, email, senha, cep, numero, endereco, cnpj, area };
     try {
-      const response = await fetch("http://localhost:8080/empresas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados),
-      });
-      if (!response.ok) throw new Error("Erro ao cadastrar usuário.");
+      await empresaService.cadastrarEmpresa(dados);
       navigate("/");
     } catch (error) {
       console.error("Erro ao cadastrar empresa:", error);
-      setMensagem(error.response?.data?.message || "Erro ao cadastrar empresa. Tente novamente.");
+      setMensagem(error.message || "Erro ao cadastrar empresa. Tente novamente.");
     }
   };
 
