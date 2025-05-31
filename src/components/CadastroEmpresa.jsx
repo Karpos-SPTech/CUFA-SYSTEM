@@ -215,7 +215,7 @@ export default function CadastroEmpresa() {
             ["Nome", nome, setNome],
             ["E-mail", email, setEmail, "email"],
           ].map(([label, value, setter, type = "text"], index) => (
-            <Grid item xs={12} key={index}>
+            <Grid item xs={12} key={index} sx={{ width: '46%' }}>
               <TextField
                 fullWidth
                 label={label}
@@ -242,7 +242,7 @@ export default function CadastroEmpresa() {
             </Grid>
           ))}
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
             <TextField
               fullWidth
               label="CEP"
@@ -268,7 +268,7 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} width={'46%'}>
             <TextField
               fullWidth
               label="Número"
@@ -295,7 +295,7 @@ export default function CadastroEmpresa() {
 
           {/* CNPJ já foi movido para outra posição */}
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
             <TextField
               fullWidth
               label="Área de Atuação"
@@ -320,7 +320,7 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
             <TextField
               fullWidth
               label="CNPJ"
@@ -370,7 +370,7 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
             <TextField
               fullWidth
               label="Senha"
@@ -396,7 +396,7 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
             <TextField
               fullWidth
               label="Confirmação de senha"

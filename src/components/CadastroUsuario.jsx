@@ -229,7 +229,7 @@ export default function CadastroUsuario() {
             sx={{
               mt: 1,
               height: "50px",
-              width: "88%",
+              width: "94%",
               backgroundColor: "var(--dark-green)",
               color: "var(--white)",
               fontWeight: "bold",

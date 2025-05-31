@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Box, 
   Paper, 
@@ -7,11 +7,15 @@ import {
   Modal,
   TextField,
   Button,
-  IconButton
+  IconButton,
+  Avatar
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import editIcon from '/src/assets/pencil-icon.svg';
 import empresaService from '../services/empresaService';
+import empresaImageManager from '../utils/empresaImageManager';
 
 const InfoCardEmpresa = () => {
   const [empresa, setEmpresa] = useState(null);
@@ -23,6 +27,12 @@ const InfoCardEmpresa = () => {
     email: '',
     cnpj: ''
   });
+  
+  // Estados para upload de imagens
+  const [profileImg, setProfileImg] = useState(null);
+  const [coverImg, setCoverImg] = useState(null);
+  const [hover, setHover] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchEmpresaData = async () => {
@@ -45,6 +55,12 @@ const InfoCardEmpresa = () => {
     };
 
     fetchEmpresaData();
+    
+    // Carregar imagens salvas usando o gerenciador
+    const savedProfileImg = empresaImageManager.getProfileImage();
+    const savedCoverImg = empresaImageManager.getCoverImage();
+    if (savedProfileImg) setProfileImg(savedProfileImg);
+    if (savedCoverImg) setCoverImg(savedCoverImg);
   }, []);
 
   const handleOpen = () => setOpen(true);
@@ -56,6 +72,48 @@ const InfoCardEmpresa = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  // Funções para upload de imagens
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB
+        alert('A imagem deve ter no máximo 2MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setProfileImg(ev.target.result);
+        localStorage.setItem('empresaProfileImg', ev.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setProfileImg(null);
+    localStorage.removeItem('empresaProfileImg');
+  };
+
+  const handleCoverUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB
+        alert('A imagem de capa deve ter no máximo 2MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setCoverImg(ev.target.result);
+        localStorage.setItem('empresaCoverImg', ev.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
   const handleSave = async () => {
     try {
@@ -84,36 +142,41 @@ const InfoCardEmpresa = () => {
           backgroundColor: '#fff',
           borderRadius: '15px',
           width: '100%',
+          minHeight: '450px', // Aumentado para acomodar a foto de capa maior
           overflow: 'hidden',
           position: 'relative'
         }}
       >
-        <Box
+        {/* Capa da empresa */}
+        <Box 
           sx={{
-            backgroundColor: '#006916',
-            height: '90px',
+            backgroundColor: coverImg ? 'transparent' : '#006916',
+            backgroundImage: coverImg ? `url(${coverImg})` : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '230px', // Aumentado para ocupar mais espaço da tela
             width: '100%',
             position: 'relative'
           }}
         >
-          <Box
-            component="img"
-            src={editIcon}
-            alt="Editar cabeçalho"
-            sx={{
-              position: 'absolute',
-              top: '50%',
-              right: 24,
-              transform: 'translateY(-50%)',
-              cursor: 'pointer',
-              width: 20,
-              height: 20,
-              filter: 'brightness(0) invert(1)',  
-              '&:hover': {
-                opacity: 0.8
-              }
-            }}
-          />
+          <input type="file" accept="image/*" id="cover-upload-empresa" style={{ display: 'none' }} onChange={handleCoverUpload} />
+          <IconButton
+            component="label"
+            htmlFor="cover-upload-empresa"
+            sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(0,0,0,0.25)', color: '#fff', zIndex: 2 }}
+          >
+            <EditIcon />
+            <input type="file" accept="image/*" hidden onChange={handleCoverUpload} />
+          </IconButton>
+          {coverImg && (
+            <IconButton
+              size="medium"
+              sx={{ position: 'absolute', top: 8, right: 48, bgcolor: 'rgba(0,0,0,0.25)', color: '#fff', zIndex: 2, width: 40, height: 40, p: 1 }}
+              onClick={() => { setCoverImg(null); localStorage.removeItem('empresaCoverImg'); }}
+            >
+              <DeleteIcon sx={{ fontSize: 24 }} />
+            </IconButton>
+          )}
         </Box>
 
         <Box sx={{ p: 3, pt: 6, position: 'relative' }}>
@@ -136,30 +199,94 @@ const InfoCardEmpresa = () => {
             }}
           />
 
+          {/* Avatar/Logo da empresa */}
           <Box
             sx={{
               position: 'absolute',
-              top: -50,
+              top: -60, // Ajustado para a nova altura da capa
               left: 24,
-              width: 100,
-              height: 100,
+              width: 120, // Aumentado de 100px para 120px
+              height: 120, // Aumentado de 100px para 120px
               borderRadius: '50%',
               border: '4px solid #fff',
               overflow: 'hidden',
               backgroundColor: '#fff',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
             }}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            onClick={handleAvatarClick}
           >
-            <Box
-              component="img"
-              src="/src/assets/microsoft-logo.png"
-              alt="Logo da empresa"
-              sx={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                p: 1
-              }}
+            {profileImg ? (
+              <Box
+                component="img"
+                src={profileImg}
+                alt="Logo da empresa"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+            ) : (
+              <Avatar
+                sx={{
+                  width: 110, // Ajustado para o novo tamanho do container
+                  height: 110, // Ajustado para o novo tamanho do container
+                  bgcolor: '#e3f2fd',
+                  fontSize: '2.2rem', // Aumentado ligeiramente
+                  fontWeight: 'bold',
+                  color: '#006916'
+                }}
+              >
+                {empresa?.nome ? empresa.nome.charAt(0).toUpperCase() : 'E'}
+              </Avatar>
+            )}
+            
+            {hover && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  bgcolor: 'rgba(0,0,0,0.45)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 2,
+                  cursor: 'pointer',
+                }}
+              >
+                <EditIcon sx={{ color: '#fff', fontSize: 24, mb: profileImg ? 0.5 : 0 }} />
+                <Typography sx={{ color: '#fff', fontSize: 11, fontWeight: 600, textAlign: 'center' }}>
+                  Trocar logo
+                </Typography>
+                {profileImg && (
+                  <IconButton 
+                    size="small" 
+                    sx={{ mt: 0.5, color: '#fff', bgcolor: 'rgba(0,0,0,0.25)' }} 
+                    onClick={e => { e.stopPropagation(); handleRemovePhoto(); }}
+                  >
+                    <DeleteIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                )}
+              </Box>
+            )}
+            
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              ref={fileInputRef}
+              onChange={handleFileChange}
             />
           </Box>
           

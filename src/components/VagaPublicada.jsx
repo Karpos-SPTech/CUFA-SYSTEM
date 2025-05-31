@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Paper, Typography, Button, List, ListItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import mcdonaldsLogo from '../assets/microsoft-logo.png';
 import editIcon from '../assets/edit-icon.png';
+import empresaImageManager from '../utils/empresaImageManager';
 
 const VagaPublicada = ({ vagaId = 1 }) => {
   const navigate = useNavigate();
+  const [empresaLogo, setEmpresaLogo] = useState(null);
+  
+  useEffect(() => {
+    // Carregar logo da empresa ao montar o componente
+    const savedLogo = empresaImageManager.getProfileImage();
+    if (savedLogo) {
+      setEmpresaLogo(savedLogo);
+    }
+
+    // Escutar mudanças na logo da empresa
+    const removeListener = empresaImageManager.addListener((imageType, imageData) => {
+      if (imageType === 'profile') {
+        setEmpresaLogo(imageData);
+      }
+    });
+
+    // Cleanup: remover listener quando o componente for desmontado
+    return removeListener;
+  }, []);
   
   const handleVerCandidatos = () => {
     navigate(`/telaCandidatos?vagaId=${vagaId}`);
@@ -25,12 +45,13 @@ const VagaPublicada = ({ vagaId = 1 }) => {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
         <Box
           component="img"
-          src={mcdonaldsLogo}
+          src={empresaLogo || mcdonaldsLogo}
           alt="MC Donald's Logo"
           sx={{
             width: 50,
             height: 50,
-            borderRadius: '50%'
+            borderRadius: '50%',
+            objectFit: 'cover'
           }}
         />
         <Box>

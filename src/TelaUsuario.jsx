@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Header from './components/Header';
+import HeaderUsuario from './components/HeaderUsuario';
 import CardEsquerda from './components/CardEsquerda';
 import CardVagas from './CardVagas';
 import CardDireita from './components/CardDireita';
@@ -89,7 +89,7 @@ const TelaUsuario = () => {
 
   return (
     <div className="tela-usuario-main">
-      <Header />
+      <HeaderUsuario />
       <div style={{
         display: 'flex',
         justifyContent: 'center',
@@ -98,13 +98,13 @@ const TelaUsuario = () => {
         background: '#E5EEE3',
         minHeight: '100vh',
         width: '100%',
-        paddingTop: 100, // espaço para o header fixo
+        paddingTop: 50, // espaço para o HeaderUsuario fixo
         boxSizing: 'border-box',
         overflowX: 'auto',
         maxWidth: 1400,
         margin: '0 auto',
       }}>
-        <div style={{ flex: '0 1 350px', maxWidth: 500, minWidth: 300, marginTop: 32 }}>
+        <div style={{ flex: '0 1 350px', maxWidth: 500, minWidth: 300, marginTop: 2 }}>
           <CardEsquerda
             showSaved={showSaved}
             toggleShowSaved={handleToggleShowSaved}

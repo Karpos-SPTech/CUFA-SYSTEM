@@ -26,7 +26,7 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
       >
         {/* Capa de perfil */}
         <Box sx={{ width: '100%', height: 120, position: 'relative', background: coverImg ? `url(${coverImg}) center/cover no-repeat` : "linear-gradient(180deg, #4CAF50 0%, #fff 80%)", borderTopLeftRadius: 12, borderTopRightRadius: 12, overflow: 'hidden' }} />
-        <Box sx={{ display: "flex", justifyContent: "center", mt: -7 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: -5 }}>
           <Avatar
             sx={{
               width: 64,
@@ -82,13 +82,6 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
             >
               {showSaved ? 'Ver todos' : 'Ver salvos'} ({savedCount})
             </Button>
-          </Stack>
-          <Divider />
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
-            <GroupsIcon color="success" />
-            <Typography variant="body2" fontWeight="medium">
-              Grupos
-            </Typography>
           </Stack>
         </CardContent>
       </Card>

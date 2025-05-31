@@ -106,7 +106,7 @@ const TelaCandidatos = () => {
             nome: 'Bruno Ferreira', 
             idade: 22, 
             email: 'bruno.ferreira@email.com',
-            telefone: '(11) 95555-0000',
+            telefone: '(11) 951473648',
             resumo: 'Estudante de Administração buscando oportunidade de primeiro emprego.',
             cidade: 'São Paulo',
             estado: 'SP',

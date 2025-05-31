@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Paper, 
@@ -15,6 +15,7 @@ import fotoIcon from '../assets/foto-icon.png';
 import videoIcon from '../assets/video-icon.png';
 import textoIcon from '../assets/text-icon.png';
 import publicacaoService from '../services/publicacaoService';
+import empresaImageManager from '../utils/empresaImageManager';
 
 const ButtonOption = ({ icon, label }) => (
   <Box
@@ -43,6 +44,7 @@ const AnunciarVaga = () => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [empresaLogo, setEmpresaLogo] = useState(null);
   const [publicacao, setPublicacao] = useState({
     titulo: '',
     descricao: '',
@@ -50,6 +52,24 @@ const AnunciarVaga = () => {
     beneficios: '',
     salario: ''
   });
+
+  useEffect(() => {
+    // Carregar logo da empresa ao montar o componente
+    const savedLogo = empresaImageManager.getProfileImage();
+    if (savedLogo) {
+      setEmpresaLogo(savedLogo);
+    }
+
+    // Escutar mudanças na logo da empresa
+    const removeListener = empresaImageManager.addListener((imageType, imageData) => {
+      if (imageType === 'profile') {
+        setEmpresaLogo(imageData);
+      }
+    });
+
+    // Cleanup: remover listener quando o componente for desmontado
+    return removeListener;
+  }, []);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -108,12 +128,13 @@ const AnunciarVaga = () => {
       >
         <Box
           component="img"
-          src={mcdonaldsLogo}
+          src={empresaLogo || mcdonaldsLogo}
           alt="Logo empresa"
           sx={{
             width: 40,
             height: 40,
-            borderRadius: '50%'
+            borderRadius: '50%',
+            objectFit: 'cover'
           }}
         />
         <Box

@@ -84,6 +84,7 @@ const Notifications = () => {
             fontSize: { xs: 12, sm: 13, md: 14 },
             color: "#006916",
             mt: 0.5,
+            fontWeight: "bold",
             fontFamily: "'Paytone One', sans-serif",
             "&:hover": {
               textDecoration: "underline",

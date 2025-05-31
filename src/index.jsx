@@ -15,17 +15,33 @@ import TelaCandidatos from './TelaCandidatos';
 import TelaPerfilUsuario from './TelaPerfilUsuario';
 import './index.css';
 
+// Wrapper para garantir que o fundo verde seja aplicado a todas as páginas
+const PageWrapper = ({ children }) => {
+  return (
+    <div style={{ 
+      backgroundColor: '#006916', 
+      minHeight: '100vh', 
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}>
+      {children}
+    </div>
+  );
+};
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/Escolha" element={<Escolha />} />
-        <Route path="/" element={<Login />} />
-        <Route path="/AtualizarSenha" element={<AtualizarSenha />} />
-        <Route path="/AtualizarSenhaPage" element={<AtualizarSenhaPage />} />
-        <Route path="/cadastroUsuario" element={<CadastroUsuario />} />
-        <Route path="/cadastroEmpresa" element={<CadastroEmpresa />} />
+        <Route path="/" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route path="/AtualizarSenha" element={<PageWrapper><AtualizarSenha /></PageWrapper>} />
+        <Route path="/AtualizarSenhaPage" element={<PageWrapper><AtualizarSenhaPage /></PageWrapper>} />
+        <Route path="/cadastroUsuario" element={<PageWrapper><CadastroUsuario /></PageWrapper>} />
+        <Route path="/cadastroEmpresa" element={<PageWrapper><CadastroEmpresa /></PageWrapper>} />
         <Route path="/telaUsuario" element={<TelaUsuario />} />
         <Route path="/telaPerfilUsuario" element={<TelaPerfilUsuario />} />
         <Route path="/telaEmpresa" element={<TelaEmpresa />} />

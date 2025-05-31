@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import Header from "./components/Header";
+import HeaderUsuario from "./components/HeaderUsuario";
 import { Box } from "@mui/material";
 import './perfil-usuario.css';
 import CardCurriculo from './components/CardCurriculo';
@@ -61,7 +61,7 @@ export default function TelaPerfilUsuario() {
   return (
     <div className="perfil-usuario-main">
       <Box sx={{ background: '#e5eee3', minHeight: '100vh', width: '100%', pb: 6 }}>
-        <Header />
+        <HeaderUsuario />
         <Box sx={{
           display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-start',
           gap: 2, pt: 4, px: 1, maxWidth: 1300, margin: '0 auto', width: '100%'

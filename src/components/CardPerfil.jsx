@@ -70,16 +70,29 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
           justifyContent: 'center',
           alignItems: 'flex-start',
           gap: 2,
-          px: 1,
+          px: 3,
           position: 'relative',
         }}>
           <Box
-            sx={{ position: 'relative', width: 110, height: 110, mt: -7, ml: { xs: 0, md: 6 }, border: '6px solid #fff', borderRadius: '50%', background: '#fff' }}
+            sx={{ 
+              position: 'relative', 
+              width: 110, 
+              height: 110, 
+              mt: -7, 
+              ml: 'auto', 
+              mr: 'auto',
+              border: '6px solid #fff', 
+              borderRadius: '50%', 
+              background: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
           >
             <Avatar
-              sx={{ width: 110, height: 110, boxShadow: 2, bgcolor: '#e3f2fd', cursor: 'pointer' }}
+              sx={{ width: 98, height: 98, boxShadow: 2, bgcolor: '#e3f2fd', cursor: 'pointer' }}
               src={profileImg || undefined}
               onClick={onAvatarClick}
             >
