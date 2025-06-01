@@ -9,6 +9,9 @@ import {
   Button,
   Avatar,
   Divider,
+  Select,
+  MenuItem,
+  FormControl,
 } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -23,6 +26,7 @@ const Header = ({ hideNotifications }) => {
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [escolaridade, setEscolaridade] = useState('');
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen((prev) => !prev);
@@ -316,134 +320,211 @@ const Header = ({ hideNotifications }) => {
             }}
           >
             &times;
-          </Button>
-          <Typography            sx={{
+          </Button>          <Typography
+            sx={{
               fontSize: { xs: 18, sm: 22, md: 24 },
               color: "#006916",
-              marginBottom: "10px",
+              marginBottom: "5px",
               fontWeight: "bold",
               textAlign: "center",
               fontFamily: "'Paytone One', sans-serif",
             }}
           >
-            Atualize seu Perfil
+            Preencha os dados para cadastrar
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: { xs: 14, sm: 16, md: 18 },
+              color: "#666",
+              marginBottom: "20px",
+              textAlign: "left",
+              fontFamily: "'Paytone One', sans-serif",
+            }}
+          >
+            Dados pessoais
           </Typography>
           <Box
             component="form"
             sx={{
               display: "flex",
               flexDirection: "column",
-              gap: "20px",
+              gap: "15px",
             }}
           >
-            <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase              placeholder="Nome" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
-              <InputBase placeholder="Sobrenome" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
+            <Box sx={{ display: "flex", gap: "15px" }}>              <InputBase
+                placeholder="Nome Completo"
+                sx={{
+                  width: "100%",
+                  padding: "12px",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor: "#f0f0f0",
+                  color: "#333",
+                  fontFamily: "'Paytone One', sans-serif",
+                  fontSize: "14px",
+                }}
+              />
+              <InputBase
+                placeholder="CPF"
+                sx={{
+                  width: "100%",
+                  padding: "12px",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor: "#f0f0f0",
+                  color: "#333",
+                  fontFamily: "'Paytone One', sans-serif",
+                  fontSize: "14px",
+                }}
+              />
             </Box>
-            <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase placeholder="CPF" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
-              <InputBase placeholder="Telefone" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
+            <Box sx={{ display: "flex", gap: "15px" }}>              <InputBase
+                placeholder="Telefone"
+                sx={{
+                  width: "96%",
+                  padding: "12px",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor: "#f0f0f0",
+                  color: "#333",
+                  fontFamily: "'Paytone One', sans-serif",
+                  fontSize: "14px",
+                }}
+              />              <FormControl 
+                fullWidth 
+                sx={{ 
+                  borderRadius: "8px",
+                  color: "#333",
+                  alignItems: "center",
+                  backgroundColor: "#f0f0f0",
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                }}
+              >
+                <Select
+                  value={escolaridade}
+                  onChange={(e) => setEscolaridade(e.target.value)}
+                  displayEmpty                  sx={{                    width: "100%",
+                    height: "41px",
+                    borderRadius: "8px",
+                    backgroundColor: "#f0f0f0",
+                    color: "#333",
+                    border: 'none',
+                    fontFamily: "'Paytone One', sans-serif",
+                    fontSize: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    '& .MuiSelect-select': {
+                      padding: "0 12px",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center"
+                    }
+                  }}                  renderValue={
+                    escolaridade !== '' ? undefined : () => <span style={{ color: '#a0a0a0', fontFamily: "'Paytone One', sans-serif", fontSize: '14px', display: 'flex', alignItems: 'center', height: '100%' }}>Escolaridade</span>
+                  }
+                >
+                  <MenuItem value="">
+                    <em>Selecione</em>
+                  </MenuItem>
+                  <MenuItem value="nenhuma">Nenhuma</MenuItem>
+                  <MenuItem value="fundamental-incompleto">Ensino Fundamental Incompleto</MenuItem>
+                  <MenuItem value="fundamental-completo">Ensino Fundamental Completo</MenuItem>
+                  <MenuItem value="medio-incompleto">Ensino Médio Incompleto</MenuItem>
+                  <MenuItem value="medio-completo">Ensino Médio Completo</MenuItem>
+                </Select>
+              </FormControl>
             </Box>
-            <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase placeholder="Data de nascimento" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
-              <InputBase placeholder="CEP" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
+            <Box sx={{ display: "flex", gap: "15px" }}>
+              <InputBase
+                placeholder="Data de nascimento"
+                sx={{
+                  width: "100%",
+                  padding: "12px",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor: "#f0f0f0",
+                  color: "#333",
+                  fontFamily: "'Paytone One', sans-serif",
+                  fontSize: "14px",
+                }}
+              />
+              <InputBase
+                placeholder="Estado Civil"
+                sx={{
+                  width: "100%",
+                  padding: "12px",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor: "#f0f0f0",
+                  color: "#333",
+                  fontFamily: "'Paytone One', sans-serif",
+                  fontSize: "14px",
+                }}
+              />
             </Box>
-            <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase placeholder="Bairro" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
-              <InputBase placeholder="Número" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
+            <Box sx={{ display: "flex", gap: "15px" }}>
+              <InputBase
+                placeholder="Estado"
+                sx={{
+                  width: "100%",
+                  padding: "12px",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor: "#f0f0f0",
+                  color: "#333",
+                  fontFamily: "'Paytone One', sans-serif",
+                  fontSize: "14px",
+                }}
+              />
+              <InputBase
+                placeholder="Cidade"
+                sx={{
+                  width: "100%",
+                  padding: "12px",
+                  border: "none",
+                  borderRadius: "8px",
+                  backgroundColor: "#f0f0f0",
+                  color: "#333",
+                  fontFamily: "'Paytone One', sans-serif",
+                  fontSize: "14px",
+                }}
+              />
             </Box>
             <InputBase
-              placeholder="Endereço"
+              placeholder="Biografia"
+              multiline
+              rows={3}
               sx={{
                 width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
+                padding: "12px",
+                border: "none",
+                borderRadius: "8px",
+                backgroundColor: "#f0f0f0",
+                color: "#333",
                 fontFamily: "'Paytone One', sans-serif",
+                fontSize: "14px",
               }}
             />
-            <Button              type="submit"
+            <Button
+              type="submit"
               sx={{
                 backgroundColor: "#006916",
                 color: "white",
                 padding: "15px",
-                borderRadius: "10px",
-                fontSize: "18px",
+                borderRadius: "8px",
+                fontSize: "16px",
                 fontWeight: "bold",
-                marginTop: "20px",
+                marginTop: "10px",
                 fontFamily: "'Paytone One', sans-serif",
+                textTransform: "none",
                 '&:hover': {
                   backgroundColor: "#004d12",
                 },
               }}
             >
-              Atualizar Perfil
+              Finalizar Cadastro
             </Button>
           </Box>
         </Box>
