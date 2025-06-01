@@ -425,9 +425,6 @@ const Header = ({ hideNotifications }) => {
                     escolaridade !== '' ? undefined : () => <span style={{ color: '#a0a0a0', fontFamily: "'Paytone One', sans-serif", fontSize: '14px', display: 'flex', alignItems: 'center', height: '100%' }}>Escolaridade</span>
                   }
                 >
-                  <MenuItem value="">
-                    <em>Selecione</em>
-                  </MenuItem>
                   <MenuItem value="nenhuma">Nenhuma</MenuItem>
                   <MenuItem value="fundamental-incompleto">Ensino Fundamental Incompleto</MenuItem>
                   <MenuItem value="fundamental-completo">Ensino Fundamental Completo</MenuItem>
