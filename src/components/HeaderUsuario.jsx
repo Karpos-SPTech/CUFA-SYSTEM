@@ -736,7 +736,7 @@ const Header = ({ hideNotifications }) => {
                       display: "flex", alignItems: "center",
                       '& .MuiSelect-select': { padding: "0 12px", height: "100%", display: "flex", alignItems: "center" }
                     }} renderValue={
-                      estadoCivil !== '' ? undefined : () => <span style={{ color: '#a0a0a0', fontFamily: "'Paytone One', sans-serif", fontSize: '14px', display: 'flex', alignItems: 'center', height: '100%' }}>Estado CIvil</span>
+                      estadoCivil !== '' ? undefined : () => <span style={{ color: '#a0a0a0', fontFamily: "'Paytone One', sans-serif", fontSize: '14px', display: 'flex', alignItems: 'center', height: '100%' }}>Estado Civil</span>
                     }
                   >
                     <MenuItem value="Solteiro(a)">Solteiro(a)</MenuItem>
