@@ -1,48 +1,162 @@
-import React, { useState } from "react";
-import { Card, CardContent, Typography, IconButton, Modal, TextField, Button, Box } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, Typography, IconButton, Modal, TextField, Button, Box, CircularProgress, Snackbar, Alert } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 
 export default function CardSobre() {
-  const [sobre, setSobre] = useState('Experiência como ajudante de obras, serviços gerais e entregas. Sempre disposto a aprender e crescer profissionalmente.');
-  const [openEdit, setOpenEdit] = useState(false);
-  const [sobreDraft, setSobreDraft] = useState(sobre);
+  const [biografia, setBiografia] = useState(''); // O estado principal para a biografia
+  const [openEdit, setOpenEdit] = useState(false); // Para controlar o modal de edição
+  const [biografiaDraft, setBiografiaDraft] = useState(''); // O rascunho enquanto edita
+  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [error, setError] = useState(null); // Estado de erro
+  const [isSaving, setIsSaving] = useState(false); // Estado para o salvamento
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-  const handleSave = () => {
-    setSobre(sobreDraft);
-    setOpenEdit(false);
+  // Mensagem padrão para a biografia
+  const defaultBiografiaMessage = "Nenhuma biografia informada.";
+
+  useEffect(() => {
+    const fetchBiografia = async () => {
+      setLoading(true);
+      setError(null);
+
+      const userId = localStorage.getItem('userId');
+      const userToken = localStorage.getItem('token');
+
+      if (!userId || !userToken) {
+        setError(new Error("Usuário não autenticado. Por favor, faça login."));
+        setLoading(false);
+        // Em um cenário real, você pode querer redirecionar para o login aqui
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userToken}`
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Biografia recebida no CardSobre:", data.biografia);
+
+        // Define a biografia principal e o rascunho com o valor do backend
+        setBiografia(data.biografia ?? '');
+        setBiografiaDraft(data.biografia ?? '');
+
+      } catch (err) {
+        console.error("Erro ao buscar biografia:", err);
+        setError(err);
+        setSnackbarMessage(`Erro ao carregar biografia: ${err.message}`);
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBiografia();
+  }, []); // O array de dependências vazio faz com que o useEffect execute apenas uma vez (no mount)
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    setError(null);
+
+    const userId = localStorage.getItem('userId');
+    const userToken = localStorage.getItem('token');
+
+    if (!userId || !userToken) {
+      setError(new Error("Sessão expirada. Não foi possível salvar a biografia."));
+      setIsSaving(false);
+      setSnackbarMessage("Sessão expirada. Por favor, faça login novamente.");
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      setOpenEdit(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+        method: 'PUT', // Usamos PUT para atualizar o recurso
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`
+        },
+        body: JSON.stringify({ biografia: biografiaDraft }) // Enviamos apenas a biografia
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+      }
+
+      // Se a resposta for 204 No Content, não haverá body para parsear
+      if (response.status !== 204) {
+         await response.json(); // Consumir o body, mesmo que seja vazio
+      }
+
+
+      setBiografia(biografiaDraft); // Atualiza o estado principal com o rascunho salvo
+      setOpenEdit(false); // Fecha o modal
+      setSnackbarMessage("Biografia salva com sucesso!");
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+
+    } catch (err) {
+      console.error("Erro ao salvar biografia:", err);
+      setError(err);
+      setSnackbarMessage(`Erro ao salvar biografia: ${err.message}`);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   return (
     <>
       <Card className="perfil-usuario-card" sx={{ flex: 1, borderRadius: 5, boxShadow: 4, background: '#fff', minHeight: 180, position: 'relative', p: 0 }}>
         <CardContent sx={{ px: 5, py: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#006916', mb: 1, fontSize: 20 }}>Sobre</Typography>
-          <Typography variant="body1" sx={{ color: '#333', fontSize: 17 }}>
-            {sobre}
-          </Typography>
-        </CardContent>
-        <IconButton sx={{ position: 'absolute', right: 24, top: 24, color: '#006916', background: '#e5eee3', boxShadow: 1 }} onClick={() => { setSobreDraft(sobre); setOpenEdit(true); }}>
-          <EditIcon />
-        </IconButton>
-      </Card>
-      <Modal open={openEdit} onClose={() => setOpenEdit(false)}>
-        <Box sx={{ bgcolor: '#fff', p: 4, borderRadius: 3, maxWidth: 400, mx: 'auto', mt: '10%', boxShadow: 6 }}>
-          <Typography variant="h6" sx={{ mb: 2, color: '#006916' }}>Editar Sobre</Typography>
-          <TextField
-            label="Sobre"
-            fullWidth
-            multiline
-            minRows={3}
-            value={sobreDraft}
-            onChange={e => setSobreDraft(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-            <Button onClick={() => setOpenEdit(false)} color="secondary">Cancelar</Button>
-            <Button variant="contained" sx={{ bgcolor: '#006916' }} onClick={handleSave}>Salvar</Button>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#006916', fontSize: 20 }}>Sobre</Typography>
           </Box>
-        </Box>
-      </Modal>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 80 }}>
+              <CircularProgress size={24} color="success" />
+              <Typography sx={{ ml: 2, color: '#006916' }}>Carregando biografia...</Typography>
+            </Box>
+          ) : error && !biografia ? ( // Mostra erro apenas se não houver biografia para exibir
+            <Typography variant="body2" color="error" sx={{ fontSize: 15, textAlign: 'center' }}>
+              {error.message}
+            </Typography>
+          ) : (
+            <Typography variant="body1" sx={{ color: '#333', fontSize: 17, whiteSpace: 'pre-wrap' }}>
+              {biografia || defaultBiografiaMessage}
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
+
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

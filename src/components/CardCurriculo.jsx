@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, Typography, Box, IconButton, Button } from "@mui/material";
+import { Card, CardContent, Typography, Box, IconButton } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 
@@ -15,26 +15,56 @@ export default function CardCurriculo({ curriculoFile, curriculoFileName, curric
             accept="application/pdf,.doc,.docx"
             style={{ display: 'none' }}
             ref={curriculoInputRef}
-            onChange={e => {
+            onChange={async (e) => {
               const file = e.target.files[0];
               if (!file) return;
+
               if (file.size > 5 * 1024 * 1024) {
                 alert('O arquivo deve ter no máximo 5MB.');
                 return;
               }
-              const reader = new FileReader();
-              reader.onload = (ev) => {
-                localStorage.setItem('curriculoFile', ev.target.result);
-                localStorage.setItem('curriculoFileName', file.name);
-                setCurriculoFile(ev.target.result);
-                setCurriculoFileName(file.name);
-              };
-              reader.readAsDataURL(file);
+
+              const userId = localStorage.getItem('userId');
+              const userToken = localStorage.getItem('token');
+
+              const formData = new FormData();
+              formData.append("file", file);
+
+              try {
+                const response = await fetch("http://localhost:8080/curriculos/upload", {
+                  method: "POST",
+                  body: formData,
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}`
+                  }
+                });
+
+                if (response.ok) {
+                  const fileNameFromServer = await response.text();
+                  setCurriculoFile(fileNameFromServer); // nome retornado do backend
+                  setCurriculoFileName(file.name); // nome original do arquivo para exibir ao usuário
+                } else {
+                  alert("Erro ao enviar currículo");
+                }
+              } catch (error) {
+                alert("Erro de rede ao enviar currículo");
+              }
             }}
           />
           <button
             type="button"
-            style={{ background: '#006916', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', boxShadow: '0 2px 6px #00691622' }}
+            style={{
+              background: '#006916',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '6px 18px',
+              fontWeight: 600,
+              fontSize: 15,
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px #00691622'
+            }}
             onClick={handleCurriculoClick}
           >
             {curriculoFile ? 'Trocar currículo' : 'Anexar currículo'}
@@ -58,8 +88,10 @@ export default function CardCurriculo({ curriculoFile, curriculoFileName, curric
                 {curriculoFileName}
               </Typography>
               <a
-                href={curriculoFile}
-                download={curriculoFileName || 'curriculo'}
+                href={`http://localhost:8080/curriculos/download/${curriculoFile}`}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{
                   background: '#006916',
                   color: '#fff',
@@ -77,14 +109,12 @@ export default function CardCurriculo({ curriculoFile, curriculoFileName, curric
                   marginLeft: 8
                 }}
               >
-                <svg style={{ marginRight: 4 }} xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24"><path fill="#fff" d="M12 16.5a1 1 0 0 1-1-1V6a1 1 0 1 1 2 0v9.5a1 1 0 0 1-1 1Z"/><path fill="#fff" d="M7.21 13.79a1 1 0 0 1 1.42-1.42l2.29 2.3 2.3-2.3a1 1 0 1 1 1.41 1.42l-3 3a1 1 0 0 1-1.42 0l-3-3Z"/><path fill="#fff" d="M5 20a1 1 0 0 1 0-2h14a1 1 0 1 1 0 2H5Z"/></svg>
+                <DownloadIcon fontSize="small" />
                 Baixar
               </a>
               <IconButton size="small" sx={{ color: '#b71c1c', background: '#fbe9e7', boxShadow: 1 }} onClick={() => {
                 setCurriculoFile('');
                 setCurriculoFileName('');
-                localStorage.removeItem('curriculoFile');
-                localStorage.removeItem('curriculoFileName');
               }}>
                 <DeleteIcon fontSize="small" />
               </IconButton>

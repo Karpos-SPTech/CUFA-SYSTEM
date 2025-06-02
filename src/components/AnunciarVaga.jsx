@@ -168,9 +168,6 @@ const AnunciarVaga = () => {
           mt: 1
         }}
       >
-        <ButtonOption icon={fotoIcon} label="Foto" />
-        <ButtonOption icon={videoIcon} label="Vídeo" />
-        <ButtonOption icon={textoIcon} label="Texto" />
       </Box>    </Paper>
 
       <Modal

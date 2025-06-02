@@ -4,6 +4,20 @@ const API_BASE_URL = "http://localhost:8080";
 
 axios.defaults.withCredentials = true;
 
+// Adiciona um interceptor para incluir o token em todas as requisições
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 const empresaService = {
   cadastrarEmpresa: async (empresaData) => {
     try {
@@ -64,15 +78,6 @@ const empresaService = {
   deletarEmpresa: async (id) => {
     try {
       const response = await axios.delete(`${API_BASE_URL}/empresas/${id}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  getEmpresaLogada: async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/empresas/me`);
       return response.data;
     } catch (error) {
       throw error;

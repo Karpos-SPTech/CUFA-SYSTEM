@@ -117,6 +117,10 @@ export default function CadastroEmpresa() {
       setMensagem("A senha deve ter pelo menos 8 caracteres.");
       return false;
     }
+    if (senha.length > 60) {  // Adicionando limite máximo para senha
+      setMensagem("A senha não pode ter mais que 60 caracteres.");
+      return false;
+    }
     if (!/[A-Za-z]/.test(senha)) {
       setMensagem("A senha deve conter pelo menos uma letra.");
       return false;
@@ -138,27 +142,63 @@ export default function CadastroEmpresa() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  
+  if (!validarCadastroEmpresa()) {
+    return;
+  }
+
+  // Remove formatação do CEP e CNPJ
+  const cepLimpo = cep.replace(/\D/g, "");
+  const cnpjLimpo = cnpj.replace(/\D/g, "");
+
+  const dados = {
+    nome,
+    email,
+    senha,
+    cep: cepLimpo,
+    numero,
+    endereco,
+    cnpj: cnpjLimpo,
+    area,
+    biografia: "",
+    dtCadastro: new Date().toISOString().split('T')[0]
+  };
+
+  try {
+    const response = await fetch("http://localhost:8080/empresas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dados),
+    });
     
-    if (!validarCadastroEmpresa()) {
+    if (response.status === 201) {
+      setMensagem("Cadastro realizado com sucesso!");
+      // Aguarda 2 segundos antes de redirecionar
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
       return;
     }
 
-
-    const dados = { nome, email, senha, cep, numero, endereco, cnpj, area };
+    // Se não for 201, tenta ler o corpo da resposta para erro
+    const responseData = await response.text();
+    let errorMessage = "Erro ao cadastrar empresa.";
+    
     try {
-      const response = await fetch("http://localhost:8080/empresas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados),
-      });
-      if (!response.ok) throw new Error("Erro ao cadastrar usuário.");
-      navigate("/");
-    } catch (error) {
-      console.error("Erro ao cadastrar empresa:", error);
-      setMensagem(error.response?.data?.message || "Erro ao cadastrar empresa. Tente novamente.");
+      const errorJson = JSON.parse(responseData);
+      errorMessage = errorJson.message || errorMessage;
+    } catch (e) {
+      // Se não conseguir parsear como JSON, usa o texto da resposta
+      errorMessage = responseData || errorMessage;
     }
-  };
+
+    throw new Error(errorMessage);
+  } catch (error) {
+    console.error("Erro ao cadastrar empresa:", error);
+    setMensagem(error.message || "Erro ao cadastrar empresa. Tente novamente.");
+  }
+};
 
   return (
     <Container
@@ -215,7 +255,7 @@ export default function CadastroEmpresa() {
             ["Nome", nome, setNome],
             ["E-mail", email, setEmail, "email"],
           ].map(([label, value, setter, type = "text"], index) => (
-            <Grid item xs={12} key={index} sx={{ width: '46%' }}>
+            <Grid item xs={12} key={index}>
               <TextField
                 fullWidth
                 label={label}
@@ -242,7 +282,7 @@ export default function CadastroEmpresa() {
             </Grid>
           ))}
 
-          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="CEP"
@@ -268,7 +308,7 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} width={'46%'}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="Número"
@@ -295,7 +335,7 @@ export default function CadastroEmpresa() {
 
           {/* CNPJ já foi movido para outra posição */}
 
-          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="Área de Atuação"
@@ -320,7 +360,7 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="CNPJ"
@@ -370,7 +410,7 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="Senha"
@@ -396,7 +436,7 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} sx={{ width: '46%' }}>
+          <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               label="Confirmação de senha"
@@ -445,8 +485,11 @@ export default function CadastroEmpresa() {
         {mensagem && (
           <Box mt={2}>
             <Alert
-              severity="error"
-              sx={{ fontWeight: "bold", color: "var(--dark-green)" }}
+              severity={mensagem.includes("sucesso") ? "success" : "error"}
+              sx={{ 
+                fontWeight: "bold", 
+                color: mensagem.includes("sucesso") ? "var(--dark-green)" : "#d32f2f"
+              }}
             >
               {mensagem}
             </Alert>

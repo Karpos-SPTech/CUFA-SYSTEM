@@ -1,17 +1,99 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, Typography, Avatar, Box, Divider, Stack, Button } from "@mui/material";
+import { Card, CardContent, Typography, Avatar, Box, Divider, Stack, Button, CircularProgress } from "@mui/material"; // Adicionado CircularProgress para o loading
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import GroupsIcon from "@mui/icons-material/Groups";
 
 export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount }) {
+  // Estados para as imagens de perfil e capa (mantidos do seu código original)
   const [profileImg, setProfileImg] = useState(null);
   const [coverImg, setCoverImg] = useState(null);
+
+  // --- NOVOS ESTADOS PARA OS DADOS DO USUÁRIO E O STATUS DO FETCH ---
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Efeito para carregar as imagens de perfil e capa do localStorage (mantido)
   useEffect(() => {
     const saved = localStorage.getItem('profileImg');
     if (saved) setProfileImg(saved);
     const cover = localStorage.getItem('coverImg');
     if (cover) setCoverImg(cover);
   }, []);
+
+  // --- NOVO useEffect para o fetch dos dados do usuário ---
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true); // Inicia o carregamento
+      setError(null);   // Limpa erros anteriores
+
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+
+      if (!userId || !token) {
+        setError(new Error("ID do usuário ou token não encontrado. Por favor, faça login."));
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Inclui o token JWT
+          },
+        });
+
+        if (!response.ok) {
+          // Lança um erro se a resposta não for bem-sucedida (status 4xx ou 5xx)
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setUserData(data); // Define os dados do usuário no estado
+      } catch (err) {
+        console.error("Erro ao buscar dados do usuário:", err);
+        setError(err); // Define o erro
+      } finally {
+        setLoading(false); // Finaliza o carregamento
+      }
+    };
+
+    fetchUserData(); // Chama a função de fetch quando o componente monta
+  }, []); // O array de dependências vazio significa que ele só roda uma vez ao montar
+
+  // --- Renderização condicional baseada no estado de carregamento e erro ---
+  if (loading) {
+    return (
+      <Box sx={{ maxWidth: 350, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+        <CircularProgress color="success" />
+        <Typography sx={{ ml: 2, color: '#006916' }}>Carregando perfil...</Typography>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ maxWidth: 350, p: 2, border: '1px solid red', borderRadius: 3, textAlign: 'center' }}>
+        <Typography color="error">Erro: {error.message}</Typography>
+        <Typography variant="body2" color="text.secondary">Não foi possível carregar os dados do perfil.</Typography>
+      </Box>
+    );
+  }
+
+  // Se não houver erro e o carregamento terminou, mas userData ainda é null (ex: userId/token faltou e não tinha erro explícito)
+  if (!userData) {
+    return (
+      <Box sx={{ maxWidth: 350, p: 2, border: '1px solid gray', borderRadius: 3, textAlign: 'center' }}>
+        <Typography color="text.secondary">Dados do perfil não disponíveis.</Typography>
+      </Box>
+    );
+  }
+
+  // Desestruturar os dados do usuário para fácil acesso
+  const { nome, estado, cidade, biografia } = userData;
 
   return (
     <Box sx={{ maxWidth: 350 }}>
@@ -51,13 +133,13 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
             component="div"
             sx={{ fontWeight: "bold", color: "green", mb: 1, textTransform: "uppercase" }}
           >
-            GUILHERME SILVA
+            {nome || "Nome do Usuário"} {/* Usa o nome do usuário do fetch */}
           </Typography>
           <Typography variant="body1" sx={{ mb: 2 }}>
-            Experiência como ajudante de obras, serviços gerais e entregas. Sempre disposto a aprender e crescer profissionalmente.
+            {biografia || "Nenhuma biografia informada."} {/* Usa a biografia do usuário */}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            São Paulo, SP
+            {(cidade && estado) ? `${cidade}, ${estado}` : "Localização não informada."} {/* Usa cidade e estado */}
           </Typography>
         </CardContent>
       </Card>

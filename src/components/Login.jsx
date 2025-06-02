@@ -35,12 +35,12 @@ export default function Login() {
     event.preventDefault();
 
     if (!email || !senha) {
-      setMensagem("Por favor, preencha todos os campos.");
+      setDivMensagem("Por favor, preencha todos os campos.");
       return;
     }
 
     if (!email.includes("@") || !email.includes(".com")) {
-      setMensagem("Por favor, insira um email válido.");
+      setDivMensagem("Por favor, insira um email válido.");
       return;
     }
 
@@ -50,46 +50,62 @@ export default function Login() {
       let response = await fetch("http://localhost:8080/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData),
+        body: JSON.stringify(loginData)
       });
 
       if (response.ok) {
         const user = await response.json();
         console.log("Usuário logado com sucesso:", user);
+
+        // Armazena o ID do usuário no localStorage
+        localStorage.setItem("userId", user.id);
+        localStorage.setItem("token", user.token); // <--- Adição aqui
+
         navigate("/telaUsuario");
         return;
       }
 
-      try {
-        const response = await fetch("http://localhost:5174/usuarios/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // Importante para o gerenciamento de cookies
-          body: JSON.stringify(loginData),
-        });
+      // ... (restante do seu código para login de empresas/funcionários)
+      response = await fetch("http://localhost:8080/empresas/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData)
+      });
 
-        if (response.ok) {
-          const empresa = await response.json();
-          console.log("Empresa logada com sucesso:", empresa);
-          navigate("/telaEmpresa");
-          return;
-        }
-
-        // Se chegou aqui, ambos os logins falharam
-        setMensagem("Email ou senha incorretos.");
-      } catch (error) {
-        console.error("Erro ao realizar o login:", error);
-        setMensagem("Erro ao tentar fazer login. Tente novamente.");
+      if (response.ok) {
+        const empresa = await response.json();
+        console.log("Empresa logada com sucesso:", empresa);
+        // Se quiser guardar o ID da empresa também
+        localStorage.setItem("empresaId", empresa.id);
+        localStorage.setItem("empresaId", empresa.token); // Exemplo para empresa
+        navigate("/telaEmpresa");
+        return;
       }
-    } catch (empresaError) {
-      console.error(
-        "Erro no login de empresa, tentando como usuário:",
-        empresaError
-      );
-      setMensagem("Erro ao tentar fazer login. Tente novamente.");
+
+      response = await fetch("http://localhost:8080/funcionarios/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData)
+      });
+
+      if (response.ok) {
+        const funcionario = await response.json();
+        console.log("Funcionário logado com sucesso:", funcionario);
+        // Se quiser guardar o ID do funcionário
+        localStorage.setItem("funcionarioId", funcionario.id);
+        localStorage.setItem("funcionarioId", funcionario.token); // Exemplo para funcionário
+        navigate("/telaEmpresa");
+        return;
+      }
+
+
+      setDivMensagem("Email ou senha incorretos.");
+
+    } catch (error) {
+      console.error("Erro ao realizar o login:", error);
+      setDivMensagem("Erro ao tentar fazer login. Tente novamente.");
     }
+
   };
 
   // O retorno do JSX deve estar FORA da função handleSubmit

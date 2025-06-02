@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -12,6 +12,9 @@ import {
   Select,
   MenuItem,
   FormControl,
+  CircularProgress,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -22,11 +25,93 @@ import profilePic from "../assets/profile-icon.png";
 import logo from "../assets/cufaLogo.png";
 import Notifications from "./Notifications";
 
+import { IMaskInput } from 'react-imask'; // Importando IMaskInput
+import { Phone } from "@mui/icons-material";
+
+const PhoneMaskCustom = React.forwardRef(function PhoneMaskCustom(props, ref) {
+  const { onChange, ...other } = props;
+
+  return (
+    <IMaskInput
+      {...other}
+      mask="(00) 00000-0000"
+      definitions={{
+        '0': /[0-9]/,
+      }}
+      inputRef={ref}
+      onAccept={(value) =>
+        onChange({ target: { name: props.name, value: value } })
+      }
+      overwrite
+    />
+  );
+});
+
+// Componente auxiliar para a máscara de data
+const DateMaskCustom = React.forwardRef(function DateMaskCustom(props, ref) {
+  const { onChange, ...other } = props;
+  return (
+    <IMaskInput
+      {...other}
+      mask="DD-MM-YYYY" // Máscara de data: Dia-Mês-Ano
+      definitions={{
+        'D': /[0-9]/, // Permite dígitos de 0 a 9
+        'M': /[0-9]/,
+        'Y': /[0-9]/,
+      }}
+      inputRef={ref}
+      // onAccept é chamado com o valor formatado (dd-mm-yyyy)
+      onAccept={(value) => onChange({ target: { name: props.name, value: value } })}
+      overwrite // Sobrescreve caracteres quando digitado
+    />
+  );
+});
+
+const CPFMaskCustom = React.forwardRef(function CPFMaskCustom(props, ref) {
+  const { onChange, ...other } = props;
+
+  return (
+    <IMaskInput
+      {...other}
+      mask="000.000.000-00"
+      definitions={{
+        '0': /[0-9]/,
+      }}
+      inputRef={ref}
+      onAccept={(value) =>
+        onChange({ target: { name: props.name, value: value } })
+      }
+      overwrite
+    />
+  );
+});
+
+
+
 const Header = ({ hideNotifications }) => {
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [escolaridade, setEscolaridade] = useState('');
+  const [estadoCivil, setEstadoCivil] = useState('');
+
+  const [formData, setFormData] = useState({
+    nome: '',
+    cpf: '',
+    telefone: '',
+    dataNascimento: '',
+    estado: '',
+    cidade: '',
+    biografia: '',
+  });
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [profileError, setProfileError] = useState(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen((prev) => !prev);
@@ -34,10 +119,205 @@ const Header = ({ hideNotifications }) => {
 
   const openSettingsModal = () => {
     setIsSettingsModalOpen(true);
+    fetchUserProfileForForm();
   };
 
   const closeSettingsModal = () => {
     setIsSettingsModalOpen(false);
+    setFormData({
+      nome: '', cpf: '', telefone: '', dataNascimento: '', estado: '', cidade: '', biografia: '',
+    });
+    setEscolaridade('');
+    setEstadoCivil('');
+    setProfileError(null);
+    setSubmitError(null);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  // Função para buscar os dados do perfil (para preencher o modal)
+  const fetchUserProfileForForm = async () => {
+    setLoadingProfile(true);
+    setProfileError(null);
+
+    const userId = localStorage.getItem('userId');
+    const userToken = localStorage.getItem('token'); // Corrigido para 'userToken'
+
+    if (!userId || !userToken) {
+      setProfileError(new Error("ID do usuário ou token não encontrado. Por favor, faça login."));
+      setLoadingProfile(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`
+        },
+      });
+
+      if (!response.ok) {
+        let errorData = {};
+        if (response.headers.get('Content-Type')?.includes('application/json')) {
+          errorData = await response.json();
+        }
+        throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Dados do perfil recebidos (GET):", data);
+
+      // --- CONVERTE dataNascimento do formato YYYY-MM-DD para DD-MM-YYYY para exibição ---
+      let displayDtNascimento = data.dtNascimento ?? '';
+      if (displayDtNascimento && displayDtNascimento.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const parts = displayDtNascimento.split('-');
+        displayDtNascimento = `${parts[2]}-${parts[1]}-${parts[0]}`; // Reordena para dd-mm-yyyy
+      }
+      // --- FIM DA CONVERSÃO ---
+
+      setFormData({
+        nome: data.nome ?? '',
+        cpf: data.cpf ?? '',
+        telefone: data.telefone ?? '',
+        dataNascimento: displayDtNascimento,
+        estado: data.estado ?? '',
+        cidade: data.cidade ?? '',
+        biografia: data.biografia ?? '',
+      });
+      setEscolaridade(data.escolaridade ?? '');
+      setEstadoCivil(data.estadoCivil ?? '');
+
+    } catch (err) {
+      console.error("Erro ao buscar dados do perfil para o formulário (GET):", err);
+      setProfileError(err);
+      setSnackbarMessage(`Erro ao carregar perfil: ${err.message}`);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Função para lidar com a submissão do formulário (FETCH PUT)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const userId = localStorage.getItem('userId');
+    const userToken = localStorage.getItem('token');
+
+    if (!userId || !userToken) {
+      setSubmitError(new Error("ID do usuário ou token não encontrado. Por favor, faça login."));
+      setIsSubmitting(false);
+      setSnackbarMessage("Sessão expirada. Por favor, faça login novamente.");
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    // --- CONVERTE dataNascimento do formato DD-MM-YYYY para YYYY-MM-DD para envio ---
+    let dataNascimentoParaEnvio = formData.dataNascimento;
+    if (dataNascimentoParaEnvio && dataNascimentoParaEnvio.match(/^\d{2}-\d{2}-\d{4}$/)) {
+      const parts = dataNascimentoParaEnvio.split('-');
+      // Verifica se a data é completa antes de reordenar
+      if (parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+        dataNascimentoParaEnvio = `${parts[2]}-${parts[1]}-${parts[0]}`; // Reordena para yyyy-mm-dd
+      } else {
+        console.warn("Data de nascimento incompleta ou inválida:", dataNascimentoParaEnvio);
+        // Se a data for incompleta, envie como null ou string vazia, ou trate como erro
+        dataNascimentoParaEnvio = null; // Ou ''
+      }
+    } else if (dataNascimentoParaEnvio === '') {
+      dataNascimentoParaEnvio = null; // Se estiver vazia, envia como null
+    } else {
+      console.warn("Formato de data de nascimento inesperado para envio. Mantendo original ou definindo como null:", dataNascimentoParaEnvio);
+      dataNascimentoParaEnvio = null; // Caso a string não seja do formato dd-mm-yyyy ou vazia
+    }
+    // --- FIM DA CONVERSÃO ---
+
+    // Cria o objeto com os dados a serem enviados (incluindo escolaridade e data convertida)
+    const dataToSubmit = {
+      nome: formData.nome,
+      cpf: formData.cpf,
+      telefone: formData.telefone,
+      escolaridade: escolaridade,
+      dtNascimento: dataNascimentoParaEnvio, // Usa a data formatada para envio
+      estadoCivil: estadoCivil,
+      estado: formData.estado,
+      cidade: formData.cidade,
+      biografia: formData.biografia,
+    };
+
+    // Filtra campos vazios/nulos antes de enviar (opcional, dependendo da sua API)
+    // Se a API espera um campo específico mesmo que seja vazio, não filtre.
+    const filteredDataToSubmit = Object.fromEntries(
+      Object.entries(dataToSubmit).filter(([_, value]) => value !== '' && value !== null)
+    );
+
+    console.log("Dados do formulário para atualização (PUT):", filteredDataToSubmit);
+
+    try {
+      const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`
+        },
+        body: JSON.stringify(filteredDataToSubmit),
+      });
+
+      if (!response.ok) {
+        let errorData = {};
+        if (response.headers.get('Content-Type')?.includes('application/json')) {
+          errorData = await response.json();
+        }
+        throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+      }
+
+      const contentType = response.headers.get('Content-Type');
+      let responseBody = null;
+      if (response.status !== 204 && contentType && contentType.includes('application/json')) {
+        responseBody = await response.json();
+      }
+
+      console.log("Perfil atualizado com sucesso:", responseBody);
+
+      setSnackbarMessage("Perfil atualizado com sucesso!");
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+      closeSettingsModal();
+    } catch (err) {
+      console.error("Erro ao atualizar perfil (PUT):", err);
+      setSubmitError(err);
+      setSnackbarMessage(`Erro ao atualizar perfil: ${err.message}`);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Função para lidar com o logout
+  const handleLogout = () => {
+    localStorage.removeItem('userId');
+    localStorage.removeItem('token');
+    navigate('/');
   };
 
   return (
@@ -56,6 +336,7 @@ const Header = ({ hideNotifications }) => {
           px: { xs: 2, sm: 3, md: 4 }
         }}
       >
+        {/* ... (Conteúdo do cabeçalho - esquerda, centro, direita - permanece o mesmo) ... */}
         {/* Esquerda */}
         <Box
           sx={{
@@ -75,15 +356,14 @@ const Header = ({ hideNotifications }) => {
               justifyContent: "center",
               gap: 0.5
             }}
-
             onClick={() => navigate("/telaUsuario")}
-
-          >          <Box
-            component="img"
-            src={homeIcon}
-            alt="Início"
-            sx={{ width: { xs: 22, sm: 28, md: 24 }, height: { xs: 22, sm: 28, md: 24 }, }}
-          />
+          >
+            <Box
+              component="img"
+              src={homeIcon}
+              alt="Início"
+              sx={{ width: { xs: 22, sm: 28, md: 24 }, height: { xs: 22, sm: 28, md: 24 }, }}
+            />
             <Typography
               sx={{
                 fontSize: { xs: 10, sm: 12, md: 15 },
@@ -274,7 +554,7 @@ const Header = ({ hideNotifications }) => {
                       backgroundColor: "#f0f0f0",
                     },
                   }}
-                  onClick={() => { setIsProfileMenuOpen(false); navigate("/"); }}
+                  onClick={handleLogout}
                 >
                   <LogoutIcon fontSize="small" /> Sair
                 </Box>
@@ -320,7 +600,8 @@ const Header = ({ hideNotifications }) => {
             }}
           >
             &times;
-          </Button>          <Typography
+          </Button>
+          <Typography
             sx={{
               fontSize: { xs: 18, sm: 22, md: 24 },
               color: "#006916",
@@ -330,7 +611,7 @@ const Header = ({ hideNotifications }) => {
               fontFamily: "'Paytone One', sans-serif",
             }}
           >
-            Preencha os dados para cadastrar
+            Ajustes do Perfil
           </Typography>
           <Typography
             sx={{
@@ -343,189 +624,186 @@ const Header = ({ hideNotifications }) => {
           >
             Dados pessoais
           </Typography>
-          <Box
-            component="form"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "15px",
-            }}
-          >
-            <Box sx={{ display: "flex", gap: "15px" }}>              <InputBase
-                placeholder="Nome Completo"
-                sx={{
-                  width: "100%",
-                  padding: "12px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "#f0f0f0",
-                  color: "#333",
-                  fontFamily: "'Paytone One', sans-serif",
-                  fontSize: "14px",
-                }}
-              />
-              <InputBase
-                placeholder="CPF"
-                sx={{
-                  width: "100%",
-                  padding: "12px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "#f0f0f0",
-                  color: "#333",
-                  fontFamily: "'Paytone One', sans-serif",
-                  fontSize: "14px",
-                }}
-              />
+
+          {/* Renderização Condicional do Formulário */}
+          {loadingProfile ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+              <CircularProgress color="success" />
+              <Typography sx={{ ml: 2, color: '#006916' }}>Carregando dados...</Typography>
             </Box>
-            <Box sx={{ display: "flex", gap: "15px" }}>              <InputBase
-                placeholder="Telefone"
-                sx={{
-                  width: "96%",
-                  padding: "12px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "#f0f0f0",
-                  color: "#333",
-                  fontFamily: "'Paytone One', sans-serif",
-                  fontSize: "14px",
-                }}
-              />              <FormControl 
-                fullWidth 
-                sx={{ 
-                  borderRadius: "8px",
-                  color: "#333",
-                  alignItems: "center",
-                  backgroundColor: "#f0f0f0",
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                }}
-              >
-                <Select
-                  value={escolaridade}
-                  onChange={(e) => setEscolaridade(e.target.value)}
-                  displayEmpty                  sx={{                    width: "100%",
-                    height: "41px",
-                    borderRadius: "8px",
-                    backgroundColor: "#f0f0f0",
-                    color: "#333",
-                    border: 'none',
-                    fontFamily: "'Paytone One', sans-serif",
-                    fontSize: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    '& .MuiSelect-select': {
-                      padding: "0 12px",
-                      height: "100%",
-                      display: "flex",
-                      alignItems: "center"
-                    }
-                  }}                  renderValue={
-                    escolaridade !== '' ? undefined : () => <span style={{ color: '#a0a0a0', fontFamily: "'Paytone One', sans-serif", fontSize: '14px', display: 'flex', alignItems: 'center', height: '100%' }}>Escolaridade</span>
-                  }
-                >
-                  <MenuItem value="nenhuma">Nenhuma</MenuItem>
-                  <MenuItem value="fundamental-incompleto">Ensino Fundamental Incompleto</MenuItem>
-                  <MenuItem value="fundamental-completo">Ensino Fundamental Completo</MenuItem>
-                  <MenuItem value="medio-incompleto">Ensino Médio Incompleto</MenuItem>
-                  <MenuItem value="medio-completo">Ensino Médio Completo</MenuItem>
-                </Select>
-              </FormControl>
+          ) : profileError ? (
+            <Box sx={{ textAlign: 'center', color: 'error.main', mt: 2 }}>
+              <Typography>Erro ao carregar dados: {profileError.message}</Typography>
+              <Typography variant="body2">Por favor, tente novamente.</Typography>
             </Box>
-            <Box sx={{ display: "flex", gap: "15px" }}>
-              <InputBase
-                placeholder="Data de nascimento"
-                sx={{
-                  width: "100%",
-                  padding: "12px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "#f0f0f0",
-                  color: "#333",
-                  fontFamily: "'Paytone One', sans-serif",
-                  fontSize: "14px",
-                }}
-              />
-              <InputBase
-                placeholder="Estado Civil"
-                sx={{
-                  width: "100%",
-                  padding: "12px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "#f0f0f0",
-                  color: "#333",
-                  fontFamily: "'Paytone One', sans-serif",
-                  fontSize: "14px",
-                }}
-              />
-            </Box>
-            <Box sx={{ display: "flex", gap: "15px" }}>
-              <InputBase
-                placeholder="Estado"
-                sx={{
-                  width: "100%",
-                  padding: "12px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "#f0f0f0",
-                  color: "#333",
-                  fontFamily: "'Paytone One', sans-serif",
-                  fontSize: "14px",
-                }}
-              />
-              <InputBase
-                placeholder="Cidade"
-                sx={{
-                  width: "100%",
-                  padding: "12px",
-                  border: "none",
-                  borderRadius: "8px",
-                  backgroundColor: "#f0f0f0",
-                  color: "#333",
-                  fontFamily: "'Paytone One', sans-serif",
-                  fontSize: "14px",
-                }}
-              />
-            </Box>
-            <InputBase
-              placeholder="Biografia"
-              multiline
-              rows={3}
+          ) : (
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
               sx={{
-                width: "100%",
-                padding: "12px",
-                border: "none",
-                borderRadius: "8px",
-                backgroundColor: "#f0f0f0",
-                color: "#333",
-                fontFamily: "'Paytone One', sans-serif",
-                fontSize: "14px",
-              }}
-            />
-            <Button
-              type="submit"
-              sx={{
-                backgroundColor: "#006916",
-                color: "white",
-                padding: "15px",
-                borderRadius: "8px",
-                fontSize: "16px",
-                fontWeight: "bold",
-                marginTop: "10px",
-                fontFamily: "'Paytone One', sans-serif",
-                textTransform: "none",
-                '&:hover': {
-                  backgroundColor: "#004d12",
-                },
+                display: "flex",
+                flexDirection: "column",
+                gap: "15px",
               }}
             >
-              Finalizar Cadastro
-            </Button>
-          </Box>
+              <Box sx={{ display: "flex", gap: "15px" }}>
+                <InputBase
+                  placeholder="Nome Completo"
+                  name="nome"
+                  value={formData.nome}
+                  onChange={handleInputChange}
+                  sx={{
+                    width: "100%", padding: "12px", border: "none", borderRadius: "8px",
+                    backgroundColor: "#f0f0f0", color: "#333", fontFamily: "'Paytone One', sans-serif", fontSize: "14px",
+                  }}
+                />
+                <InputBase
+                  placeholder="CPF"
+                  name="cpf"
+                  value={formData.cpf}
+                  onChange={handleInputChange}
+                  inputComponent={CPFMaskCustom}
+                  sx={{
+                    width: "100%", padding: "12px", border: "none", borderRadius: "8px",
+                    backgroundColor: "#f0f0f0", color: "#333", fontFamily: "'Paytone One', sans-serif", fontSize: "14px",
+                  }}
+                />
+              </Box>
+              <Box sx={{ display: "flex", gap: "15px" }}>
+                <InputBase
+                  placeholder="Telefone"
+                  name="telefone"
+                  value={formData.telefone}
+                  onChange={handleInputChange}
+                  inputComponent={PhoneMaskCustom}
+                  sx={{
+                    width: "95%", padding: "12px", border: "none", borderRadius: "8px",
+                    backgroundColor: "#f0f0f0", color: "#333", fontFamily: "'Paytone One', sans-serif", fontSize: "14px",
+                  }}
+                />
+                <FormControl
+                  fullWidth
+                  sx={{
+                    borderRadius: "8px", color: "#333", alignItems: "center", backgroundColor: "#f0f0f0",
+                    '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                  }}
+                >
+                  <Select
+                    value={escolaridade}
+                    onChange={(e) => setEscolaridade(e.target.value)}
+                    displayEmpty sx={{
+                      width: "100%", height: "55px", borderRadius: "8px", backgroundColor: "#f0f0f0",
+                      color: "#333", border: 'none', fontFamily: "'Paytone One', sans-serif", fontSize: "14px",
+                      display: "flex", alignItems: "center",
+                      '& .MuiSelect-select': { padding: "0 12px", height: "100%", display: "flex", alignItems: "center" }
+                    }} renderValue={
+                      escolaridade !== '' ? undefined : () => <span style={{ color: '#a0a0a0', fontFamily: "'Paytone One', sans-serif", fontSize: '14px', display: 'flex', alignItems: 'center', height: '100%' }}>Escolaridade</span>
+                    }
+                  >
+                    <MenuItem value="Nenhuma">Nenhuma</MenuItem>
+                    <MenuItem value="Ensino Fundamental Incompleto">Ensino Fundamental Incompleto</MenuItem>
+                    <MenuItem value="Ensino Fundamental Completo">Ensino Fundamental Completo</MenuItem>
+                    <MenuItem value="Ensino Médio Incompleto">Ensino Médio Incompleto</MenuItem>
+                    <MenuItem value="Ensino Médio Completo">Ensino Médio Completo</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+              <Box sx={{ display: "flex", gap: "15px" }}>
+                <InputBase
+                  placeholder="Data de nascimento (DD-MM-AAAA)" // Placeholder atualizado
+                  name="dataNascimento"
+                  value={formData.dataNascimento}
+                  onChange={handleInputChange}
+                  inputComponent={DateMaskCustom} // USANDO O COMPONENTE DE MÁSCARA AQUI
+                  sx={{
+                    width: "95%", padding: "12px", border: "none", borderRadius: "8px",
+                    backgroundColor: "#f0f0f0", color: "#333", fontFamily: "'Paytone One', sans-serif", fontSize: "14px",
+                  }}
+                />
+                <FormControl
+                  fullWidth
+                  sx={{
+                    borderRadius: "8px", color: "#333", alignItems: "center", backgroundColor: "#f0f0f0",
+                    '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                  }}
+                >
+                  <Select
+                    value={estadoCivil}
+                    onChange={(e) => setEstadoCivil(e.target.value)}
+                    displayEmpty sx={{
+                      width: "100%", height: "55px", borderRadius: "8px", backgroundColor: "#f0f0f0",
+                      color: "#333", border: 'none', fontFamily: "'Paytone One', sans-serif", fontSize: "14px",
+                      display: "flex", alignItems: "center",
+                      '& .MuiSelect-select': { padding: "0 12px", height: "100%", display: "flex", alignItems: "center" }
+                    }} renderValue={
+                      estadoCivil !== '' ? undefined : () => <span style={{ color: '#a0a0a0', fontFamily: "'Paytone One', sans-serif", fontSize: '14px', display: 'flex', alignItems: 'center', height: '100%' }}>Estado CIvil</span>
+                    }
+                  >
+                    <MenuItem value="Solteiro(a)">Solteiro(a)</MenuItem>
+                    <MenuItem value="Casado(a)">Casado(a)</MenuItem>
+                    <MenuItem value="Separado(a) Judicialmente">Separado(a) Judicialmente</MenuItem>
+                    <MenuItem value="Divorciado(a)">Divorciado(a)</MenuItem>
+                    <MenuItem value="Viúvo(a)">Viúvo(a)</MenuItem>
+                    <MenuItem value="União Estável">União Estável</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+              <Box sx={{ display: "flex", gap: "15px" }}>
+                <InputBase
+                  placeholder="Estado"
+                  name="estado"
+                  value={formData.estado}
+                  onChange={handleInputChange}
+                  sx={{
+                    width: "100%", padding: "12px", border: "none", borderRadius: "8px",
+                    backgroundColor: "#f0f0f0", color: "#333", fontFamily: "'Paytone One', sans-serif", fontSize: "14px",
+                  }}
+                />
+                <InputBase
+                  placeholder="Cidade"
+                  name="cidade"
+                  value={formData.cidade}
+                  onChange={handleInputChange}
+                  sx={{
+                    width: "100%", padding: "12px", border: "none", borderRadius: "8px",
+                    backgroundColor: "#f0f0f0", color: "#333", fontFamily: "'Paytone One', sans-serif", fontSize: "14px",
+                  }}
+                />
+              </Box>
+              <InputBase
+                placeholder="Biografia"
+                name="biografia"
+                value={formData.biografia}
+                onChange={handleInputChange}
+                multiline
+                rows={3}
+                sx={{
+                  width: "100%", padding: "12px", border: "none", borderRadius: "8px",
+                  backgroundColor: "#f0f0f0", color: "#333", fontFamily: "'Paytone One', sans-serif", fontSize: "14px",
+                }}
+              />
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                sx={{
+                  backgroundColor: "#006916", color: "white", padding: "15px", borderRadius: "8px",
+                  fontSize: "16px", fontWeight: "bold", marginTop: "10px", fontFamily: "'Paytone One', sans-serif",
+                  textTransform: "none",
+                  '&:hover': { backgroundColor: "#004d12" },
+                }}
+              >
+                {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Finalizar Cadastro"}
+              </Button>
+            </Box>
+          )}
         </Box>
       </Modal>
+
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

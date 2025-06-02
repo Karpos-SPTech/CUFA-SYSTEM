@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import { Box, CircularProgress } from '@mui/material';
 import AnunciarVaga from './components/AnunciarVaga';
@@ -9,16 +10,21 @@ import empresaService from './services/empresaService';
 import '../src/telaEmpresa.css';
 
 const TelaEmpresa = () => {
+  const navigate = useNavigate();
   const [empresaData, setEmpresaData] = useState(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await empresaService.getEmpresaLogada();
+        const data = await empresaService.listarEmpresas();
         setEmpresaData(data);
       } catch (error) {
         console.error('Erro ao carregar dados da empresa:', error);
+        // Se o erro for de autenticação, redirecionar para o login
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          localStorage.removeItem('token');
+          navigate('/');
+        }
       }
       setLoading(false);
     };
