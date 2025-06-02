@@ -146,6 +146,7 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
       <Card
         sx={{
           borderRadius: 3,
+          height: 65,
           boxShadow: 1,
           mt: 2,
           background: "#f8f8f8",
