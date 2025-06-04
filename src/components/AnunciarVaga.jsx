@@ -246,8 +246,8 @@ const AnunciarVaga = () => {
               fullWidth
               multiline
               rows={3}
-              label="Requisitos"
-              name="requisitos"
+              label="Tipo de contrato"
+              name="tipoContrato"
               value={publicacao.requisitos}
               onChange={handleChange}
             />
@@ -257,22 +257,11 @@ const AnunciarVaga = () => {
               fullWidth
               multiline
               rows={3}
-              label="Benefícios"
-              name="beneficios"
+              label="data de Expiração"
+              name="dataExpiracao"
               value={publicacao.beneficios}
               onChange={handleChange}
             />
-
-            <TextField
-              required
-              fullWidth
-              label="Salário"
-              name="salario"
-              value={publicacao.salario}
-              onChange={handleChange}
-              placeholder="Ex: R$ 2.500,00"
-            />
-
             <Button
               type="submit"
               variant="contained"

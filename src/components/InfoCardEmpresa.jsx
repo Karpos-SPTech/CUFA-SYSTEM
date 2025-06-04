@@ -38,7 +38,7 @@ const InfoCardEmpresa = () => {
     const fetchEmpresaData = async () => {
       try {
         const empresaData = await empresaService.getEmpresaLogada();
-        if (empresaData) {
+          if (empresaData) {
           setEmpresa(empresaData);
           setFormData({
             nome: empresaData.nome || '',

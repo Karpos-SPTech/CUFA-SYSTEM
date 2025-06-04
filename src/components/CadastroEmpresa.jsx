@@ -265,7 +265,7 @@ export default function CadastroEmpresa() {
                 sx={{
                   "& .MuiInputBase-root": {
                     height: "50px",
-                    marginLeft: "5px",
+                    marginLeft: "10px",
                     borderRadius: "25px",
                     backgroundColor: "var(--white)",
                     padding: "0 20px",
@@ -292,7 +292,7 @@ export default function CadastroEmpresa() {
               sx={{
                 "& .MuiInputBase-root": {
                   height: "50px",
-                  marginLeft: "5px",
+                  marginLeft: "10px",
                   borderRadius: "25px",
                   backgroundColor: "var(--white)",
                   padding: "0 20px",
@@ -317,7 +317,7 @@ export default function CadastroEmpresa() {
               sx={{
                 "& .MuiInputBase-root": {
                   height: "50px",
-                  marginLeft: "5px",
+                  marginLeft: "10px",
                   borderRadius: "25px",
                   backgroundColor: "var(--white)",
                   padding: "0 20px",
@@ -344,7 +344,7 @@ export default function CadastroEmpresa() {
               sx={{
                 "& .MuiInputBase-root": {
                   height: "50px",
-                  marginLeft: "5px",
+                  marginLeft: "10px",
                   borderRadius: "25px",
                   backgroundColor: "var(--white)",
                   padding: "0 20px",
@@ -369,7 +369,7 @@ export default function CadastroEmpresa() {
               sx={{
                 "& .MuiInputBase-root": {
                   height: "50px",
-                  marginLeft: "5px",
+                  marginLeft: "10px",
                   borderRadius: "25px",
                   backgroundColor: "var(--white)",
                   padding: "0 20px",
@@ -385,7 +385,7 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
-          <Grid item sx={{ width: '95%' }}>
+          <Grid item sx={{ width: '93%' }}>
             <TextField
               fullWidth
               label="Endereço"
@@ -394,7 +394,7 @@ export default function CadastroEmpresa() {
               sx={{
                 "& .MuiInputBase-root": {
                   height: "50px",
-                  marginLeft: "5px",
+                  marginLeft: "10px",
                   borderRadius: "25px",
                   backgroundColor: "var(--white)",
                   padding: "0 20px",
@@ -420,7 +420,7 @@ export default function CadastroEmpresa() {
               sx={{
                 "& .MuiInputBase-root": {
                   height: "50px",
-                  marginLeft: "5px",
+                  marginLeft: "10px",
                   borderRadius: "25px",
                   backgroundColor: "var(--white)",
                   padding: "0 20px",
@@ -446,7 +446,7 @@ export default function CadastroEmpresa() {
               sx={{
                 "& .MuiInputBase-root": {
                   height: "50px",
-                  marginLeft: "5px",
+                  marginLeft: "10px",
                   borderRadius: "25px",
                   backgroundColor: "var(--white)",
                   padding: "0 20px",

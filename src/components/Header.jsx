@@ -346,38 +346,9 @@ const Header = ({ hideNotifications }) => {
                 color: "#555",
                 fontFamily: "'Paytone One', sans-serif",
               }} />
-              <InputBase placeholder="Sobrenome" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
             </Box>
             <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase placeholder="CPF" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
-              <InputBase placeholder="Telefone" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
-            </Box>
-            <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase placeholder="Data de nascimento" sx={{
+              <InputBase placeholder="CNPJ" sx={{
                 width: "100%",
                 padding: "10px",
                 border: "1px solid #ccc",
