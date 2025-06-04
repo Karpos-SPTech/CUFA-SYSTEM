@@ -1,115 +1,91 @@
-import React from "react";
-import { Card, CardContent, Typography, Box, Avatar, IconButton, Button, Stack } from "@mui/material";
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, Typography, Box, CircularProgress } from "@mui/material";
 
-// Componente pronto para receber props de vaga
-export default function CardVagas({ vaga, onSave, saved }) {
+export default function Publicacoes() {
+  const [publicacoes, setPublicacoes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Efeito para buscar as publicações
+  useEffect(() => {
+    const fetchPublicacoes = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("http://localhost:8080/publicacao/all");
+
+        if (!response.ok) {
+          throw new Error(`Erro HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.length === 0) {
+          setPublicacoes(null); // Indica que não há publicações
+        } else {
+          setPublicacoes(data);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar publicações:", err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPublicacoes();
+  }, []);
+
+  // --- Exibição de carregamento ---
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}>
+        <CircularProgress color="success" />
+        <Typography sx={{ ml: 2, color: "#006916" }}>Carregando publicações...</Typography>
+      </Box>
+    );
+  }
+
+  // --- Exibição de erro ---
+  if (error) {
+    return (
+      <Box sx={{ maxWidth: 350, p: 2, border: "1px solid red", borderRadius: 3, textAlign: "center" }}>
+        <Typography color="error">Erro: {error.message}</Typography>
+        <Typography variant="body2" color="text.secondary">Não foi possível carregar as publicações.</Typography>
+      </Box>
+    );
+  }
+
+  // --- Se não houver publicações ---
+  if (!publicacoes) {
+    return (
+      <Box sx={{ maxWidth: 350, p: 2, borderRadius: 3, textAlign: "center" }}>
+        <Typography color="text.secondary">Não há publicações disponíveis.</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ maxWidth: 420, margin: "0 auto" }}>
-      <Card sx={{ borderRadius: 3, boxShadow: 3, p: 2, position: "relative" }}>
-        <Stack direction="row" alignItems="flex-start" spacing={2}>
-          <Avatar
-            variant="rounded"
-            src={vaga?.logoUrl || "https://upload.wikimedia.org/wikipedia/commons/4/4f/McDonalds_Logo.svg"}
-            alt={vaga?.empresa || "Logo"}
-            sx={{ width: 64, height: 64, bgcolor: "#fff" }}
-          />
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" sx={{ color: "green", fontWeight: "bold", lineHeight: 1 }}>
-              {vaga?.empresa || "Mc Donald’s"}
+      {publicacoes.map((publicacao) => (
+        <Card key={publicacao.idPublicacao} sx={{ borderRadius: 3, boxShadow: 3, p: 2, mb: 2 }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ fontWeight: "bold", color: "green" }}>
+              {publicacao.nomeEmpresa}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {vaga?.segmento || "Fast Food"}
+              Tipo de contrato: {publicacao.tipoContrato}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {vaga?.tipo || "CLT"}
+              Publicado em: {new Date(publicacao.dtPublicacao).toLocaleDateString()}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {vaga?.tempo || "Há 7 horas"}
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              {publicacao.descricao}
             </Typography>
-          </Box>
-          <IconButton onClick={() => onSave && onSave(vaga)}>
-            {saved ? (
-              <BookmarkIcon sx={{ color: "green" }} />
-            ) : (
-              <BookmarkBorderIcon sx={{ color: "green" }} />
-            )}
-          </IconButton>
-        </Stack>
-        <Typography
-          variant="h6"
-          align="center"
-          sx={{ color: "green", fontWeight: "bold", mt: 2, mb: 1 }}
-        >
-          {vaga?.titulo || "Título da publicação"}
-        </Typography>
-        <Box
-          sx={{
-            background: "#f3f6ee",
-            borderRadius: 3,
-            p: 2,
-            mb: 2,
-          }}
-        >
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
-            <li>
-              <b>Vaga oferecida pela empresa</b>
-            </li>
-          </ul>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            <b>Descrição da empresa - </b>
-            {vaga?.descricao ||
-              "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae provident unde accusantium quidem eos non explicabo suscipit. Quidem, quisquam obcaecati, sunt magnam repellendus libero itaque nihil eaque architecto, cum pariatur?"}
-          </Typography>
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
-            <li>
-              <b>O que o usuário irá realizar:</b>
-            </li>
-          </ul>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            {vaga?.funcoes
-              ? vaga.funcoes.map((f, i) => (
-                  <span key={i}><b>{f}</b><br /></span>
-                ))
-              : (
-                <>
-                  <b>Função 1</b><br />
-                  <b>Função 2</b><br />
-                  <b>Função 3</b>
-                </>
-              )}
-          </Typography>
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
-            <li>
-              <b>Benefícios:</b>
-            </li>
-          </ul>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            <b>Vale-refeição ou alimentação</b><br />
-            <b>Plano de saúde e odontológico</b><br />
-            <b>Vale transporte</b>
-          </Typography>
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            {vaga?.fraseAtrativa || "Frase atrativa para chamar a atenção do usuário !!"}
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            background: "green",
-            color: "#fff",
-            fontWeight: "bold",
-            fontSize: 20,
-            borderRadius: 2,
-            boxShadow: 1,
-            "&:hover": { background: "#388e3c" },
-          }}
-        >
-          ME CANDIDATAR
-        </Button>
-      </Card>
+          </CardContent>
+        </Card>
+      ))}
     </Box>
   );
 }

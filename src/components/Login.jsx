@@ -35,12 +35,12 @@ export default function Login() {
     event.preventDefault();
 
     if (!email || !senha) {
-      setDivMensagem("Por favor, preencha todos os campos.");
+      setMensagem("Por favor, preencha todos os campos.");
       return;
     }
 
     if (!email.includes("@") || !email.includes(".com")) {
-      setDivMensagem("Por favor, insira um email válido.");
+      setMensagem("Por favor, insira um email válido.");
       return;
     }
 
@@ -99,11 +99,11 @@ export default function Login() {
       }
 
 
-      setDivMensagem("Email ou senha incorretos.");
+      setMensagem("Email ou senha incorretos.");
 
     } catch (error) {
       console.error("Erro ao realizar o login:", error);
-      setDivMensagem("Erro ao tentar fazer login. Tente novamente.");
+      setMensagem("Erro ao tentar fazer login. Tente novamente.");
     }
 
   };
@@ -162,14 +162,6 @@ export default function Login() {
 
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
-          {mensagem && (
-            <Alert
-              severity="error"
-              sx={{ fontWeight: "bold", color: "var(--dark-green)" }}
-            >
-              {mensagem}
-            </Alert>
-          )}
           <TextField
             fullWidth
             label="E-mail"
@@ -254,6 +246,14 @@ export default function Login() {
               Esqueceu sua senha?
             </Link>
           </Typography>
+          {mensagem && (
+            <Alert
+              severity="error"
+              sx={{ fontWeight: "bold", color: "var(--dark-green)" }}
+            >
+              {mensagem}
+            </Alert>
+          )}
 
           <Button
             type="submit"
