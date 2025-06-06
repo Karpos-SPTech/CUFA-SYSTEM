@@ -23,12 +23,84 @@ const Header = ({ hideNotifications }) => {
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [empresaData, setEmpresaData] = useState({
+    nome: '',
+    cnpj: '',
+    cep: '',
+    bairro: '',
+    numero: '',
+    endereco: ''
+  });
+
+  const fetchEmpresaData = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/empresas', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao buscar dados da empresa');
+      }
+
+      const empresas = await response.json();
+      const empresa = empresas[0];
+      
+      if (empresa) {
+        setEmpresaData({
+          id: empresa.id,
+          nome: empresa.nome || '',
+          cnpj: empresa.cnpj || '',
+          cep: empresa.cep || '',
+          bairro: empresa.bairro || '',
+          numero: empresa.numero || '',
+          endereco: empresa.endereco || ''
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dados:', error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEmpresaData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:8080/empresas/${empresaData.id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(empresaData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar dados');
+      }
+
+      closeSettingsModal();
+    } catch (error) {
+      console.error('Erro ao atualizar:', error);
+    }
+  };
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen((prev) => !prev);
   };
 
   const openSettingsModal = () => {
+    fetchEmpresaData();
     setIsSettingsModalOpen(true);
   };
 
@@ -330,6 +402,7 @@ const Header = ({ hideNotifications }) => {
           </Typography>
           <Box
             component="form"
+            onSubmit={handleSubmit}
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -337,57 +410,90 @@ const Header = ({ hideNotifications }) => {
             }}
           >
             <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase              placeholder="Nome" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
+              <InputBase
+                name="nome"
+                value={empresaData.nome}
+                onChange={handleInputChange}
+                placeholder="Nome"
+                sx={{
+                  width: "100%",
+                  padding: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                  backgroundColor: "#f1f8f4",
+                  color: "#555",
+                  fontFamily: "'Paytone One', sans-serif",
+                }}
+              />
             </Box>
             <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase placeholder="CNPJ" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
-              <InputBase placeholder="CEP" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
+              <InputBase
+                name="cnpj"
+                value={empresaData.cnpj}
+                onChange={handleInputChange}
+                placeholder="CNPJ"
+                sx={{
+                  width: "100%",
+                  padding: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                  backgroundColor: "#f1f8f4",
+                  color: "#555",
+                  fontFamily: "'Paytone One', sans-serif",
+                }}
+              />
+              <InputBase
+                name="cep"
+                value={empresaData.cep}
+                onChange={handleInputChange}
+                placeholder="CEP"
+                sx={{
+                  width: "100%",
+                  padding: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                  backgroundColor: "#f1f8f4",
+                  color: "#555",
+                  fontFamily: "'Paytone One', sans-serif",
+                }}
+              />
             </Box>
             <Box sx={{ display: "flex", gap: "20px" }}>
-              <InputBase placeholder="Bairro" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
-              <InputBase placeholder="Número" sx={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                backgroundColor: "#f1f8f4",
-                color: "#555",
-                fontFamily: "'Paytone One', sans-serif",
-              }} />
+              <InputBase
+                name="bairro"
+                value={empresaData.bairro}
+                onChange={handleInputChange}
+                placeholder="Bairro"
+                sx={{
+                  width: "100%",
+                  padding: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                  backgroundColor: "#f1f8f4",
+                  color: "#555",
+                  fontFamily: "'Paytone One', sans-serif",
+                }}
+              />
+              <InputBase
+                name="numero"
+                value={empresaData.numero}
+                onChange={handleInputChange}
+                placeholder="Número"
+                sx={{
+                  width: "100%",
+                  padding: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                  backgroundColor: "#f1f8f4",
+                  color: "#555",
+                  fontFamily: "'Paytone One', sans-serif",
+                }}
+              />
             </Box>
             <InputBase
+              name="endereco"
+              value={empresaData.endereco}
+              onChange={handleInputChange}
               placeholder="Endereço"
               sx={{
                 width: "100%",
@@ -399,7 +505,8 @@ const Header = ({ hideNotifications }) => {
                 fontFamily: "'Paytone One', sans-serif",
               }}
             />
-            <Button              type="submit"
+            <Button
+              type="submit"
               sx={{
                 backgroundColor: "#006916",
                 color: "white",
