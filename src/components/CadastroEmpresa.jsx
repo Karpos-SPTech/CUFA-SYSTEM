@@ -9,7 +9,6 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import empresaService from '../services/empresaService';
 
 export default function CadastroEmpresa() {
   const navigate = useNavigate();

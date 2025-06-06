@@ -8,14 +8,16 @@ import {
   TextField,
   Button,
   IconButton,
-  Avatar
+  Avatar,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import editIcon from '/src/assets/pencil-icon.svg';
-import empresaService from '../services/empresaService';
 import empresaImageManager from '../utils/empresaImageManager';
+import { formatCNPJ, removeMascara } from '../utils/formatters';
 
 const InfoCardEmpresa = () => {
   const [empresa, setEmpresa] = useState(null);
@@ -34,21 +36,58 @@ const InfoCardEmpresa = () => {
   const [hover, setHover] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Snackbar states
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
   useEffect(() => {
     const fetchEmpresaData = async () => {
       try {
-        const empresaData = await empresaService.getEmpresaLogada();
-          if (empresaData) {
+        setLoading(true);
+        setError(null);
+        
+        const empresaToken = localStorage.getItem('empresaToken');
+        if (!empresaToken) {
+          throw new Error('Token de autenticação não encontrado');
+        }
+
+        const response = await fetch('http://localhost:8080/empresas', {
+          headers: {
+            'Authorization': `Bearer ${empresaToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao buscar dados da empresa');
+        }
+
+        const empresas = await response.json();
+        
+        // Decodifica o token para pegar o email
+        const token = empresaToken.split('.')[1];
+        const decodedToken = JSON.parse(atob(token));
+        const emailEmpresaLogada = decodedToken.sub;
+
+        // Encontra a empresa pelo email
+        const empresaData = empresas.find(emp => emp.email === emailEmpresaLogada);
+
+        if (empresaData) {
           setEmpresa(empresaData);
           setFormData({
             nome: empresaData.nome || '',
             email: empresaData.email || '',
-            cnpj: empresaData.cnpj || ''
+            cnpj: empresaData.cnpj ? formatCNPJ(empresaData.cnpj) : ''
           });
         }
       } catch (err) {
         console.error('Erro ao buscar dados da empresa:', err);
-        setError('Não foi possível carregar os dados');
+        setError('Não foi possível carregar os dados. Tente novamente.');
+        
+        setSnackbarMessage('Erro ao carregar dados da empresa. Tente novamente.');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
       } finally {
         setLoading(false);
       }
@@ -56,7 +95,7 @@ const InfoCardEmpresa = () => {
 
     fetchEmpresaData();
     
-    // Carregar imagens salvas usando o gerenciador
+    // Carregar imagens salvas
     const savedProfileImg = empresaImageManager.getProfileImage();
     const savedCoverImg = empresaImageManager.getCoverImage();
     if (savedProfileImg) setProfileImg(savedProfileImg);
@@ -118,12 +157,39 @@ const InfoCardEmpresa = () => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      await empresaService.atualizarEmpresa(empresa.id, formData);
-      setEmpresa(formData);
+      const empresaToken = localStorage.getItem('empresaToken');
+      if (!empresaToken) {
+        throw new Error('Token de autenticação não encontrado');
+      }
+
+      const response = await fetch(`http://localhost:8080/empresas/${empresa.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${empresaToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...formData,
+          cnpj: formData.cnpj ? removeMascara(formData.cnpj) : undefined
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar dados da empresa');
+      }
+
+      const data = await response.json();
+      setEmpresa(data);
       handleClose();
-    } catch (err) {
-      console.error('Erro ao atualizar dados da empresa:', err);
-      setError('Não foi possível atualizar os dados');
+      
+      setSnackbarMessage('Dados atualizados com sucesso!');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('Erro ao atualizar empresa:', error);
+      setSnackbarMessage('Erro ao atualizar dados. Tente novamente.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
@@ -449,6 +515,17 @@ const InfoCardEmpresa = () => {
           </Box>
         </Box>
       </Modal>
+
+      <Snackbar 
+        open={snackbarOpen} 
+        autoHideDuration={6000} 
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

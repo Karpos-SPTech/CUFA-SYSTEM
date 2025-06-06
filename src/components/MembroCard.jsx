@@ -13,7 +13,6 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import profileIcon from '../assets/profile-icon.png';
-import funcionarioService from '../services/funcionarioService';
 
 const MemberRow = ({ image, name }) => (
   <Box
@@ -95,12 +94,30 @@ const MembroCard = () => {
         funcao: formData.funcao
       };
 
-      await funcionarioService.criarFuncionario(funcionarioData);
+      const empresaToken = localStorage.getItem('empresaToken');
+      if (!empresaToken) {
+        throw new Error('Token de autenticação não encontrado');
+      }
+
+      const response = await fetch('http://localhost:8080/funcionarios', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${empresaToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(funcionarioData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao cadastrar funcionário');
+      }
+
       handleClose();
       // Aqui você pode adicionar uma função para recarregar a lista de membros
     } catch (err) {
       console.error('Erro ao cadastrar funcionário:', err);
-      setError('Não foi possível cadastrar o funcionário. Tente novamente.');
+      setError(err.message || 'Não foi possível cadastrar o funcionário. Tente novamente.');
     } finally {
       setLoading(false);
     }

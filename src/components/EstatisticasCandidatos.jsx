@@ -17,11 +17,6 @@ const EstatisticasCandidatos = () => {
     { nivel: 'Nível superior', percentual: 18.75 },
   ];
 
-  const dadosGenero = [
-    { nome: 'Masculino', percentual: 85 },
-    { nome: 'Feminino', percentual: 15 },
-  ];
-
   const COLORS = ['#4CAF50', '#81C784'];
   return (
     <Box>
@@ -96,49 +91,6 @@ const EstatisticasCandidatos = () => {
               radius={[0, 5, 5, 0]}
             />
           </BarChart>
-        </ResponsiveContainer>
-      </Paper>
-
-      <Paper sx={{ p: 2, borderRadius: '16px' }}>
-        <Typography variant="h6" gutterBottom align="center" sx={{ 
-          fontSize: '14px', 
-          color: '#006400',
-          fontFamily: "'Paytone One', sans-serif"
-        }}>
-          Distribuição de Candidatos por Gênero
-        </Typography>
-        <ResponsiveContainer width="100%" height={200}>
-          <PieChart margin={{ top: 5, right: 20, bottom: 5, left: 5 }}>
-            <Pie
-              data={dadosGenero}
-              dataKey="percentual"
-              nameKey="nome"
-              cx="50%"
-              cy="50%"
-              innerRadius={45}
-              outerRadius={60}
-              label={({ percentual }) => `${percentual}%`}
-            >
-              {dadosGenero.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip formatter={(value) => [`${value}%`, 'Percentual']} />
-            <Legend 
-              verticalAlign="middle"
-              align="right"
-              layout="vertical"
-              formatter={(value) => (
-                <span style={{ 
-                  color: '#006400', 
-                  fontFamily: "'Paytone One', sans-serif",
-                  fontSize: '11px'
-                }}>
-                  {value}
-                </span>
-              )}
-            />
-          </PieChart>
         </ResponsiveContainer>
       </Paper>
     </Box>

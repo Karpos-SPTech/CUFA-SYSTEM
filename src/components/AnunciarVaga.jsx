@@ -14,7 +14,6 @@ import mcdonaldsLogo from '../assets/microsoft-logo.png';
 import fotoIcon from '../assets/foto-icon.png';
 import videoIcon from '../assets/video-icon.png';
 import textoIcon from '../assets/text-icon.png';
-import publicacaoService from '../services/publicacaoService';
 import empresaImageManager from '../utils/empresaImageManager';
 
 const ButtonOption = ({ icon, label }) => (

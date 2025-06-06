@@ -18,7 +18,6 @@ import googleLogo from "../assets/google-logo.png";
 import microsoftLogo from "../assets/microsoft-logo.png";
 import emailIcon from "../assets/Icon-Email.png";
 import passwordIcon from "../assets/Icon-Senha.png";
-import empresaService from "../services/empresaService";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -26,6 +25,7 @@ export default function Login() {
   const [senha, setSenha] = useState("");
   const [showSenha, setShowSenha] = useState(false);
   const [mensagem, setMensagem] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleSenha = () => {
     setShowSenha(!showSenha);
@@ -33,20 +33,25 @@ export default function Login() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);
+    setMensagem("");
 
     if (!email || !senha) {
       setMensagem("Por favor, preencha todos os campos.");
+      setIsLoading(false);
       return;
     }
 
     if (!email.includes("@") || !email.includes(".com")) {
       setMensagem("Por favor, insira um email válido.");
+      setIsLoading(false);
       return;
     }
 
     const loginData = { email, senha };
 
     try {
+      // Tenta login como usuário
       let response = await fetch("http://localhost:8080/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,17 +60,13 @@ export default function Login() {
 
       if (response.ok) {
         const user = await response.json();
-        console.log("Usuário logado com sucesso:", user);
-
-        // Armazena o ID do usuário no localStorage
         localStorage.setItem("userId", user.id);
-        localStorage.setItem("token", user.token); // <--- Adição aqui
-
+        localStorage.setItem("token", user.token);
         navigate("/telaUsuario");
         return;
       }
 
-      // ... (restante do seu código para login de empresas/funcionários)
+      // Se não for usuário, tenta empresa
       response = await fetch("http://localhost:8080/empresas/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -74,38 +75,27 @@ export default function Login() {
 
       if (response.ok) {
         const empresa = await response.json();
-        console.log("Empresa logada com sucesso:", empresa);
-        // Se quiser guardar o ID da empresa também
         localStorage.setItem("empresaId", empresa.id);
-        localStorage.setItem("empresaId", empresa.token); // Exemplo para empresa
+        localStorage.setItem("empresaToken", empresa.token); // Corrigido: agora usa empresaToken
         navigate("/telaEmpresa");
         return;
       }
 
-      response = await fetch("http://localhost:8080/funcionarios/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData)
-      });
-
-      if (response.ok) {
-        const funcionario = await response.json();
-        console.log("Funcionário logado com sucesso:", funcionario);
-        // Se quiser guardar o ID do funcionário
-        localStorage.setItem("funcionarioId", funcionario.id);
-        localStorage.setItem("funcionarioId", funcionario.token); // Exemplo para funcionário
-        navigate("/telaEmpresa");
-        return;
+      // Se chegou aqui, não conseguiu logar como usuário nem empresa
+      const errorData = await response.text();
+      try {
+        const errorJson = JSON.parse(errorData);
+        setMensagem(errorJson.message || "Email ou senha incorretos.");
+      } catch {
+        setMensagem("Email ou senha incorretos.");
       }
-
-
-      setMensagem("Email ou senha incorretos.");
 
     } catch (error) {
-      console.error("Erro ao realizar o login:", error);
-      setMensagem("Erro ao tentar fazer login. Tente novamente.");
+      console.error("Erro no login:", error);
+      setMensagem("Erro ao fazer login. Por favor, tente novamente.");
+    } finally {
+      setIsLoading(false);
     }
-
   };
 
   // O retorno do JSX deve estar FORA da função handleSubmit
@@ -273,7 +263,7 @@ export default function Login() {
               },
             }}
           >
-            Entrar
+            {isLoading ? "Entrando..." : "Entrar"}
           </Button>
 
           <Typography

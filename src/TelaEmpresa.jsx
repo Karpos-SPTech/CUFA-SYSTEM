@@ -6,23 +6,44 @@ import AnunciarVaga from './components/AnunciarVaga';
 import VagaPublicada from './components/VagaPublicada';
 import NotificationsPanel from './components/NotificationsPanel';
 import EstatisticasCandidatos from './components/EstatisticasCandidatos';
-import empresaService from './services/empresaService';
 import '../src/telaEmpresa.css';
 
 const TelaEmpresa = () => {
   const navigate = useNavigate();
   const [empresaData, setEmpresaData] = useState(null);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await empresaService.listarEmpresas();
+        const empresaToken = localStorage.getItem('empresaToken');
+        if (!empresaToken) {
+          throw new Error('Token de autenticação não encontrado');
+        }
+
+        const response = await fetch('http://localhost:8080/empresas', {
+          headers: {
+            'Authorization': `Bearer ${empresaToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('empresaToken');
+            navigate('/');
+            return;
+          }
+          throw new Error('Erro ao carregar dados da empresa');
+        }
+
+        const data = await response.json();
         setEmpresaData(data);
       } catch (error) {
         console.error('Erro ao carregar dados da empresa:', error);
         // Se o erro for de autenticação, redirecionar para o login
         if (error.response?.status === 401 || error.response?.status === 403) {
-          localStorage.removeItem('token');
+          localStorage.removeItem('empresaToken');
           navigate('/');
         }
       }
@@ -52,7 +73,8 @@ const TelaEmpresa = () => {
             maxWidth: '1400px',
             mx: 'auto',
           }}
-        >          <Box sx={{ width: 350 }}>
+        >
+          <Box sx={{ width: 350 }}>
             <EstatisticasCandidatos />
           </Box>
 
