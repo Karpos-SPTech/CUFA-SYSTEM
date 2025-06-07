@@ -61,9 +61,10 @@ body {
 .perfil-empresa-side-column {
   display: flex;
   flex-direction: column;
-  gap: 32px; /* Aumentado para criar mais espaçamento visual entre os cards */
-  width: 450px;
+  gap: 24px;
+  width: 400px;
   min-width: 450px;
+  height: calc(100vh - 160px);
 }
 
 .perfil-empresa-container .MuiPaper-root {
@@ -74,18 +75,24 @@ body {
 
 /* Estilo específico para o card de membros */
 .membro-card-container .MuiPaper-root {
-  height: 250px;
-  max-height: 400px;
+  height: 412px;
+  max-height: 412px;
   overflow-y: auto;
+  flex: 2;
+}
+
+/* Estilo específico para o card de sobre a empresa */
+.sobre-empresa-container .MuiPaper-root {
+  min-height: 150px;
+  max-height: 200px;
+  background-color: #fff;
+  flex: 1;
 }
 
 /* Estilo específico para o card de informações da empresa */
 .perfil-empresa-main-column > div:first-child .MuiPaper-root {
-  min-height: 320px; /* Aumentado para acomodar a foto de capa maior */
+  min-height: 320px;
 }
-
-/* Adicionando espaço extra acima do card de vagas */
-
 
 @media (max-width: 1200px) {
   .perfil-empresa-content {

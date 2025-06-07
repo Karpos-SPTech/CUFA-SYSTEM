@@ -4,7 +4,6 @@ import Header from './components/Header';
 import InfoCardEmpresa from './components/InfoCardEmpresa';
 import SobreEmpresa from './components/SobreEmpresa';
 import MembroCard from './components/MembroCard';
-import VagaCard from './components/VagaCard';
 import './PerfilEmpresa.css';
 
 const PerfilEmpresa = () => {
@@ -15,14 +14,13 @@ const PerfilEmpresa = () => {
         <div className="perfil-empresa-layout">
           <div className="perfil-empresa-main-column">
             <InfoCardEmpresa />
-            <SobreEmpresa />
           </div>
           <div className="perfil-empresa-side-column">
             <div className="membro-card-container">
               <MembroCard />
             </div>
-            <div className="vaga-card-container">
-              <VagaCard />
+            <div className="sobre-empresa-container">
+              <SobreEmpresa />
             </div>
           </div>
         </div>

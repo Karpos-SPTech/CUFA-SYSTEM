@@ -1,50 +1,67 @@
-import React, { useState } from 'react';
-import { 
-  Box, 
-  Paper, 
-  Typography, 
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Paper,
+  Typography,
   Avatar,
   IconButton,
   Modal,
   TextField,
   Button,
-  CircularProgress
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
-import profileIcon from '../assets/profile-icon.png';
+  CircularProgress,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete"; // Import do ícone
+import profileIcon from "../assets/profile-icon.png";
 
-const MemberRow = ({ image, name }) => (
+const MemberRow = ({ image, name, onDelete }) => (
   <Box
     sx={{
-      display: 'flex',
-      alignItems: 'center',
+      display: "flex",
+      alignItems: "center",
       gap: 2,
       mb: 2,
       p: 1,
-      borderRadius: '8px',
-      '&:hover': {
-        backgroundColor: '#e8f5e9',
-      }
+      borderRadius: "8px",
+      justifyContent: "space-between",
+      "&:hover": {
+        backgroundColor: "#e8f5e9",
+      },
     }}
   >
-    <Avatar
-      src={image || profileIcon}
-      alt={name}
-      sx={{ 
-        width: 36, 
-        height: 36,
-      }}
-    />
-    <Typography
+    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+      <Avatar
+        src={image || profileIcon}
+        alt={name}
+        sx={{
+          width: 36,
+          height: 36,
+        }}
+      />
+      <Typography
+        sx={{
+          fontSize: "14px",
+          color: "#1e1e1e",
+          fontWeight: 500,
+        }}
+      >
+        {name}
+      </Typography>
+    </Box>
+    <IconButton
+      onClick={onDelete}
+      aria-label="delete member"
+      size="small"
       sx={{
-        fontSize: '14px',
-        color: '#1e1e1e',
-        fontWeight: 500,
+        color: "red",
+        "&:hover": {
+          backgroundColor: "#fddede",
+        },
       }}
     >
-      {name}
-    </Typography>
+      <DeleteIcon fontSize="small" />
+    </IconButton>
   </Box>
 );
 
@@ -52,31 +69,130 @@ const MembroCard = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // Valores válidos para o enum Cargo no backend
+  const cargosValidos = {
+    FUNCIONARIO: "FUNCIONARIO",
+    ADMINISTRADOR: "ADMINISTRADOR"
+  };
+
   const [formData, setFormData] = useState({
-    nome: '',
-    sobrenome: '',
-    email: '',
-    cpf: '',
-    funcao: '',
+    nome: "",
+    email: "",
+    senha: "",
+    cargo: cargosValidos.FUNCIONARIO, // Valor padrão
   });
+
+  const [members, setMembers] = useState([]);
+
+  // Função para carregar os funcionários
+  const fetchFuncionarios = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const empresaId = localStorage.getItem("empresaId");
+      if (!empresaId) {
+        throw new Error("ID da empresa não encontrado");
+      }
+
+      console.log("Fazendo request com:", {
+        empresaId,
+        url: `http://localhost:8080/funcionarios/${empresaId}`
+      });
+
+      const response = await fetch(
+        `http://localhost:8080/funcionarios/${empresaId}`,
+        {
+          method: "GET",
+          credentials: 'include', // Importante: inclui os cookies na requisição
+          headers: {
+            "Content-Type": "application/json"
+          },
+        }
+      );
+
+      let errorData;
+      let responseData;
+      
+      try {
+        responseData = await response.json();
+      } catch (e) {
+        console.error("Erro ao parsear resposta:", e);
+        throw new Error(`Erro ao processar resposta do servidor: ${response.status}`);
+      }
+
+      if (!response.ok) {
+        console.error("Resposta não ok:", responseData);
+        throw new Error(
+          responseData?.message || 
+          responseData?.error || 
+          `Erro ao buscar funcionários (${response.status})`
+        );
+      }
+
+      const funcionarios = responseData;
+
+      // Verifica se funcionarios é um array
+      if (!Array.isArray(funcionarios)) {
+        throw new Error("Resposta inválida do servidor");
+      }
+
+      // Função auxiliar para validar o cargo
+      const getCargo = (cargoValue) => {
+        if (!cargoValue) return "USUARIO";
+        const cargo = typeof cargoValue === 'object' ? cargoValue.nome : cargoValue;
+        // Verifica se o cargo é um dos valores válidos
+        return Object.values(cargosValidos).includes(cargo) ? cargo : "USUARIO";
+      };
+
+      const membrosFormatados = funcionarios.map((funcionario) => ({
+        id: funcionario.id,
+        name: funcionario.nome || "Sem nome",
+        email: funcionario.email || "Sem email",
+        cargo: getCargo(funcionario.cargo),
+        image: null,
+      }));
+
+      setMembers(membrosFormatados);
+    } catch (error) {
+      console.error("Erro ao buscar funcionários:", error);
+      setError(error.message || "Erro ao acessar o servidor. Verifique sua conexão e tente novamente.");
+      setMembers([]);
+      
+      // Se o erro for de autenticação, podemos redirecionar para o login
+      if (error.message.includes("403") || error.message.includes("401")) {
+        // Limpa os dados da sessão
+        localStorage.removeItem("empresaToken");
+        localStorage.removeItem("empresaId");
+        // Redireciona para o login (você pode ajustar o caminho conforme necessário)
+        window.location.href = "/login";
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Carrega os funcionários quando o componente montar
+  useEffect(() => {
+    fetchFuncionarios();
+  }, []);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     setFormData({
-      nome: '',
-      sobrenome: '',
-      email: '',
-      cpf: '',
-      funcao: '',
+      nome: "",
+      email: "",
+      senha: "",
+      cargo: cargosValidos.USUARIO,
     });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -84,81 +200,92 @@ const MembroCard = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     try {
+      const empresaId = localStorage.getItem("empresaId");
+      if (!empresaId) {
+        throw new Error("ID da empresa não encontrado");
+      }
+
       const funcionarioData = {
         nome: formData.nome,
-        sobrenome: formData.sobrenome,
         email: formData.email,
-        cpf: formData.cpf,
-        funcao: formData.funcao
+        senha: formData.senha,
+        cargo: formData.cargo,
+        fkEmpresa: parseInt(empresaId),
       };
 
-      const empresaToken = localStorage.getItem('empresaToken');
-      if (!empresaToken) {
-        throw new Error('Token de autenticação não encontrado');
-      }
-
-      const response = await fetch('http://localhost:8080/funcionarios', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8080/funcionarios", {
+        method: "POST",
+        credentials: 'include', // Importante: inclui os cookies na requisição
         headers: {
-          'Authorization': `Bearer ${empresaToken}`,
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(funcionarioData)
+        body: JSON.stringify(funcionarioData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao cadastrar funcionário');
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (e) {
+        if (!response.ok) {
+          throw new Error(`Erro ao cadastrar funcionário: ${response.status}`);
+        }
       }
 
+      if (!response.ok) {
+        throw new Error(responseData?.message || "Erro ao cadastrar funcionário");
+      }
+
+      // Atualiza a lista buscando todos os funcionários novamente
+      await fetchFuncionarios();
+
       handleClose();
-      // Aqui você pode adicionar uma função para recarregar a lista de membros
     } catch (err) {
-      console.error('Erro ao cadastrar funcionário:', err);
-      setError(err.message || 'Não foi possível cadastrar o funcionário. Tente novamente.');
+      console.error("Erro ao cadastrar funcionário:", err);
+      setError(
+        err.message ||
+          "Não foi possível cadastrar o funcionário. Tente novamente."
+      );
     } finally {
       setLoading(false);
     }
   };
 
- 
-  const members = [
-    { id: 1, name: 'Nome membro', image: null },
-    { id: 2, name: 'Nome membro', image: null },
-    { id: 3, name: 'Nome membro', image: null },
-  ];
+  // Função para deletar membro
+  const handleDeleteMember = (id) => {
+    setMembers((prev) => prev.filter((member) => member.id !== id));
+  };
 
   return (
     <>
       <Paper
         elevation={1}
         sx={{
-          backgroundColor: '#fff',
-          borderRadius: '15px',
+          backgroundColor: "#fff",
+          borderRadius: "15px",
           p: 2,
-          width: '100%',
-          minWidth: '400px',
-          boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.08)',
-          height: '200px',
-          maxHeight: '400px',
-          overflowY: 'auto',
+          width: "100%",
+          minWidth: "400px",
+          boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.08)",
+          height: "200px",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             mb: 2,
           }}
         >
           <Typography
             sx={{
-              fontSize: '16px',
+              fontSize: "16px",
               fontWeight: 600,
-              color: '#1e1e1e',
+              color: "#1e1e1e",
             }}
           >
             Membros
@@ -166,24 +293,44 @@ const MembroCard = () => {
           <IconButton
             onClick={handleOpen}
             sx={{
-              backgroundColor: '#e9f1e7',
+              backgroundColor: "#e9f1e7",
               width: 24,
               height: 24,
-              '&:hover': {
-                backgroundColor: '#d8e6d5',
-              }
+              "&:hover": {
+                backgroundColor: "#d8e6d5",
+              },
             }}
           >
-            <AddIcon sx={{ fontSize: 16, color: '#006916' }} />
+            <AddIcon sx={{ fontSize: 16, color: "#006916" }} />
           </IconButton>
         </Box>
 
-        <Box>
+        <Box
+          sx={{
+            overflowY: "auto",
+            flex: 1,
+            "&::-webkit-scrollbar": {
+              width: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1",
+              borderRadius: "4px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#006916",
+              borderRadius: "4px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "#005713",
+            },
+          }}
+        >
           {members.map((member) => (
             <MemberRow
               key={member.id}
               name={member.name}
               image={member.image}
+              onDelete={() => handleDeleteMember(member.id)}
             />
           ))}
         </Box>
@@ -196,23 +343,26 @@ const MembroCard = () => {
       >
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 500,
-            bgcolor: 'background.paper',
-            borderRadius: '15px',
-            boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            borderRadius: "15px",
+            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
             p: 4,
-            outline: 'none',
+            outline: "none",
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
           }}
         >
           <IconButton
             aria-label="close"
             onClick={handleClose}
             sx={{
-              position: 'absolute',
+              position: "absolute",
               right: 8,
               top: 8,
               color: (theme) => theme.palette.grey[500],
@@ -221,12 +371,11 @@ const MembroCard = () => {
             <CloseIcon />
           </IconButton>
 
-          <Typography variant="h6" sx={{ color: '#006916', mb: 3, fontWeight: 'bold' }}>
+          <Typography
+            variant="h6"
+            sx={{ color: "#006916", mb: 3, fontWeight: "bold" }}
+          >
             Preencha os dados para cadastrar
-          </Typography>
-          
-          <Typography variant="subtitle1" sx={{ mb: 2, color: '#666' }}>
-            Dados pessoais
           </Typography>
 
           {error && (
@@ -235,103 +384,97 @@ const MembroCard = () => {
             </Typography>
           )}
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Box sx={{ display: 'flex', gap: 3 }}>
-              <TextField
-                fullWidth
-                name="nome"
-                value={formData.nome}
-                onChange={handleChange}
-                placeholder="Nome"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: '#E3EEE5',
-                    height: '48px',
-                    borderRadius: '12px',
-                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.5)',
-                    '& fieldset': {
-                      border: 'none',
-                    },
-                  },
-                }}
-              />
-              <TextField
-                fullWidth
-                name="sobrenome"
-                value={formData.sobrenome}
-                onChange={handleChange}
-                placeholder="Sobrenome"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: '#E3EEE5',
-                    height: '48px',
-                    borderRadius: '12px',
-                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.5)',
-                    '& fieldset': {
-                      border: 'none',
-                    },
-                  },
-                }}
-              />
-            </Box>
-
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
             <TextField
               fullWidth
-              name="email"
-              value={formData.email}
+              name="nome"
+              value={formData.nome}
               onChange={handleChange}
-              placeholder="Email"
+              placeholder="Nome"
               sx={{
-                '& .MuiOutlinedInput-root': {
-                  bgcolor: '#E3EEE5',
-                  height: '48px',
-                  borderRadius: '12px',
-                  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.5)',
-                  '& fieldset': {
-                    border: 'none',
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "#E3EEE5",
+                  height: "48px",
+                  borderRadius: "12px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                  "& fieldset": {
+                    border: "none",
                   },
                 },
               }}
             />
 
-            <Box sx={{ display: 'flex', gap: 3 }}>
-              <TextField
-                fullWidth
-                name="cpf"
-                value={formData.cpf}
-                onChange={handleChange}
-                placeholder="CPF"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: '#E3EEE5',
-                    height: '48px',
-                    borderRadius: '12px',
-                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.5)',
-                    '& fieldset': {
-                      border: 'none',
-                    },
+            <TextField
+              fullWidth
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Email"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "#E3EEE5",
+                  height: "48px",
+                  borderRadius: "12px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                  "& fieldset": {
+                    border: "none",
                   },
-                }}
-              />
-              <TextField
-                fullWidth
-                name="funcao"
-                value={formData.funcao}
-                onChange={handleChange}
-                placeholder="função"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: '#E3EEE5',
-                    height: '48px',
-                    borderRadius: '12px',
-                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.5)',
-                    '& fieldset': {
-                      border: 'none',
-                    },
+                },
+              }}
+            />
+
+            <TextField
+              fullWidth
+              name="senha"
+              type="password"
+              value={formData.senha}
+              onChange={handleChange}
+              placeholder="Senha"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "#E3EEE5",
+                  height: "48px",
+                  borderRadius: "12px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                  "& fieldset": {
+                    border: "none",
                   },
-                }}
-              />
-            </Box>
+                },
+              }}
+            />
+
+            <TextField
+              select
+              fullWidth
+              name="cargo"
+              value={formData.cargo}
+              onChange={handleChange}
+              SelectProps={{
+                native: true
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "#E3EEE5",
+                  height: "48px",
+                  borderRadius: "12px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                  "& fieldset": {
+                    border: "none",
+                  },
+                },
+              }}
+            >
+              {Object.entries(cargosValidos).map(([key, value]) => (
+                <option key={key} value={value}>
+                  {value}
+                </option>
+              ))}
+            </TextField>
 
             <Button
               type="submit"
@@ -340,20 +483,20 @@ const MembroCard = () => {
               disabled={loading}
               sx={{
                 mt: 2,
-                height: '48px',
-                bgcolor: '#006916',
-                color: 'white',
-                borderRadius: '12px',
-                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                '&:hover': {
-                  bgcolor: '#005713',
+                height: "48px",
+                bgcolor: "#006916",
+                color: "white",
+                borderRadius: "12px",
+                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                "&:hover": {
+                  bgcolor: "#005713",
                 },
               }}
             >
               {loading ? (
-                <CircularProgress size={24} sx={{ color: 'white' }} />
+                <CircularProgress size={24} sx={{ color: "white" }} />
               ) : (
-                'Finalizar Cadastro'
+                "Finalizar Cadastro"
               )}
             </Button>
           </Box>

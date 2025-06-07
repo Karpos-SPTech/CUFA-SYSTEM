@@ -4,31 +4,26 @@ import {
   Paper,
   Typography,
   CircularProgress,
-  Modal,
-  TextField,
-  Button,
   IconButton,
   Avatar,
   Snackbar,
   Alert,
+  Grid,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import editIcon from "/src/assets/pencil-icon.svg";
+import EmailIcon from "@mui/icons-material/Email";
+import BusinessIcon from "@mui/icons-material/Business";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import HomeIcon from "@mui/icons-material/Home";
+import TagIcon from "@mui/icons-material/Tag";
 import empresaImageManager from "../utils/empresaImageManager";
-import { formatCNPJ, removeMascara } from "../utils/formatters";
+import { formatCNPJ } from "../utils/formatters";
 
 const InfoCardEmpresa = () => {
   const [empresa, setEmpresa] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    nome: "",
-    email: "",
-    cnpj: "",
-  });
 
   // Estados para upload de imagens
   const [profileImg, setProfileImg] = useState(null);
@@ -44,16 +39,21 @@ const InfoCardEmpresa = () => {
   useEffect(() => {
     const fetchEmpresaData = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        const empresaId = localStorage.getItem("empresaId");
+        if (!empresaId) {
+          throw new Error("ID da empresa não encontrado");
+        }
 
-        const response = await fetch("http://localhost:8080/empresas", {
-          method: "GET",
-          credentials: "include", // para enviar o cookie JWT
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `http://localhost:8080/empresas/${empresaId}`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Erro ao buscar dados da empresa");
@@ -61,12 +61,12 @@ const InfoCardEmpresa = () => {
 
         const empresaData = await response.json();
 
-        setEmpresa(empresaData);
-        setFormData({
-          nome: empresaData.nome || "",
-          email: empresaData.email || "",
-          cnpj: empresaData.cnpj ? formatCNPJ(empresaData.cnpj) : "",
-        });
+        if (empresaData) {
+          setEmpresa({
+            ...empresaData,
+            cnpj: empresaData.cnpj ? formatCNPJ(empresaData.cnpj) : "",
+          });
+        }
 
         // Carrega imagens salvas
         const savedProfileImg = empresaImageManager.getProfileImage();
@@ -89,17 +89,6 @@ const InfoCardEmpresa = () => {
     fetchEmpresaData();
   }, []);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   // Funções para upload de imagens
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -109,7 +98,6 @@ const InfoCardEmpresa = () => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        // 2MB
         alert("A imagem deve ter no máximo 2MB.");
         return;
       }
@@ -131,7 +119,6 @@ const InfoCardEmpresa = () => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        // 2MB
         alert("A imagem de capa deve ter no máximo 2MB.");
         return;
       }
@@ -143,55 +130,72 @@ const InfoCardEmpresa = () => {
       reader.readAsDataURL(file);
     }
   };
-  const handleSave = async () => {
-    try {
-      setLoading(true);
-      const empresaToken = localStorage.getItem("empresaToken");
-      if (!empresaToken) {
-        throw new Error("Token de autenticação não encontrado");
-      }
-
-      const response = await fetch(
-        `http://localhost:8080/empresas/${empresa.id}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...formData,
-            cnpj: formData.cnpj ? removeMascara(formData.cnpj) : undefined,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erro ao atualizar dados da empresa");
-      }
-
-      const data = await response.json();
-      setEmpresa(data);
-      handleClose();
-
-      setSnackbarMessage("Dados atualizados com sucesso!");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-    } catch (error) {
-      console.error("Erro ao atualizar empresa:", error);
-      setSnackbarMessage("Erro ao atualizar dados. Tente novamente.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getDisplayValue = (value, type) => {
     if (loading) return <CircularProgress size={16} />;
     if (error) return `Não foi possível carregar ${type}`;
     return value || `Não foi possível carregar ${type}`;
   };
+
+  const InfoItem = ({ icon, label, value }) => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        p: 2.5,
+        borderRadius: "12px",
+        transition: "all 0.2s ease",
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #e9ecef",
+        height: "85px",
+        "&:hover": {
+          backgroundColor: "#f5f9f6",
+          borderColor: "#006916",
+          transform: "translateY(-2px)",
+          boxShadow: "0 4px 12px rgba(0, 105, 22, 0.1)",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          minWidth: 48,
+          height: 48,
+          borderRadius: "10px",
+          backgroundColor: "#e8f5e9",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mr: 2,
+        }}
+      >
+        {React.cloneElement(icon, { sx: { color: "#006916", fontSize: 24 } })}
+      </Box>
+      <Box>
+        <Typography
+          sx={{
+            color: "#666",
+            fontSize: "12px",
+            textTransform: "uppercase",
+            letterSpacing: "0.5px",
+            fontWeight: 600,
+            mb: 0.5,
+          }}
+        >
+          {label}
+        </Typography>
+        <Typography
+          sx={{
+            color: "#1e1e1e",
+            fontSize: "15px",
+            fontWeight: "500",
+            lineHeight: "1.4",
+          }}
+        >
+          {value}
+        </Typography>
+      </Box>
+    </Box>
+  );
 
   return (
     <>
@@ -200,9 +204,10 @@ const InfoCardEmpresa = () => {
           backgroundColor: "#fff",
           borderRadius: "15px",
           width: "100%",
-          minHeight: "450px", // Aumentado para acomodar a foto de capa maior
+          minHeight: "450px",
           overflow: "hidden",
           position: "relative",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
         }}
       >
         {/* Capa da empresa */}
@@ -212,7 +217,7 @@ const InfoCardEmpresa = () => {
             backgroundImage: coverImg ? `url(${coverImg})` : "none",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            height: "230px", // Aumentado para ocupar mais espaço da tela
+            height: "230px",
             width: "100%",
             position: "relative",
           }}
@@ -237,12 +242,6 @@ const InfoCardEmpresa = () => {
             }}
           >
             <EditIcon />
-            <input
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={handleCoverUpload}
-            />
           </IconButton>
           {coverImg && (
             <IconButton
@@ -268,34 +267,15 @@ const InfoCardEmpresa = () => {
           )}
         </Box>
 
-        <Box sx={{ p: 3, pt: 6, position: "relative" }}>
-          <Box
-            component="img"
-            src={editIcon}
-            alt="Editar informações"
-            onClick={handleOpen}
-            sx={{
-              position: "absolute",
-              top: 24,
-              right: 24,
-              cursor: "pointer",
-              width: 20,
-              height: 20,
-              opacity: 0.6,
-              "&:hover": {
-                opacity: 1,
-              },
-            }}
-          />
-
+        <Box sx={{ p: 4, pt: 6, position: "relative" }}>
           {/* Avatar/Logo da empresa */}
           <Box
             sx={{
               position: "absolute",
-              top: -60, // Ajustado para a nova altura da capa
+              top: -60,
               left: 24,
-              width: 120, // Aumentado de 100px para 120px
-              height: 120, // Aumentado de 100px para 120px
+              width: 120,
+              height: 120,
               borderRadius: "50%",
               border: "4px solid #fff",
               overflow: "hidden",
@@ -324,10 +304,10 @@ const InfoCardEmpresa = () => {
             ) : (
               <Avatar
                 sx={{
-                  width: 110, // Ajustado para o novo tamanho do container
-                  height: 110, // Ajustado para o novo tamanho do container
+                  width: 110,
+                  height: 110,
                   bgcolor: "#e3f2fd",
-                  fontSize: "2.2rem", // Aumentado ligeiramente
+                  fontSize: "2.2rem",
                   fontWeight: "bold",
                   color: "#006916",
                 }}
@@ -391,171 +371,84 @@ const InfoCardEmpresa = () => {
             />
           </Box>
 
-          <Box sx={{ ml: 15 }}>
-            <Typography
-              variant="h6"
+          <Box sx={{ ml: 6, width: "100%" }}>
+            <Box
               sx={{
-                color: "#1e1e1e",
-                fontSize: "20px",
-                fontWeight: "600",
-                mb: 1,
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                mb: 2,
+                position: "relative",
               }}
             >
-              {getDisplayValue(empresa?.nome, "o nome da empresa")}
-            </Typography>
-            <Typography
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "#006916",
+                  fontSize: "36px",
+                  fontWeight: "700",
+                  mb: 1,
+                  marginRight: "200px",
+                  letterSpacing: "0.5px",
+                }}
+              >
+                {getDisplayValue(empresa?.nome, "o nome da empresa")}
+              </Typography>
+              <Box
+                sx={{
+                  width: "95%",
+                  height: "1px",
+                  backgroundColor: "#e0e0e0",
+                }}
+              />
+            </Box>
+
+            <Box
               sx={{
-                color: "#666",
-                fontSize: "14px",
-                mb: 0.5,
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+                marginRight: "200px",
+                maxWidth: "1000px",
+                mx: "auto",
+                px: 4,
               }}
             >
-              {getDisplayValue(empresa?.email, "o email da empresa")}
-            </Typography>
-            <Typography
-              sx={{
-                color: "#666",
-                fontSize: "14px",
-              }}
-            >
-              {getDisplayValue(empresa?.cnpj, "o CNPJ da empresa")}
-            </Typography>
+              <Box sx={{ display: "flex", gap: 3 }}>
+                <InfoItem
+                  icon={<EmailIcon />}
+                  label="Email"
+                  value={getDisplayValue(empresa?.email, "o email da empresa")}
+                />
+                <InfoItem
+                  icon={<BusinessIcon />}
+                  label="CNPJ"
+                  value={getDisplayValue(empresa?.cnpj, "o CNPJ da empresa")}
+                />
+                <InfoItem
+                  icon={<TagIcon />}
+                  label="CEP"
+                  value={getDisplayValue(empresa?.cep, "o CEP")}
+                />
+              </Box>
+
+              <Box sx={{ display: "flex", gap: 3 }}>
+                <InfoItem
+                  icon={<LocationOnIcon />}
+                  label="Endereço"
+                  value={getDisplayValue(empresa?.endereco, "o endereço")}
+                />
+                <InfoItem
+                  icon={<HomeIcon />}
+                  label="Número"
+                  value={getDisplayValue(empresa?.numero, "o número")}
+                />
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Paper>
-
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-editar-empresa"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 500,
-            bgcolor: "background.paper",
-            borderRadius: "15px",
-            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-            p: 4,
-            outline: "none",
-          }}
-        >
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-
-          <Typography
-            variant="h6"
-            sx={{ color: "#006916", mb: 3, fontWeight: "bold" }}
-          >
-            Editar informações da empresa
-          </Typography>
-
-          <Box
-            component="form"
-            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-          >
-            {error && (
-              <Typography color="error" sx={{ mb: 2 }}>
-                {error}
-              </Typography>
-            )}
-
-            <TextField
-              fullWidth
-              name="nome"
-              value={formData.nome}
-              onChange={handleChange}
-              placeholder="Nome da empresa"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  bgcolor: "#E3EEE5",
-                  height: "48px",
-                  borderRadius: "12px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                  "& fieldset": {
-                    border: "none",
-                  },
-                },
-              }}
-            />
-
-            <TextField
-              fullWidth
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  bgcolor: "#E3EEE5",
-                  height: "48px",
-                  borderRadius: "12px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                  "& fieldset": {
-                    border: "none",
-                  },
-                },
-              }}
-            />
-
-            <TextField
-              fullWidth
-              name="cnpj"
-              value={formData.cnpj}
-              onChange={handleChange}
-              placeholder="CNPJ"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  bgcolor: "#E3EEE5",
-                  height: "48px",
-                  borderRadius: "12px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                  "& fieldset": {
-                    border: "none",
-                  },
-                },
-              }}
-            />
-
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={handleSave}
-              disabled={loading}
-              sx={{
-                mt: 2,
-                height: "48px",
-                bgcolor: "#006916",
-                color: "white",
-                borderRadius: "12px",
-                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                "&:hover": {
-                  bgcolor: "#005713",
-                },
-              }}
-            >
-              {loading ? (
-                <CircularProgress size={24} sx={{ color: "white" }} />
-              ) : (
-                "Salvar alterações"
-              )}
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
 
       <Snackbar
         open={snackbarOpen}
