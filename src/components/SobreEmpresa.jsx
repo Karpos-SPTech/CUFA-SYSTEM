@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Paper, 
@@ -6,20 +6,111 @@ import {
   Modal,
   TextField,
   Button,
-  IconButton
+  IconButton,
+  CircularProgress,
+  Alert,
+  Snackbar
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import editIcon from '/src/assets/pencil-icon.svg';
 
 const SobreEmpresa = () => {
   const [open, setOpen] = useState(false);
-  const [biografia, setBiografia] = useState("Biografia da empresa");
+  const [biografia, setBiografia] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [editingBiografia, setEditingBiografia] = useState("");
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  useEffect(() => {
+    fetchBiografia();
+  }, []);
 
-  const handleSave = () => {
-    handleClose();
+  const fetchBiografia = async () => {
+    try {
+      const empresaId = localStorage.getItem("empresaId");
+      if (!empresaId) {
+        throw new Error("ID da empresa não encontrado");
+      }
+
+      const response = await fetch(
+        `http://localhost:8080/empresas/${empresaId}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao buscar dados da empresa");
+      }
+
+      const empresaData = await response.json();
+      setBiografia(empresaData.biografia || "Adicione uma biografia para sua empresa");
+    } catch (err) {
+      console.error("Erro ao buscar biografia:", err);
+      setError("Não foi possível carregar a biografia");
+    }
+  };
+
+  const handleOpen = () => {
+    setEditingBiografia(biografia);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setError(null);
+  };
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!editingBiografia.trim()) {
+        throw new Error("A biografia não pode estar vazia");
+      }
+
+      console.log("[Debug] Atualizando biografia...");
+      
+      const response = await fetch("http://localhost:8080/empresas/biografia", {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ biografia: editingBiografia.trim() }),
+      });
+
+      console.log("[Debug] Status da resposta:", response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        console.log("[Debug] Erro recebido:", errorData);
+        throw new Error(errorData?.message || "Erro ao atualizar biografia");
+      }
+
+      console.log("[Debug] Biografia atualizada com sucesso");
+      setBiografia(editingBiografia);
+      setSnackbarMessage("Biografia atualizada com sucesso!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+      handleClose();
+    } catch (err) {
+      console.error("Erro ao atualizar biografia:", err);
+      setError("Não foi possível atualizar a biografia. Tente novamente.");
+      setSnackbarMessage("Erro ao atualizar biografia");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -107,14 +198,21 @@ const SobreEmpresa = () => {
             Editar biografia
           </Typography>
 
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
           <TextField
             fullWidth
             multiline
-            rows={4}
-            value={biografia}
-            onChange={(e) => setBiografia(e.target.value)}
+            rows={6}
+            value={editingBiografia}
+            onChange={(e) => setEditingBiografia(e.target.value)}
             placeholder="Digite a biografia da empresa"
             sx={{
+              mb: 3,
               '& .MuiOutlinedInput-root': {
                 bgcolor: '#E3EEE5',
                 borderRadius: '12px',
@@ -130,6 +228,7 @@ const SobreEmpresa = () => {
             fullWidth
             variant="contained"
             onClick={handleSave}
+            disabled={loading}
             sx={{
               mt: 3,
               height: '48px',
@@ -142,10 +241,25 @@ const SobreEmpresa = () => {
               },
             }}
           >
-            Salvar alterações
+            {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Salvar alterações'}
           </Button>
         </Box>
       </Modal>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

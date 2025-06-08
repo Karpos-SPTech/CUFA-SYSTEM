@@ -1,36 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Paper, 
-  Modal, 
-  Typography, 
-  TextField, 
+import React, { useState, useEffect } from "react";
+import {
+  Box,
+  Paper,
+  Modal,
+  Typography,
+  TextField,
   Button,
   Alert,
-  IconButton
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import mcdonaldsLogo from '../assets/microsoft-logo.png';
-import fotoIcon from '../assets/foto-icon.png';
-import videoIcon from '../assets/video-icon.png';
-import textoIcon from '../assets/text-icon.png';
-import empresaImageManager from '../utils/empresaImageManager';
+  IconButton,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import mcdonaldsLogo from "../assets/microsoft-logo.png";
+import fotoIcon from "../assets/foto-icon.png";
+import videoIcon from "../assets/video-icon.png";
+import textoIcon from "../assets/text-icon.png";
+import empresaImageManager from "../utils/empresaImageManager";
 
 const ButtonOption = ({ icon, label }) => (
   <Box
     sx={{
-      display: 'flex',
-      alignItems: 'center',
+      display: "flex",
+      alignItems: "center",
       gap: 1,
-      cursor: 'pointer',
-      color: '#006916',
-      fontSize: '14px',
-      '&:hover': {
-        opacity: 0.8
-      }
+      cursor: "pointer",
+      color: "#006916",
+      fontSize: "14px",
+      "&:hover": {
+        opacity: 0.8,
+      },
     }}
   >
-    <Box      component="img"
+    <Box
+      component="img"
       src={icon}
       alt={label}
       sx={{ width: 28, height: 28 }}
@@ -39,172 +40,236 @@ const ButtonOption = ({ icon, label }) => (
   </Box>
 );
 
-const AnunciarVaga = () => {
-  const [open, setOpen] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+const AnunciarVaga = ({ isEdit = false, open: propOpen, onClose, publicacaoParaEditar, onSave }) => {
+  const [open, setOpen] = useState(propOpen || false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [empresaLogo, setEmpresaLogo] = useState(null);
   const [publicacao, setPublicacao] = useState({
-    titulo: '',
-    descricao: '',
-    requisitos: '',
-    beneficios: '',
-    salario: ''
+    titulo: "",
+    descricao: `Descrição da vaga:
+(Descreva brevemente sobre a vaga e a empresa)
+
+O que o contratado irá realizar:
+• 
+• 
+• 
+
+Benefícios:
+• ex(vale refeição, vale transporte, etc)
+• 
+• 
+
+Frase atrativa:
+(Adicione uma frase chamativa para atrair candidatos)`,
+    tipoContrato: "",
+    dtExpiracao: "",
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Carregar logo da empresa ao montar o componente
-    const savedLogo = empresaImageManager.getProfileImage();
-    if (savedLogo) {
-      setEmpresaLogo(savedLogo);
+    // Se for edição, preenche o formulário com os dados da publicação
+    if (isEdit && publicacaoParaEditar) {
+      setPublicacao({
+        titulo: publicacaoParaEditar.titulo || "",
+        descricao: publicacaoParaEditar.descricao || "",
+        tipoContrato: publicacaoParaEditar.tipoContrato || "",
+        dtExpiracao: publicacaoParaEditar.dtExpiracao ? 
+          new Date(publicacaoParaEditar.dtExpiracao).toISOString().slice(0, 16) : "",
+      });
     }
+  }, [isEdit, publicacaoParaEditar]);
 
-    // Escutar mudanças na logo da empresa
-    const removeListener = empresaImageManager.addListener((imageType, imageData) => {
-      if (imageType === 'profile') {
-        setEmpresaLogo(imageData);
+  useEffect(() => {
+    setOpen(propOpen);
+  }, [propOpen]);
+
+  const fetchPublicacoes = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const empresaId = localStorage.getItem("empresaId");
+      console.log("[Debug] Iniciando busca de publicações");
+      console.log("[Debug] EmpresaId encontrado:", empresaId);
+
+      if (!empresaId) throw new Error("ID da empresa não encontrado");
+
+      const url = "http://localhost:8080/publicacao";
+      console.log("[Debug] Fazendo requisição GET para:", url);
+      
+      const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("[Debug] Status da resposta:", response.status);
+      console.log("[Debug] Headers da resposta:", Object.fromEntries(response.headers.entries()));
+
+      const contentType = response.headers.get("content-type");
+      console.log("[Debug] Content-Type da resposta:", contentType);
+
+      if (!response.ok) {
+        console.log("[Debug] Resposta não ok. Status:", response.status);
+        const errorText = await response.text();
+        console.log("[Debug] Corpo do erro:", errorText);
+        throw new Error(`Erro ${response.status}: ${errorText || 'Sem mensagem de erro'}`);
       }
+
+      if (!contentType || !contentType.includes("application/json")) {
+        const textContent = await response.text();
+        console.log("[Debug] Resposta não-JSON recebida:", textContent);
+        throw new Error("Resposta inesperada do servidor (não é JSON)");
+      }
+
+      const data = await response.json();
+      console.log("[Debug] Dados recebidos:", JSON.stringify(data, null, 2));
+
+      setPublicacoes(data);
+    } catch (err) {
+      console.error("Erro ao buscar publicações:", err);
+      setError(err.message || "Erro ao carregar publicações");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const savedLogo = empresaImageManager.getProfileImage();
+    if (savedLogo) setEmpresaLogo(savedLogo);
+
+    const removeListener = empresaImageManager.addListener((type, image) => {
+      if (type === "profile") setEmpresaLogo(image);
     });
 
-    // Cleanup: remover listener quando o componente for desmontado
     return removeListener;
   }, []);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
     setPublicacao({
-      titulo: '',
-      descricao: '',
-      requisitos: '',
-      beneficios: '',
-      salario: ''
+      titulo: "",
+      descricao: `Descrição da vaga:
+(Descreva brevemente sobre a vaga e a empresa)
+
+O que o contratado irá realizar:
+• 
+• 
+• 
+
+Benefícios:
+• ex(vale refeição, vale transporte, etc)
+• 
+• 
+
+Frase atrativa:
+(Adicione uma frase chamativa para atrair candidatos)`,
+      tipoContrato: "",
+      dtExpiracao: "",
     });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPublicacao(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setPublicacao((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
+    setLoading(true);
 
     try {
-      const response = await publicacaoService.criarPublicacao(publicacao);
-      setSuccess('Vaga publicada com sucesso!');
-      setTimeout(handleClose, 2000);
+      const empresaId = localStorage.getItem("empresaId");
+      if (!empresaId) throw new Error("ID da empresa não encontrado");
+
+      const novaPublicacao = {
+        ...publicacao,
+        fkEmpresa: parseInt(empresaId),
+      };
+
+      const url = isEdit ? 
+        `http://localhost:8080/publicacao/${publicacaoParaEditar.idPublicacao}` :
+        "http://localhost:8080/publicacao";
+
+      const response = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(novaPublicacao),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || `Erro ao ${isEdit ? 'editar' : 'cadastrar'} publicação`);
+      }
+
+      setSuccess(`Publicação ${isEdit ? 'editada' : 'cadastrada'} com sucesso!`);
+      if (onSave) onSave(); // Isso vai chamar fetchPublicacao no componente pai
+      handleClose();
     } catch (err) {
-      setError(err.response?.data?.message || 'Erro ao publicar vaga. Tente novamente.');
+      console.error(`Erro ao ${isEdit ? 'editar' : 'cadastrar'} publicação:`, err);
+      setError(err.message || `Erro ao ${isEdit ? 'editar' : 'salvar'} publicação`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <Paper sx={{
-        backgroundColor: '#fff',
-        borderRadius: '10px',
-        p: 2,
-        width: '100%',
-        border: '1px solid #ddd',
-        minHeight: '80px'
-      }}
-    >      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'auto 1fr',
-          gap: 2,
-          alignItems: 'center',
-          mb: 3
-        }}
-      >
-        <Box
-          component="img"
-          src={empresaLogo || mcdonaldsLogo}
-          alt="Logo empresa"
-          sx={{
-            width: 40,
-            height: 40,
-            borderRadius: '50%',
-            objectFit: 'cover'
-          }}
-        />
-        <Box
-          component="button"
-          onClick={handleOpen}
-          sx={{
-            background: '#e9f1e7',
-            border: 'none',
-            borderRadius: '15px',
-            padding: '12px 16px',
-            color: '#006916',
-            fontSize: '14px',
-            fontWeight: '400',
-            cursor: 'pointer',
-            transition: 'background-color 0.2s',
-            width: '100%',
-            textAlign: 'left',
-            minHeight: '45px',
-            '&:hover': {
-              background: '#d8e6d5',
-            }
-          }}
-        >
-          Anunciar novas vagas!
+      <Paper sx={{ p: 2, borderRadius: 2, mb: 2 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box display="flex" alignItems="center" gap={2}>
+            <img
+              src={empresaLogo || mcdonaldsLogo}
+              alt="Logo"
+              style={{ width: 40, height: 40 }}
+            />
+            <Typography fontWeight={600}>Anunciar nova vaga</Typography>
+          </Box>
+          <Button
+            variant="contained"
+            onClick={handleOpen}
+            sx={{ bgcolor: "#006916" }}
+          >
+            Nova Publicação
+          </Button>
         </Box>
-      </Box>      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          gap: 2,
-          mt: 1
-        }}
-      >
-      </Box>    </Paper>
+      </Paper>
 
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-publicar-vaga"
-        aria-describedby="modal-publicar-nova-vaga"
-      >
+      <Modal open={open} onClose={handleClose}>
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 600,
-            bgcolor: 'background.paper',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
             borderRadius: 2,
-            boxShadow: 24,
             p: 4,
-            maxHeight: '90vh',
-            overflowY: 'auto'
+            boxShadow: 24,
           }}
         >
           <IconButton
-            aria-label="close"
             onClick={handleClose}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500]
-            }}
+            sx={{ position: "absolute", top: 8, right: 8 }}
           >
             <CloseIcon />
           </IconButton>
 
-          <Typography variant="h6" component="h2" sx={{ mb: 3, color: '#006916' }}>
-            Publicar Nova Vaga
+          <Typography variant="h6" gutterBottom>
+            {isEdit ? 'Editar Publicação' : 'Nova Publicação'}
           </Typography>
 
           {error && (
@@ -212,69 +277,92 @@ const AnunciarVaga = () => {
               {error}
             </Alert>
           )}
-
           {success && (
             <Alert severity="success" sx={{ mb: 2 }}>
               {success}
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <form onSubmit={handleSubmit}>
             <TextField
-              required
-              fullWidth
-              label="Título da Vaga"
               name="titulo"
+              label="Título da Vaga"
               value={publicacao.titulo}
               onChange={handleChange}
-            />
-            
-            <TextField
-              required
               fullWidth
-              multiline
-              rows={4}
-              label="Descrição da Vaga"
+              margin="dense"
+              required
+              placeholder="Ex: Desenvolvedor Front-end Júnior"
+            />
+            <TextField
               name="descricao"
+              label="Descrição da Vaga"
               value={publicacao.descricao}
-              onChange={handleChange}
-            />
+              onChange={(e) => {
+                const linhas = e.target.value.split('\n');
+                const linhaAtual = e.target.selectionStart;
+                let linhaNumero = 0;
+                let posicaoAtual = 0;
+                
+                // Encontra a linha atual baseado na posição do cursor
+                while (posicaoAtual <= linhaAtual && linhaNumero < linhas.length) {
+                  posicaoAtual += linhas[linhaNumero].length + 1;
+                  linhaNumero++;
+                }
+                linhaNumero--; // Ajusta o índice
 
-            <TextField
-              required
+                // Se a linha atual está vazia ou é um placeholder, limpa ela
+                if (linhas[linhaNumero] && linhas[linhaNumero].includes('(')) {
+                  linhas[linhaNumero] = '';
+                }
+
+                const novoValor = linhas.join('\n');
+                setPublicacao(prev => ({ ...prev, descricao: novoValor }));
+              }}
               fullWidth
+              margin="dense"
               multiline
-              rows={3}
-              label="Tipo de contrato"
+              rows={10}
+              InputProps={{
+                sx: { 
+                  fontFamily: 'monospace',
+                  '& .MuiOutlinedInput-input': {
+                    whiteSpace: 'pre-line'
+                  }
+                }
+              }}
+            />
+            <TextField
               name="tipoContrato"
-              value={publicacao.requisitos}
+              label="Tipo de Contrato"
+              value={publicacao.tipoContrato}
               onChange={handleChange}
+              fullWidth
+              margin="dense"
+            />
+            <TextField
+              name="dtExpiracao"
+              label="Data de Expiração"
+              type="datetime-local"
+              value={publicacao.dtExpiracao}
+              onChange={handleChange}
+              fullWidth
+              margin="dense"
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
 
-            <TextField
-              required
-              fullWidth
-              multiline
-              rows={3}
-              label="data de Expiração"
-              name="dataExpiracao"
-              value={publicacao.beneficios}
-              onChange={handleChange}
-            />
             <Button
               type="submit"
               variant="contained"
-              sx={{
-                mt: 2,
-                bgcolor: '#006916',
-                '&:hover': {
-                  bgcolor: '#005713'
-                }
-              }}
+              fullWidth
+              disabled={loading}
+              sx={{ mt: 2, bgcolor: "#006916" }}
             >
-              Publicar Vaga
+              {loading ? "Salvando..." : "Publicar"}
             </Button>
-          </Box>
+          </form>
         </Box>
       </Modal>
     </>

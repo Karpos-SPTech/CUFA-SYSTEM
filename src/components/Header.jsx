@@ -9,6 +9,8 @@ import {
   Button,
   Avatar,
   Divider,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -24,6 +26,7 @@ const Header = ({ hideNotifications }) => {
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [empresaData, setEmpresaData] = useState({
     nome: "",
     email: "",
@@ -98,15 +101,23 @@ const Header = ({ hideNotifications }) => {
     } else if (name === "cep") {
       let cep = value.replace(/\D/g, "");
       if (cep.length > 8) return; // Limita a 8 dígitos
+
+      // Formata o CEP
       if (cep.length > 5) {
+        const cepFormatado = `${cep.slice(0, 5)}-${cep.slice(5, 8)}`;
         setEmpresaData((prev) => ({
           ...prev,
-          [name]: `${cep.slice(0, 5)}-${cep.slice(5, 8)}`,
+          cep: cepFormatado,
         }));
+
+        // Se o CEP estiver completo (8 dígitos), busca o endereço
+        if (cep.length === 8) {
+          buscarEndereco(cep);
+        }
       } else {
         setEmpresaData((prev) => ({
           ...prev,
-          [name]: cep,
+          cep,
         }));
       }
     } else {
@@ -117,20 +128,37 @@ const Header = ({ hideNotifications }) => {
     }
   };
 
+  const buscarEndereco = async (cep) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setEmpresaData((prev) => ({
+          ...prev,
+          endereco: data.logradouro || prev.endereco,
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Remove máscaras antes de enviar
+      // Envia apenas os campos editáveis permitidos pelo PATCH
       const dataToSend = {
-        ...empresaData,
-        cnpj: empresaData.cnpj ? removeMascara(empresaData.cnpj) : undefined,
+        nome: empresaData.nome,
         cep: empresaData.cep ? removeMascara(empresaData.cep) : undefined,
+        endereco: empresaData.endereco,
+        numero: empresaData.numero,
       };
 
       const response = await fetch(
         `http://localhost:8080/empresas/${empresaData.id}`,
         {
-          method: "PUT",
+          method: "PATCH",
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
@@ -143,9 +171,13 @@ const Header = ({ hideNotifications }) => {
         throw new Error("Erro ao atualizar dados");
       }
 
+      // Atualiza os dados locais após sucesso
+      fetchEmpresaData();
       closeSettingsModal();
+      setSnackbar({ open: true, message: "Perfil atualizado com sucesso!", severity: "success" });
     } catch (error) {
       console.error("Erro ao atualizar:", error);
+      setSnackbar({ open: true, message: "Erro ao atualizar perfil.", severity: "error" });
     }
   };
 
@@ -160,6 +192,10 @@ const Header = ({ hideNotifications }) => {
 
   const closeSettingsModal = () => {
     setIsSettingsModalOpen(false);
+  };  
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -512,16 +548,17 @@ const Header = ({ hideNotifications }) => {
               <InputBase
                 name="email"
                 value={empresaData.email}
-                onChange={handleInputChange}
                 placeholder="Email"
+                disabled
                 sx={{
                   width: "100%",
                   padding: "10px",
                   border: "1px solid #ccc",
                   borderRadius: "5px",
-                  backgroundColor: "#f1f8f4",
-                  color: "#555",
+                  backgroundColor: "#e0e0e0",
+                  color: "#666",
                   fontFamily: "'Paytone One', sans-serif",
+                  cursor: "not-allowed",
                 }}
               />
             </Box>
@@ -529,16 +566,17 @@ const Header = ({ hideNotifications }) => {
               <InputBase
                 name="cnpj"
                 value={empresaData.cnpj}
-                onChange={handleInputChange}
                 placeholder="CNPJ"
+                disabled
                 sx={{
                   width: "100%",
                   padding: "10px",
                   border: "1px solid #ccc",
                   borderRadius: "5px",
-                  backgroundColor: "#f1f8f4",
-                  color: "#555",
+                  backgroundColor: "#e0e0e0",
+                  color: "#666",
                   fontFamily: "'Paytone One', sans-serif",
+                  cursor: "not-allowed",
                 }}
               />
               <InputBase
@@ -610,6 +648,22 @@ const Header = ({ hideNotifications }) => {
           </Box>
         </Box>
       </Modal>
+
+      {/* Snackbar para mensagens */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

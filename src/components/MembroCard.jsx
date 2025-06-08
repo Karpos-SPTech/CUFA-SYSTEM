@@ -9,6 +9,11 @@ import {
   TextField,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -69,10 +74,13 @@ const MembroCard = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState(null);
+
   // Valores válidos para o enum Cargo no backend
   const cargosValidos = {
     FUNCIONARIO: "FUNCIONARIO",
-    ADMINISTRADOR: "ADMINISTRADOR"
+    ADMINISTRADOR: "ADMINISTRADOR",
   };
 
   const [formData, setFormData] = useState({
@@ -97,23 +105,23 @@ const MembroCard = () => {
 
       console.log("Fazendo request com:", {
         empresaId,
-        url: `http://localhost:8080/funcionarios/${empresaId}`
+        url: `http://localhost:8080/funcionarios/${empresaId}`,
       });
 
       const response = await fetch(
         `http://localhost:8080/funcionarios/${empresaId}`,
         {
           method: "GET",
-          credentials: 'include', // Importante: inclui os cookies na requisição
+          credentials: "include", // Importante: inclui os cookies na requisição
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
         }
       );
 
       let errorData;
       let responseData;
-      
+
       try {
         responseData = await response.json();
       } catch (e) {
@@ -124,9 +132,9 @@ const MembroCard = () => {
       if (!response.ok) {
         console.error("Resposta não ok:", responseData);
         throw new Error(
-          responseData?.message || 
-          responseData?.error || 
-          `Erro ao buscar funcionários (${response.status})`
+          responseData?.message ||
+            responseData?.error ||
+            `Erro ao buscar funcionários (${response.status})`
         );
       }
 
@@ -140,7 +148,8 @@ const MembroCard = () => {
       // Função auxiliar para validar o cargo
       const getCargo = (cargoValue) => {
         if (!cargoValue) return "USUARIO";
-        const cargo = typeof cargoValue === 'object' ? cargoValue.nome : cargoValue;
+        const cargo =
+          typeof cargoValue === "object" ? cargoValue.nome : cargoValue;
         // Verifica se o cargo é um dos valores válidos
         return Object.values(cargosValidos).includes(cargo) ? cargo : "USUARIO";
       };
@@ -156,9 +165,12 @@ const MembroCard = () => {
       setMembers(membrosFormatados);
     } catch (error) {
       console.error("Erro ao buscar funcionários:", error);
-      setError(error.message || "Erro ao acessar o servidor. Verifique sua conexão e tente novamente.");
+      setError(
+        error.message ||
+          "Erro ao acessar o servidor. Verifique sua conexão e tente novamente."
+      );
       setMembers([]);
-      
+
       // Se o erro for de autenticação, podemos redirecionar para o login
       if (error.message.includes("403") || error.message.includes("401")) {
         // Limpa os dados da sessão
@@ -217,7 +229,7 @@ const MembroCard = () => {
 
       const response = await fetch("http://localhost:8080/funcionarios", {
         method: "POST",
-        credentials: 'include', // Importante: inclui os cookies na requisição
+        credentials: "include", // Importante: inclui os cookies na requisição
         headers: {
           "Content-Type": "application/json",
         },
@@ -253,8 +265,49 @@ const MembroCard = () => {
   };
 
   // Função para deletar membro
-  const handleDeleteMember = (id) => {
-    setMembers((prev) => prev.filter((member) => member.id !== id));
+  const handleDeleteMember = async (id) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`http://localhost:8080/funcionarios/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao deletar funcionário: ${response.status}`);
+      }
+
+      // Atualiza a lista de funcionários após deletar
+      fetchFuncionarios();
+    } catch (err) {
+      console.error("Erro ao deletar funcionário:", err);
+      setError(err.message || "Erro ao deletar funcionário. Por favor, tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (member) => {
+    setMemberToDelete(member);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (memberToDelete) {
+      handleDeleteMember(memberToDelete.id);
+    }
+    setDeleteConfirmOpen(false);
+    setMemberToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmOpen(false);
+    setMemberToDelete(null);
   };
 
   return (
@@ -330,7 +383,7 @@ const MembroCard = () => {
               key={member.id}
               name={member.name}
               image={member.image}
-              onDelete={() => handleDeleteMember(member.id)}
+              onDelete={() => handleDeleteClick(member)}
             />
           ))}
         </Box>
@@ -455,7 +508,7 @@ const MembroCard = () => {
               value={formData.cargo}
               onChange={handleChange}
               SelectProps={{
-                native: true
+                native: true,
               }}
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -502,6 +555,34 @@ const MembroCard = () => {
           </Box>
         </Box>
       </Modal>
+
+      {/* Dialog de confirmação */}
+      <Dialog open={deleteConfirmOpen} onClose={handleCancelDelete}>
+        <DialogTitle>Confirmar exclusão</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Tem certeza que deseja excluir o funcionário{" "}
+            {memberToDelete?.name}? Esta ação não pode ser desfeita.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} sx={{ color: "#666" }}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            sx={{
+              bgcolor: "#FF0000",
+              "&:hover": {
+                bgcolor: "#D32F2F",
+              },
+            }}
+          >
+            Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
