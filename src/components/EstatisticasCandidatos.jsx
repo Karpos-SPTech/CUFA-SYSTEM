@@ -4,17 +4,18 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, ResponsiveCo
 
 const EstatisticasCandidatos = () => {
   const dadosFaixaEtaria = [
-    { faixa: 'Menor de 18', percentual: 30 },
-    { faixa: '18 a 25', percentual: 40 },
-    { faixa: '25 a 40', percentual: 15 },
+    { faixa: 'Abaixo de 18', percentual: 30 },
+    { faixa: 'De 18 a 25', percentual: 40 },
+    { faixa: 'De 25 a 40', percentual: 15 },
     { faixa: 'Acima de 40', percentual: 5 },
   ];
 
   const dadosEscolaridade = [
-    { nivel: 'Sem instrução', percentual: 6.25 },
-    { nivel: 'Nível fundamental', percentual: 43.75 },
-    { nivel: 'Nível médio', percentual: 31.25 },
-    { nivel: 'Nível superior', percentual: 18.75 },
+    { nivel: 'Nenhuma', percentual: 20.0 },
+    { nivel: 'Fundamental Incompleto', percentual: 20.0 },
+    { nivel: 'Fundamental Completo', percentual: 20.0 },
+    { nivel: 'Ensimo Médio Incompleto', percentual: 20.0 },
+    { nivel: 'Ensimo Médio Completo', percentual: 20.0 }
   ];
 
   const COLORS = ['#4CAF50', '#81C784'];
@@ -22,14 +23,15 @@ const EstatisticasCandidatos = () => {
     <Box>
       <Paper sx={{ p: 2, mb: 2, borderRadius: '16px' }}>
         <Typography variant="h6" gutterBottom align="center" sx={{ 
-          fontSize: '14px', 
+          fontSize: '15px',
+          fontWeight: 'bold', 
           color: '#006400',
           fontFamily: "'Paytone One', sans-serif" 
         }}>
           Distribuição de Candidatos por Faixa Etária
         </Typography>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={dadosFaixaEtaria} margin={{ top: 5, right: 20, bottom: 20, left: 10 }}>
+        <ResponsiveContainer width="120%" height={200}>
+          <BarChart data={dadosFaixaEtaria} margin={{ top: 15, right: 65, bottom: 5, left: -25 }}>
             <XAxis 
               dataKey="faixa" 
               tick={{ 
@@ -40,7 +42,7 @@ const EstatisticasCandidatos = () => {
             <YAxis 
               tickFormatter={(value) => `${value}%`} 
               tick={{ 
-                fontSize: 11,
+                fontSize: 12,
                 fontFamily: "'Paytone One', sans-serif"
               }} 
             />
@@ -52,7 +54,8 @@ const EstatisticasCandidatos = () => {
 
       <Paper sx={{ p: 2, mb: 2, borderRadius: '16px' }}>
         <Typography variant="h6" gutterBottom align="center" sx={{ 
-          fontSize: '14px', 
+          fontSize: '15px',
+          fontWeight: 'bold', 
           color: '#006400',
           fontFamily: "'Paytone One', sans-serif"
         }}>
@@ -62,7 +65,7 @@ const EstatisticasCandidatos = () => {
           <BarChart 
             layout="vertical" 
             data={dadosEscolaridade} 
-            margin={{ top: 5, right: 20, bottom: 5, left: 5 }}
+            margin={{ top: 2, right: 20, bottom: -10, left: -20 }}
             barSize={25}
           >
             <XAxis 
@@ -70,7 +73,7 @@ const EstatisticasCandidatos = () => {
               domain={[0, 60]}
               tickFormatter={(value) => `${value}%`} 
               tick={{ 
-                fontSize: 11,
+                fontSize: 12,
                 fontFamily: "'Paytone One', sans-serif"
               }}
             />

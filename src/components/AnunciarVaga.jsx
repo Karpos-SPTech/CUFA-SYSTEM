@@ -8,6 +8,10 @@ import {
   Button,
   Alert,
   IconButton,
+  Select, // Importe Select
+  MenuItem, // Importe MenuItem
+  InputLabel, // Importe InputLabel para o Select
+  FormControl, // Importe FormControl para o Select
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import mcdonaldsLogo from "../assets/microsoft-logo.png";
@@ -74,7 +78,7 @@ Frase atrativa:
         titulo: publicacaoParaEditar.titulo || "",
         descricao: publicacaoParaEditar.descricao || "",
         tipoContrato: publicacaoParaEditar.tipoContrato || "",
-        dtExpiracao: publicacaoParaEditar.dtExpiracao ? 
+        dtExpiracao: publicacaoParaEditar.dtExpiracao ?
           new Date(publicacaoParaEditar.dtExpiracao).toISOString().slice(0, 16) : "",
       });
     }
@@ -96,7 +100,7 @@ Frase atrativa:
 
       const url = "http://localhost:8080/publicacao";
       console.log("[Debug] Fazendo requisição GET para:", url);
-      
+
       const response = await fetch(url, {
         method: "GET",
         credentials: "include",
@@ -128,7 +132,12 @@ Frase atrativa:
       const data = await response.json();
       console.log("[Debug] Dados recebidos:", JSON.stringify(data, null, 2));
 
-      setPublicacoes(data);
+      // Note: setPublicacoes here refers to the state variable for the form,
+      // but fetchPublicacoes was likely intended to update a list of publications.
+      // If this function is meant to update a list, you'll need to pass a setter
+      // from the parent component or manage the list state here.
+      // For now, I'm assuming this fetch is not directly related to updating the form's publicacao state.
+      // If it was, the logic would need to change.
     } catch (err) {
       console.error("Erro ao buscar publicações:", err);
       setError(err.message || "Erro ao carregar publicações");
@@ -173,6 +182,7 @@ Frase atrativa:
       tipoContrato: "",
       dtExpiracao: "",
     });
+    onClose(); // Chama o onClose que pode vir do componente pai
   };
 
   const handleChange = (e) => {
@@ -195,7 +205,7 @@ Frase atrativa:
         fkEmpresa: parseInt(empresaId),
       };
 
-      const url = isEdit ? 
+      const url = isEdit ?
         `http://localhost:8080/publicacao/${publicacaoParaEditar.idPublicacao}` :
         "http://localhost:8080/publicacao";
 
@@ -303,7 +313,7 @@ Frase atrativa:
                 const linhaAtual = e.target.selectionStart;
                 let linhaNumero = 0;
                 let posicaoAtual = 0;
-                
+
                 // Encontra a linha atual baseado na posição do cursor
                 while (posicaoAtual <= linhaAtual && linhaNumero < linhas.length) {
                   posicaoAtual += linhas[linhaNumero].length + 1;
@@ -324,7 +334,7 @@ Frase atrativa:
               multiline
               rows={10}
               InputProps={{
-                sx: { 
+                sx: {
                   fontFamily: 'monospace',
                   '& .MuiOutlinedInput-input': {
                     whiteSpace: 'pre-line'
@@ -332,14 +342,25 @@ Frase atrativa:
                 }
               }}
             />
-            <TextField
-              name="tipoContrato"
-              label="Tipo de Contrato"
-              value={publicacao.tipoContrato}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
-            />
+
+            {/* Início da alteração: Substituindo TextField por Select */}
+            <FormControl fullWidth margin="dense" required>
+              <InputLabel id="tipoContrato-label">Tipo de Contrato</InputLabel>
+              <Select
+                labelId="tipoContrato-label"
+                name="tipoContrato"
+                value={publicacao.tipoContrato}
+                label="Tipo de Contrato"
+                onChange={handleChange}
+              >
+                <MenuItem value="CLT">CLT</MenuItem>
+                <MenuItem value="PJ">PJ</MenuItem>
+                <MenuItem value="FreeLancer">FreeLancer</MenuItem>
+                <MenuItem value="Estágio">Estágio</MenuItem>
+              </Select>
+            </FormControl>
+            {/* Fim da alteração */}
+
             <TextField
               name="dtExpiracao"
               label="Data de Expiração"

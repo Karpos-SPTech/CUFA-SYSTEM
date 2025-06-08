@@ -7,9 +7,28 @@ import {
   Stack,
   FormControlLabel,
   Checkbox,
+  RadioGroup, 
+  Radio, // Importe Radio
 } from "@mui/material";
 
-export default function CardDireita() {
+// Recebe as props para ambos os filtros
+export default function CardDireita({
+  onContractFilterChange, // Renomeado para clareza
+  selectedContractTypes,
+  onDateFilterChange, // Nova prop
+  selectedDateFilter, // Nova prop
+}) {
+  // Lida com a mudança dos checkboxes de tipo de contrato
+  const handleContractChange = (event) => {
+    const { name, checked } = event.target;
+    onContractFilterChange(name, checked);
+  };
+
+  // Lida com a mudança dos radio buttons de filtro de data
+  const handleDateChange = (event) => {
+    onDateFilterChange(event.target.value);
+  };
+
   return (
     <Box sx={{ maxWidth: 350, width: "100%" }}>
       <Card
@@ -29,34 +48,31 @@ export default function CardDireita() {
             Filtrar Vagas
           </Typography>
 
-          {/* Stack principal para os checkboxes */}
-          <Stack
-            direction="row" // Alinha os grupos na mesma linha
-            justifyContent="space-between" // Distribui o espaço entre os grupos
-            alignItems="flex-start" // Alinha o início dos grupos (topo)
-            sx={{ width: "100%", px: 1 }} // Garante que ocupe a largura total
+          {/* Seção de Filtro por Tipo de Contrato */}
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: "bold", color: "green", mb: 1 }}
           >
-            {/* Grupo da Esquerda: CLT e Freelancer */}
-            <Stack direction="column" spacing={0.5}> {/* Organiza verticalmente */}
+            Tipo de Contrato:
+          </Typography>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-start"
+            sx={{ width: "100%", px: 1, mb: 3 }} // Adicionado mb para espaçamento
+          >
+            <Stack direction="column" spacing={0.5}>
               <FormControlLabel
                 control={
                   <Checkbox
-                    sx={{
-                      color: "green",
-                      "&.Mui-checked": {
-                        color: "green",
-                      },
-                    }}
+                    name="CLT"
+                    checked={selectedContractTypes.includes("CLT")}
+                    onChange={handleContractChange}
+                    sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                   />
                 }
                 label={
-                  <Typography
-                    sx={{
-                      fontSize: 14,
-                      color: "black",
-                      fontWeight: 600,
-                    }}
-                  >
+                  <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
                     CLT
                   </Typography>
                 }
@@ -64,49 +80,32 @@ export default function CardDireita() {
               <FormControlLabel
                 control={
                   <Checkbox
-                    sx={{
-                      color: "green",
-                      "&.Mui-checked": {
-                        color: "green",
-                      },
-                    }}
+                    name="Freelancer"
+                    checked={selectedContractTypes.includes("Freelancer")}
+                    onChange={handleContractChange}
+                    sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                   />
                 }
                 label={
-                  <Typography
-                    sx={{
-                      fontSize: 14,
-                      color: "black",
-                      fontWeight: 600,
-                    }}
-                  >
+                  <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
                     Freelancer
                   </Typography>
                 }
               />
             </Stack>
 
-            {/* Grupo da Direita: PJ e Estágio */}
-            <Stack direction="column" spacing={0.5}> {/* Organiza verticalmente */}
+            <Stack direction="column" spacing={0.5}>
               <FormControlLabel
                 control={
                   <Checkbox
-                    sx={{
-                      color: "green",
-                      "&.Mui-checked": {
-                        color: "green",
-                      },
-                    }}
+                    name="PJ"
+                    checked={selectedContractTypes.includes("PJ")}
+                    onChange={handleContractChange}
+                    sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                   />
                 }
                 label={
-                  <Typography
-                    sx={{
-                      fontSize: 14,
-                      color: "black",
-                      fontWeight: 600,
-                    }}
-                  >
+                  <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
                     PJ
                   </Typography>
                 }
@@ -114,28 +113,80 @@ export default function CardDireita() {
               <FormControlLabel
                 control={
                   <Checkbox
-                    sx={{
-                      color: "green",
-                      "&.Mui-checked": {
-                        color: "green",
-                      },
-                    }}
+                    name="Estágio"
+                    checked={selectedContractTypes.includes("Estágio")}
+                    onChange={handleContractChange}
+                    sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                   />
                 }
                 label={
-                  <Typography
-                    sx={{
-                      fontSize: 14,
-                      color: "black",
-                      fontWeight: 600,
-                    }}
-                  >
+                  <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
                     Estágio
                   </Typography>
                 }
               />
             </Stack>
           </Stack>
+
+          {/* --- NOVA SEÇÃO DE FILTRO POR DATA --- */}
+          <Typography
+            variant="subtitle1"
+            sx={{ fontWeight: "bold", color: "green", mb: 1 }}
+          >
+            Data de Publicação:
+          </Typography>
+          <RadioGroup
+            aria-label="date-filter"
+            name="dateFilter"
+            value={selectedDateFilter} // Controlado pelo estado pai
+            onChange={handleDateChange} // Lida com a mudança
+          >
+            <FormControlLabel
+              value="" // Valor vazio para "Todos" ou "Qualquer data"
+              control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "green" } }} />}
+              label={
+                <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
+                  Qualquer data
+                </Typography>
+              }
+            />
+            <FormControlLabel
+              value="Ultima hora"
+              control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "green" } }} />}
+              label={
+                <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
+                  Última hora
+                </Typography>
+              }
+            />
+            <FormControlLabel
+              value="Ultimas 24 horas"
+              control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "green" } }} />}
+              label={
+                <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
+                  Últimas 24 horas
+                </Typography>
+              }
+            />
+            <FormControlLabel
+              value="Ultima semana"
+              control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "green" } }} />}
+              label={
+                <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
+                  Última semana
+                </Typography>
+              }
+            />
+            <FormControlLabel
+              value="Ultimo Mes"
+              control={<Radio sx={{ color: "green", "&.Mui-checked": { color: "green" } }} />}
+              label={
+                <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
+                  Último Mês
+                </Typography>
+              }
+            />
+          </RadioGroup>
         </CardContent>
       </Card>
     </Box>

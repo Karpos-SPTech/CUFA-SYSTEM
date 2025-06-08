@@ -487,7 +487,7 @@ const Header = ({ hideNotifications }) => {
                 sx={{
                   position: "absolute",
                   top: { xs: 40, sm: 50, md: 55 },
-                  right: 0,
+                  right: -8,
                   backgroundColor: "white",
                   borderRadius: "10px",
                   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",

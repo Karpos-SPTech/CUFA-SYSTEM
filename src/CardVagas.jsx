@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   Typography,
@@ -50,17 +50,17 @@ const formatarDescricao = (descricao) => {
 
   if (secoes.length > 0) resultado.descricaoGeral = secoes[0].trim();
 
-secoes.forEach((secao) => {
-  if (secao.startsWith("O que o contratado irá realizar:")) {
-    resultado.funcoes = secao.split("\n").slice(1).filter(Boolean).map(item =>
-      item.trim());
-  } else if (secao.startsWith("Benefícios:")) {
-    resultado.beneficios = secao.split("\n").slice(1).filter(Boolean).map(item =>
-      item.trim());
-  } else if (secao.startsWith("Frase atrativa:")) {
-    resultado.fraseAtrativa = secao.replace("Frase atrativa:", "").trim();
-  }
-});
+  secoes.forEach((secao) => {
+    if (secao.startsWith("O que o contratado irá realizar:")) {
+      resultado.funcoes = secao.split("\n").slice(1).filter(Boolean).map(item =>
+        item.trim());
+    } else if (secao.startsWith("Benefícios:")) {
+      resultado.beneficios = secao.split("\n").slice(1).filter(Boolean).map(item =>
+        item.trim());
+    } else if (secao.startsWith("Frase atrativa:")) {
+      resultado.fraseAtrativa = secao.replace("Frase atrativa:", "").trim();
+    }
+  });
 
   return resultado;
 };
@@ -70,15 +70,68 @@ export default function CardVagas({ vaga, onSave, saved }) {
   const secoesDaVaga = formatarDescricao(vaga?.descricao);
   const [candidaturaSucesso, setCandidaturaSucesso] = useState(false);
   const [botaoCandidaturaTexto, setBotaoCandidaturaTexto] = useState("ME CANDIDATAR");
+  const [checkingCandidacy, setCheckingCandidacy] = useState(true); // Estado para controlar o loading da verificação
 
+  // --- ATUALIZAÇÃO: useEffect para verificar candidaturas usando o novo endpoint ---
+  useEffect(() => {
+    const checkUserCandidacy = async () => {
+      const userId = localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
+
+      // Só tenta verificar se tiver userId e idPublicacao
+      if (!userId || !vaga?.idPublicacao) {
+        setCheckingCandidacy(false);
+        return;
+      }
+
+      try {
+        // Usando o novo endpoint de verificação: GET /candidatura/verificar/{userId}/{vagaId}
+        const response = await fetch(`http://localhost:8080/candidatura/verificar/${userId}/${vaga.idPublicacao}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          // A API retorna um boolean (true/false) diretamente
+          const alreadyApplied = await response.json();
+          if (alreadyApplied) {
+            setCandidaturaSucesso(true);
+            setBotaoCandidaturaTexto("JÁ SE CANDIDATOU");
+          }
+        } else {
+          // Se a resposta não for OK, algo deu errado no backend, mas não significa
+          // que o usuário já se candidatou. Apenas logamos o erro.
+          console.warn("Erro ao verificar candidatura:", response.status, await response.text());
+        }
+      } catch (error) {
+        console.error("Erro na comunicação para verificar candidatura:", error);
+      } finally {
+        setCheckingCandidacy(false); // Finaliza o estado de carregamento
+      }
+    };
+
+    // Garante que a vaga existe e tem um ID antes de tentar verificar
+    if (vaga?.idPublicacao) {
+      checkUserCandidacy();
+    }
+  }, [vaga?.idPublicacao]); // Dependência: re-executa se o ID da publicação mudar
+
+  // Lógica de handleCandidatar permanece a mesma, mas agora o botão será desabilitado corretamente
   const handleCandidatar = async () => {
     const userId = localStorage.getItem("userId");
     const token = localStorage.getItem("token");
 
-    if (!userId) return alert("ID do usuário não encontrado. Faça login para se candidatar.");
+    if (!userId) {
+      alert("ID do usuário não encontrado. Faça login para se candidatar.");
+      return;
+    }
     if (!vaga?.idPublicacao || !vaga?.fkEmpresa) {
       console.log("Debug de Vaga Incompleta:", vaga);
-      return alert("Informações da vaga incompletas para candidatura.");
+      alert("Informações da vaga incompletas para candidatura.");
+      return;
     }
 
     try {
@@ -103,7 +156,14 @@ export default function CardVagas({ vaga, onSave, saved }) {
         alert("Candidatura feita, parabéns!");
       } else {
         const errorData = await response.json();
-        alert(`Erro ao candidatar: ${errorData.message || response.statusText}`);
+        // Se a API retornar uma mensagem específica para "já candidatado" ou um status 409
+        if (response.status === 409 || (errorData.message && errorData.message.includes("já se candidatou"))) {
+            setCandidaturaSucesso(true);
+            setBotaoCandidaturaTexto("JÁ SE CANDIDATOU");
+            alert("Você já se candidatou a esta vaga.");
+        } else {
+            alert(`Erro ao candidatar: ${errorData.message || response.statusText}`);
+        }
       }
     } catch (error) {
       console.error("Erro na candidatura:", error);
@@ -112,14 +172,14 @@ export default function CardVagas({ vaga, onSave, saved }) {
   };
 
   return (
-    <Box sx={{ maxWidth: 500, margin: "0 auto" }}>
+    <Box sx={{ width: 550, margin: "0 auto" }}>
       <Card sx={{ borderRadius: 3, boxShadow: 3, p: 2, position: "relative" }}>
         <Stack direction="row" alignItems="flex-start" spacing={2}>
           <Avatar
             variant="rounded"
             src={vaga?.logoUrl || "https://upload.wikimedia.org/wikipedia/commons/4/4f/McDonalds_Logo.svg"}
             alt={vaga?.nomeEmpresa || "Logo"}
-            sx={{ width: 64, height: 64, bgcolor: "#fff" }}
+            sx={{ width: 85, height: 85, bgcolor: "#fff" }}
           />
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" sx={{ color: "green", fontWeight: "bold" }}>
@@ -200,28 +260,30 @@ export default function CardVagas({ vaga, onSave, saved }) {
           )}
         </Box>
 
-        {candidaturaSucesso && (
-          <Typography variant="body1" align="center" sx={{ color: "green", fontWeight: "bold", mb: 1 }}>
-            Candidatura feita, parabéns!
-          </Typography>
+        {checkingCandidacy ? (
+            <Typography variant="body2" align="center" sx={{ color: "gray", mb: 1 }}>
+                Verificando status de candidatura...
+            </Typography>
+        ) : (
+            <>
+                <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={handleCandidatar}
+                    disabled={candidaturaSucesso}
+                    sx={{
+                        background: candidaturaSucesso ? "#81c784" : "green",
+                        color: "#fff",
+                        fontWeight: "bold",
+                        fontSize: 18,
+                        borderRadius: 2,
+                        mt: 1,
+                    }}
+                >
+                    {botaoCandidaturaTexto}
+                </Button>
+            </>
         )}
-
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={handleCandidatar}
-          disabled={candidaturaSucesso}
-          sx={{
-            background: candidaturaSucesso ? "#81c784" : "green",
-            color: "#fff",
-            fontWeight: "bold",
-            fontSize: 18,
-            borderRadius: 2,
-            mt: 1,
-          }}
-        >
-          {botaoCandidaturaTexto}
-        </Button>
       </Card>
     </Box>
   );
