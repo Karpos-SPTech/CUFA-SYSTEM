@@ -8,10 +8,8 @@
 
   script.onload = function() {
     if (window.VLibras && typeof window.VLibras.Widget === 'function') {
-      console.log('VLibras plugin script carregado e API disponível.');
       try {
         new window.VLibras.Widget('https://vlibras.gov.br/app');
-        console.log('VLibras inicializado com sucesso!');
 
       } catch (error) {
         console.error('Erro ao inicializar VLibras Widget:', error);

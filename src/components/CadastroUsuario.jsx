@@ -31,7 +31,7 @@ export default function CadastroUsuario() {
       setMensagem("A senha deve conter pelo menos um caractere especial.");
       return false;
     }
-        if (/\d/.test(nome)) {
+    if (/\d/.test(nome)) {
       setMensagem("O nome não pode conter números.");
       return false;
     }
@@ -56,11 +56,28 @@ export default function CadastroUsuario() {
         body: JSON.stringify(dados),
       });
 
-      if (!response.ok) throw new Error("Erro ao cadastrar usuário.");
-      navigate("/");
+      if (response.status === 201 || response.ok) {
+        setMensagem("Cadastro realizado com sucesso!");
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+        return;
+      }
+
+      // Tenta obter erro da resposta
+      const responseData = await response.text();
+      let errorMessage = "Erro ao cadastrar usuário.";
+      try {
+        const errorJson = JSON.parse(responseData);
+        errorMessage = errorJson.message || errorMessage;
+      } catch (e) {
+        errorMessage = responseData || errorMessage;
+      }
+
+      throw new Error(errorMessage);
     } catch (error) {
       console.error("Erro ao cadastrar:", error);
-      setMensagem("Erro ao cadastrar usuário.");
+      setMensagem(error.message || "Erro ao cadastrar usuário.");
     }
   };
 
@@ -245,8 +262,11 @@ export default function CadastroUsuario() {
         {mensagem && (
           <Box mt={2}>
             <Alert
-              severity="error"
-              sx={{ fontWeight: "bold", color: "var(--dark-green)" }}
+              severity={mensagem.includes("sucesso") ? "success" : "error"}
+              sx={{
+                fontWeight: "bold",
+                color: mensagem.includes("sucesso") ? "var(--dark-green)" : "#d32f2f"
+              }}
             >
               {mensagem}
             </Alert>

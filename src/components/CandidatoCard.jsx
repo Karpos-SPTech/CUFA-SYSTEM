@@ -1,9 +1,9 @@
 import React from 'react';
-import { 
-  Box, 
-  Paper, 
-  Typography, 
-  Avatar, 
+import {
+  Box,
+  Paper,
+  Typography,
+  Avatar,
   Button,
   Divider,
   List,
@@ -21,6 +21,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import DescriptionIcon from '@mui/icons-material/Description';
 import profileIcon from '../assets/profile-icon.png';
+import DownloadIcon from '@mui/icons-material/Download';
 
 const CandidatoCard = ({ candidato }) => {
   const handleWhatsAppClick = () => {
@@ -31,7 +32,7 @@ const CandidatoCard = ({ candidato }) => {
     // Abrir em uma nova aba
     window.open(whatsappUrl, '_blank');
   };
-  
+
   return (
     <Paper
       elevation={1}
@@ -57,8 +58,8 @@ const CandidatoCard = ({ candidato }) => {
         <Avatar
           src={candidato.foto || profileIcon}
           alt={candidato.nome}
-          sx={{ 
-            width: 70, 
+          sx={{
+            width: 70,
             height: 70,
             mr: 2,
             border: '2px solid #E3EEE5'
@@ -77,18 +78,18 @@ const CandidatoCard = ({ candidato }) => {
           >
             {candidato.nome}
           </Typography>
-          <Typography 
+          <Typography
             variant="body2"
-            sx={{ 
+            sx={{
               color: '#555',
               mb: 0.5
             }}
           >
             {candidato.idade} anos
           </Typography>
-          <Typography 
+          <Typography
             variant="body2"
-            sx={{ 
+            sx={{
               color: '#666',
               fontStyle: 'italic',
               fontSize: '12px',
@@ -118,17 +119,17 @@ const CandidatoCard = ({ candidato }) => {
         </Box>
       </Box>      {/* Experiência */}
       <Box sx={{ mb: 2, flex: 1 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'space-between',
-          mb: 1 
+          mb: 1
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <BusinessCenterIcon sx={{ color: '#006916', mr: 1, fontSize: 18 }} />
-            <Typography 
-              variant="body2" 
-              sx={{ 
+            <Typography
+              variant="body2"
+              sx={{
                 color: '#444',
                 fontWeight: 'bold',
                 fontSize: '14px'
@@ -137,21 +138,21 @@ const CandidatoCard = ({ candidato }) => {
               Experiência
             </Typography>
           </Box>
-          
+
           {candidato.experiencia.length > 3 && (
-            <Typography 
+            <Typography
               variant="caption"
-              sx={{ 
+              sx={{
                 color: '#006916',
                 fontSize: '11px',
                 fontStyle: 'italic'
               }}
             >
-              {candidato.experiencia.length} experiências
+              {candidato.experiencia.length} Experiências
             </Typography>
           )}
         </Box>
-        
+
         <Paper
           elevation={0}
           sx={{
@@ -175,10 +176,10 @@ const CandidatoCard = ({ candidato }) => {
           }}
         >
           {candidato.experiencia.map((exp, index) => (
-            <Box 
+            <Box
               key={index}
-              sx={{ 
-                py: 0.5, 
+              sx={{
+                py: 0.5,
                 px: 1,
                 '&:not(:last-child)': {
                   borderBottom: '1px solid #eaeaea',
@@ -190,27 +191,28 @@ const CandidatoCard = ({ candidato }) => {
                 }
               }}
             >
-              <Typography 
-                variant="body2" 
-                sx={{ 
+              <Typography
+                variant="body2"
+                sx={{
                   color: '#555',
-                  fontSize: '13px'
+                  fontSize: '13.2px',
+                  whiteSpace: 'pre-line'
                 }}
               >
-                • {exp}
+                {exp}
               </Typography>
             </Box>
           ))}
         </Paper>
       </Box>
-      
+
       {/* Currículo */}
-      <Box sx={{ mb: 2, flex: 1, overflow: 'hidden' }}>
+      <Box sx={{ mb: 1, flex: 1, overflow: 'hidden' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
           <DescriptionIcon sx={{ color: '#006916', mr: 1, fontSize: 18 }} />
-          <Typography 
-            variant="body2" 
-            sx={{ 
+          <Typography
+            variant="body2"
+            sx={{
               color: '#444',
               fontWeight: 'bold',
               fontSize: '14px'
@@ -223,7 +225,6 @@ const CandidatoCard = ({ candidato }) => {
           {candidato.curriculo ? (
             <Link
               href={candidato.curriculo}
-              target="_blank"
               rel="noopener"
               sx={{
                 display: 'flex',
@@ -235,9 +236,12 @@ const CandidatoCard = ({ candidato }) => {
                 }
               }}
             >
-              <Typography variant="body2" sx={{ fontSize: '13px' }}>
-                Ver currículo completo
-              </Typography>
+              <>
+                <Typography variant="body2" sx={{ fontSize: '15px', mr: 0.5 }}>
+                  Baixar Currículo Completo
+                </Typography>
+                <DownloadIcon fontSize="small" />
+              </>
             </Link>
           ) : (
             <Typography variant="body2" sx={{ color: '#888', fontSize: '13px', fontStyle: 'italic' }}>
@@ -248,12 +252,12 @@ const CandidatoCard = ({ candidato }) => {
       </Box>
 
       {/* Botão para entrar em contato via WhatsApp */}
-      <Button 
+      <Button
         variant="contained"
         fullWidth
         onClick={handleWhatsAppClick}
         startIcon={<WhatsAppIcon />}
-        sx={{ 
+        sx={{
           mt: 2,
           backgroundColor: '#006916',
           color: '#fff',

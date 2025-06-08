@@ -36,7 +36,7 @@ export default function EscolherPerfil() {
         <Box
           sx={{
             backgroundColor: "#006916",
-            transform: "translate(0, -63%)",
+            transform: "translate(0, -65%)",
             padding: "10px 50px",
             color: "white",
             fontSize: "1.5rem",
