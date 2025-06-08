@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, Typography, Avatar, Box, Divider, Stack, Button, CircularProgress } from "@mui/material"; // Adicionado CircularProgress para o loading
+import { Card, CardContent, Typography, Avatar, Box, Divider, Stack, Button, CircularProgress } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import GroupsIcon from "@mui/icons-material/Groups";
+import GroupsIcon from "@mui/icons-material/Groups"; // Ícone para vagas candidatadas (ou outro de sua preferência)
+import SendIcon from '@mui/icons-material/Send'; // Outra opção de ícone para "candidatado"
 
-export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount }) {
-  // Estados para as imagens de perfil e capa (mantidos do seu código original)
+export default function CardEsquerda({
+  showSaved,
+  toggleShowSaved,
+  savedCount,
+  // --- NOVAS PROPS ---
+  showApplied,
+  toggleShowApplied,
+  appliedCount,
+}) {
   const [profileImg, setProfileImg] = useState(null);
   const [coverImg, setCoverImg] = useState(null);
-
-  // --- NOVOS ESTADOS PARA OS DADOS DO USUÁRIO E O STATUS DO FETCH ---
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Efeito para carregar as imagens de perfil e capa do localStorage (mantido)
   useEffect(() => {
     const saved = localStorage.getItem('profileImg');
     if (saved) setProfileImg(saved);
@@ -21,11 +26,10 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
     if (cover) setCoverImg(cover);
   }, []);
 
-  // --- NOVO useEffect para o fetch dos dados do usuário ---
   useEffect(() => {
     const fetchUserData = async () => {
-      setLoading(true); // Inicia o carregamento
-      setError(null);   // Limpa erros anteriores
+      setLoading(true);
+      setError(null);
 
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
@@ -41,30 +45,28 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Inclui o token JWT
+            'Authorization': `Bearer ${token}`
           },
         });
 
         if (!response.ok) {
-          // Lança um erro se a resposta não for bem-sucedida (status 4xx ou 5xx)
           const errorData = await response.json();
           throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
         }
 
         const data = await response.json();
-        setUserData(data); // Define os dados do usuário no estado
+        setUserData(data);
       } catch (err) {
         console.error("Erro ao buscar dados do usuário:", err);
-        setError(err); // Define o erro
+        setError(err);
       } finally {
-        setLoading(false); // Finaliza o carregamento
+        setLoading(false);
       }
     };
 
-    fetchUserData(); // Chama a função de fetch quando o componente monta
-  }, []); // O array de dependências vazio significa que ele só roda uma vez ao montar
+    fetchUserData();
+  }, []);
 
-  // --- Renderização condicional baseada no estado de carregamento e erro ---
   if (loading) {
     return (
       <Box sx={{ maxWidth: 350, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
@@ -83,7 +85,6 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
     );
   }
 
-  // Se não houver erro e o carregamento terminou, mas userData ainda é null (ex: userId/token faltou e não tinha erro explícito)
   if (!userData) {
     return (
       <Box sx={{ maxWidth: 350, p: 2, border: '1px solid gray', borderRadius: 3, textAlign: 'center' }}>
@@ -92,7 +93,6 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
     );
   }
 
-  // Desestruturar os dados do usuário para fácil acesso
   const { nome, estado, cidade, biografia } = userData;
 
   return (
@@ -133,16 +133,18 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
             component="div"
             sx={{ fontWeight: "bold", color: "green", mb: 1, textTransform: "uppercase" }}
           >
-            {nome || "Nome do Usuário"} {/* Usa o nome do usuário do fetch */}
+            {nome || "Nome do Usuário"}
           </Typography>
           <Typography variant="body1" sx={{ mb: 2 }}>
-            {biografia || "Nenhuma biografia informada."} {/* Usa a biografia do usuário */}
+            {biografia || "Nenhuma biografia informada."}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {(cidade && estado) ? `${cidade}, ${estado}` : "Localização não informada."} {/* Usa cidade e estado */}
+            {(cidade && estado) ? `${cidade}, ${estado}` : "Localização não informada."}
           </Typography>
         </CardContent>
       </Card>
+
+      {/* Card de Itens Salvos */}
       <Card
         sx={{
           borderRadius: 3,
@@ -153,17 +155,44 @@ export default function CardEsquerda({ showSaved, toggleShowSaved, savedCount })
         }}
       >
         <CardContent>
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+          <Stack direction="row" alignItems="center" spacing={1}>
             <BookmarkIcon color="success" />
             <Typography variant="body2" fontWeight="medium">
-              Itens salvos
+              Vagas Salvas
             </Typography>
             <Button
               size="small"
               onClick={toggleShowSaved}
               sx={{ ml: 1, color: '#006916', fontWeight: 600 }}
             >
-              {showSaved ? 'Ver todos' : 'Ver salvos'} ({savedCount})
+              {showSaved ? 'Ver todos' : `Ver salvos (${savedCount})`}
+            </Button>
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {/* --- NOVO CARD PARA VAGAS CANDIDATADAS --- */}
+      <Card
+        sx={{
+          borderRadius: 3,
+          height: 65,
+          boxShadow: 1,
+          mt: 2,
+          background: "#f8f8f8",
+        }}
+      >
+        <CardContent>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <SendIcon color="success" /> {/* Ícone para vagas candidatadas */}
+            <Typography variant="body2" fontWeight="medium">
+              Candidaturas
+            </Typography>
+            <Button
+              size="small"
+              onClick={toggleShowApplied}
+              sx={{ ml: 1, color: '#006916', fontWeight: 600 }}
+            >
+              {showApplied ? 'Ver todos' : `Ver candidaturas (${appliedCount})`}
             </Button>
           </Stack>
         </CardContent>

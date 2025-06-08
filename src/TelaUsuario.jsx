@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import HeaderUsuario from './components/HeaderUsuario';
 import CardVagas from './CardVagas';
 import CardEsquerda from './components/CardEsquerda';
-import CardDireita from './components/CardDireita'; // Certifique-se de que está importado
+import CardDireita from './components/CardDireita';
+import { Box, Typography } from '@mui/material';
 
 const TelaUsuario = () => {
   const [jobs, setJobs] = useState([]);
@@ -11,8 +12,9 @@ const TelaUsuario = () => {
   const [savedJobs, setSavedJobs] = useState([]);
   const [showSaved, setShowSaved] = useState(false);
   const [selectedContractTypes, setSelectedContractTypes] = useState([]);
-
   const [selectedDateFilter, setSelectedDateFilter] = useState('');
+  const [appliedJobs, setAppliedJobs] = useState([]);
+  const [showApplied, setShowApplied] = useState(false);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -40,75 +42,96 @@ const TelaUsuario = () => {
     fetchJobs();
   }, []);
 
+  useEffect(() => {
+    const fetchAppliedJobs = async () => {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+
+      if (!userId || !token) return;
+
+      try {
+        const response = await fetch(`http://localhost:8080/candidatura/usuario/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const data = await response.json();
+        setAppliedJobs(data);
+      } catch (e) {
+        console.error("Erro ao buscar vagas candidatas:", e);
+      }
+    };
+
+    fetchAppliedJobs();
+  }, []);
+
   const handleToggleSaveJob = (vagaToSave) => {
     setSavedJobs((prevSavedJobs) => {
       const isSaved = prevSavedJobs.some(
         (job) => job.idPublicacao === vagaToSave.idPublicacao
       );
-      if (isSaved) {
-        return prevSavedJobs.filter(
-          (job) => job.idPublicacao !== vagaToSave.idPublicacao
-        );
-      } else {
-        return [...prevSavedJobs, vagaToSave];
-      }
+      return isSaved
+        ? prevSavedJobs.filter((job) => job.idPublicacao !== vagaToSave.idPublicacao)
+        : [...prevSavedJobs, vagaToSave];
     });
   };
 
   const handleToggleShowSaved = () => {
     setShowSaved(!showSaved);
+    if (!showSaved) setShowApplied(false);
+  };
+
+  const handleToggleShowApplied = () => {
+    setShowApplied(!showApplied);
+    if (!showApplied) setShowSaved(false);
   };
 
   const handleContractFilterChange = (type, isChecked) => {
-    setSelectedContractTypes((prevTypes) => {
-      if (isChecked) {
-        return [...prevTypes, type];
-      } else {
-        return prevTypes.filter((t) => t !== type);
-      }
-    });
+    setSelectedContractTypes((prevTypes) =>
+      isChecked ? [...prevTypes, type] : prevTypes.filter((t) => t !== type)
+    );
   };
 
-  // --- NOVA FUNÇÃO PARA LIDAR COM MUDANÇAS NO FILTRO DE DATA ---
   const handleDateFilterChange = (filterValue) => {
     setSelectedDateFilter(filterValue);
   };
 
-  // --- LÓGICA DE FILTRO COMBINADA ---
-  const filteredJobs = jobs.filter((vaga) => {
-    // 1. Filtrar por Tipo de Contrato
-    const matchesContractType =
-      selectedContractTypes.length === 0 ||
-      selectedContractTypes.includes(vaga.tipoContrato);
+  // Reutilizável para qualquer array de vagas
+  const filtrarVagas = (vagas) => {
+    return vagas.filter((vaga) => {
+      const matchesContractType =
+        selectedContractTypes.length === 0 ||
+        selectedContractTypes.includes(vaga.tipoContrato);
 
-    // 2. Filtrar por Data de Publicação
-    let matchesDateFilter = true;
-    if (selectedDateFilter) {
-      const vagaDate = new Date(vaga.dtPublicacao);
-      const now = new Date();
+      let matchesDateFilter = true;
+      if (selectedDateFilter) {
+        const vagaDate = new Date(vaga.dtPublicacao);
+        const now = new Date();
 
-      switch (selectedDateFilter) {
-        case 'Ultima hora':
-          matchesDateFilter = now.getTime() - vagaDate.getTime() <= 60 * 60 * 1000; // 1 hora em ms
-          break;
-        case 'Ultimas 24 horas':
-          matchesDateFilter = now.getTime() - vagaDate.getTime() <= 24 * 60 * 60 * 1000; // 24 horas em ms
-          break;
-        case 'Ultima semana':
-          matchesDateFilter = now.getTime() - vagaDate.getTime() <= 7 * 24 * 60 * 60 * 1000; // 7 dias em ms
-          break;
-        case 'Ultimo Mes':
-          // Aproximação para 30 dias, pois meses têm durações diferentes
-          matchesDateFilter = now.getTime() - vagaDate.getTime() <= 30 * 24 * 60 * 60 * 1000; // 30 dias em ms
-          break;
-        default:
-          matchesDateFilter = true; // Se não houver filtro, não aplica restrição
+        switch (selectedDateFilter) {
+          case 'Ultima hora':
+            matchesDateFilter = now - vagaDate <= 60 * 60 * 1000;
+            break;
+          case 'Ultimas 24 horas':
+            matchesDateFilter = now - vagaDate <= 24 * 60 * 60 * 1000;
+            break;
+          case 'Ultima semana':
+            matchesDateFilter = now - vagaDate <= 7 * 24 * 60 * 60 * 1000;
+            break;
+          case 'Ultimo Mes':
+            matchesDateFilter = now - vagaDate <= 30 * 24 * 60 * 60 * 1000;
+            break;
+          default:
+            matchesDateFilter = true;
+        }
       }
-    }
 
-    // Retorna true apenas se ambos os filtros corresponderem
-    return matchesContractType && matchesDateFilter;
-  });
+      return matchesContractType && matchesDateFilter;
+    });
+  };
+
+  const filteredJobs = filtrarVagas(jobs);
 
   return (
     <div className="tela-usuario-main">
@@ -132,37 +155,91 @@ const TelaUsuario = () => {
             showSaved={showSaved}
             toggleShowSaved={handleToggleShowSaved}
             savedCount={savedJobs.length}
+            showApplied={showApplied}
+            toggleShowApplied={handleToggleShowApplied}
+            appliedCount={appliedJobs.length}
           />
         </div>
-        <div style={{ flex: '1 1 600px', maxWidth: 700, minWidth: 350, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32 }}>
+
+        <div style={{
+          flex: '1 1 600px',
+          maxWidth: 700,
+          minWidth: 350,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 32
+        }}>
+          <Box sx={{
+            textAlign: 'center',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 3,
+            height: 65,
+            color: '#006916',
+            fontWeight: "bold",
+            width: '550px',
+            background: "#f8f8f8",
+            boxShadow: 3,
+            mb: -2,
+          }}>
+            <Typography variant="h6" sx={{ color: "green", fontWeight: "bold" }}>
+              {showSaved
+                ? 'Minhas Vagas Salvas'
+                : showApplied
+                  ? 'Minhas Candidaturas'
+                  : 'Todas as Publicações'}
+            </Typography>
+          </Box>
+
           {loading ? (
-            <p style={{ color: '#006916', fontWeight: 600 }}>Carregando vagas...</p>
+            <Typography color="primary" fontWeight={600}>Carregando vagas...</Typography>
           ) : error ? (
-            <p style={{ color: 'red', fontWeight: 600 }}>Erro ao carregar vagas: {error.message}</p>
+            <Typography color="error" fontWeight={600}>Erro ao carregar vagas: {error.message}</Typography>
           ) : showSaved ? (
-            savedJobs.length > 0 ? (
-              savedJobs.map((vaga) => (
+            filtrarVagas(savedJobs).length > 0 ? (
+              filtrarVagas(savedJobs).map((vaga) => (
                 <CardVagas key={vaga.idPublicacao} vaga={vaga} onSave={handleToggleSaveJob} saved />
               ))
             ) : (
-              <p style={{ color: '#006916', fontWeight: 600 }}>Nenhuma vaga salva.</p>
+              <Typography color="green" fontWeight={600}>Nenhuma vaga salva com os filtros selecionados.</Typography>
+            )
+          ) : showApplied ? (
+            filtrarVagas(appliedJobs).length > 0 ? (
+              filtrarVagas(appliedJobs).map((vaga) => (
+                <CardVagas
+                  key={vaga.idPublicacao}
+                  vaga={vaga}
+                  onSave={handleToggleSaveJob}
+                  saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)}
+                />
+              ))
+            ) : (
+              <Typography color="green" fontWeight={600}>Nenhuma vaga candidatada com os filtros selecionados.</Typography>
             )
           ) : (
             filteredJobs.length > 0 ? (
               filteredJobs.map((vaga) => (
-                <CardVagas key={vaga.idPublicacao} vaga={vaga} onSave={handleToggleSaveJob} saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)} />
+                <CardVagas
+                  key={vaga.idPublicacao}
+                  vaga={vaga}
+                  onSave={handleToggleSaveJob}
+                  saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)}
+                />
               ))
             ) : (
-              <p style={{ color: '#006916', fontWeight: 600 }}>Nenhuma vaga disponível com os filtros selecionados.</p>
+              <Typography color="green" fontWeight={600}>Nenhuma vaga disponível com os filtros selecionados.</Typography>
             )
           )}
         </div>
+
         <div style={{ flex: '0 1 380px', maxWidth: 420, minWidth: 360 }}>
           <CardDireita
-            onContractFilterChange={handleContractFilterChange} // Renomeado para clareza
+            onContractFilterChange={handleContractFilterChange}
             selectedContractTypes={selectedContractTypes}
-            onDateFilterChange={handleDateFilterChange} // Nova prop
-            selectedDateFilter={selectedDateFilter} // Nova prop
+            onDateFilterChange={handleDateFilterChange}
+            selectedDateFilter={selectedDateFilter}
           />
         </div>
       </div>
