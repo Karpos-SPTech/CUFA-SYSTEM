@@ -1,24 +1,165 @@
-import React from 'react';
-import { Box, Typography, Paper } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Paper, CircularProgress } from '@mui/material';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const EstatisticasCandidatos = () => {
-  const dadosFaixaEtaria = [
-    { faixa: 'Abaixo de 18', percentual: 30 },
-    { faixa: 'De 18 a 25', percentual: 40 },
-    { faixa: 'De 25 a 40', percentual: 15 },
-    { faixa: 'Acima de 40', percentual: 5 },
-  ];
+  const [dadosFaixaEtaria, setDadosFaixaEtaria] = useState([]);
+  const [dadosEscolaridade, setDadosEscolaridade] = useState([
+    { nivel: 'Ensino Fundamental', percentual: 0 },
+    { nivel: 'Ensino Médio', percentual: 0 },
+    { nivel: 'Ensino fundamental', percentual: 0 },
+    { nivel: 'Nenhuma', percentual: 0 }
+  ]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const dadosEscolaridade = [
-    { nivel: 'Nenhuma', percentual: 20.0 },
-    { nivel: 'Fundamental Incompleto', percentual: 20.0 },
-    { nivel: 'Fundamental Completo', percentual: 20.0 },
-    { nivel: 'Ensimo Médio Incompleto', percentual: 20.0 },
-    { nivel: 'Ensimo Médio Completo', percentual: 20.0 }
-  ];
+  useEffect(() => {
+    const fetchCandidatos = async () => {
+      try {
+        const empresaId = localStorage.getItem("empresaId");
+        if (!empresaId) throw new Error("ID da empresa não encontrado");
 
-  const COLORS = ['#4CAF50', '#81C784'];
+        // Primeiro, buscar todas as vagas da empresa
+        const response = await fetch("http://localhost:8080/publicacao", {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erro ao buscar publicações: ${response.status}`);
+        }
+
+        const vagas = await response.json();
+        if (!Array.isArray(vagas)) {
+          throw new Error("Formato de dados inválido para publicações");
+        }
+        
+        // Buscar candidatos de todas as vagas
+        let todosCandidatos = [];
+        for (const vaga of vagas) {
+          const candidatosResponse = await fetch(`http://localhost:8080/candidatura/${vaga.idPublicacao}`, {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (candidatosResponse.ok) {
+            const candidatosData = await candidatosResponse.json();
+            if (candidatosData.candidatos && Array.isArray(candidatosData.candidatos)) {
+              // Filter out candidates without valid age data
+              const validCandidatos = candidatosData.candidatos.filter(c => 
+                typeof c.idade === 'number' && c.idade > 0 && c.idade < 100
+              );
+              todosCandidatos = [...todosCandidatos, ...validCandidatos];
+            }
+          }
+        }
+
+        // Se não houver candidatos, definir dados zerados
+        if (todosCandidatos.length === 0) {
+          setDadosFaixaEtaria([
+            { faixa: 'Abaixo de 18', percentual: 0 },
+            { faixa: 'De 18 a 25', percentual: 0 },
+            { faixa: 'De 25 a 40', percentual: 0 },
+            { faixa: 'Acima de 40', percentual: 0 }
+          ]);
+          setDadosEscolaridade([
+            { nivel: 'Nenhuma', percentual: 0 },
+            { nivel: 'Ensino Fundamental', percentual: 0 },
+            { nivel: 'Ensino Médio', percentual: 0 },
+          ]);
+          return;
+        }
+
+        // Calcular estatísticas por faixa etária
+        const estatisticas = {
+          'Abaixo de 18': 0,
+          'De 18 a 25': 0,
+          'De 25 a 40': 0,
+          'Acima de 40': 0
+        };
+
+        todosCandidatos.forEach(candidato => {
+          const idade = candidato.idade;
+          if (idade < 18) estatisticas['Abaixo de 18']++;
+          else if (idade >= 18 && idade <= 25) estatisticas['De 18 a 25']++;
+          else if (idade > 25 && idade <= 40) estatisticas['De 25 a 40']++;
+          else estatisticas['Acima de 40']++;
+        });
+
+        // Calcular estatísticas por escolaridade
+        const estatisticasEscolaridade = {
+          'Nenhuma': 0,
+          'Ensino Fundamental': 0,
+          'Ensino Médio': 0,
+        };
+
+        todosCandidatos.forEach(candidato => {
+          const escolaridade = candidato.escolaridade;
+          if (escolaridade) {
+            if (escolaridade.toLowerCase().includes('fundamental')) {
+              estatisticasEscolaridade['Nenhuma']++;
+            } else if (escolaridade.toLowerCase().includes('fundamental')) {
+              estatisticasEscolaridade['Ensino Fundamental']++;
+            } else if (escolaridade.toLowerCase().includes('pós')){
+              estatisticasEscolaridade['Ensino Médio']++;
+            }
+          }
+        });
+
+        // Converter para percentuais (escolaridade)
+        const total = todosCandidatos.length;
+        const dadosEscolaridadeFormatados = Object.entries(estatisticasEscolaridade)
+          .map(([nivel, quantidade]) => ({
+            nivel,
+            percentual: total > 0 ? Math.round((quantidade / total) * 100) : 0
+          }));
+
+        setDadosEscolaridade(dadosEscolaridadeFormatados);
+
+        // Converter para percentuais (faixa etária)
+        const dadosFormatados = Object.entries(estatisticas).map(([faixa, quantidade]) => ({
+          faixa,
+          percentual: total > 0 ? Math.round((quantidade / total) * 100) : 0
+        }));
+
+        setDadosFaixaEtaria(dadosFormatados);
+      } catch (err) {
+        console.error("Erro ao buscar candidatos:", err);
+        setError(err.message || "Erro ao buscar dados dos candidatos");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCandidatos();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height={200}>
+        <CircularProgress sx={{ color: '#006916' }} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height={200}>
+        <Typography color="error" sx={{ fontFamily: "'Paytone One', sans-serif" }}>
+          {error}
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       <Paper sx={{ p: 2, mb: 2, borderRadius: '16px' }}>

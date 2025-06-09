@@ -9,6 +9,7 @@ import {
   Stack,
   List,
   ListItem,
+  Modal,
 } from "@mui/material";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
@@ -70,7 +71,12 @@ export default function CardVagas({ vaga, onSave, saved }) {
   const secoesDaVaga = formatarDescricao(vaga?.descricao);
   const [candidaturaSucesso, setCandidaturaSucesso] = useState(false);
   const [botaoCandidaturaTexto, setBotaoCandidaturaTexto] = useState("ME CANDIDATAR");
-  const [checkingCandidacy, setCheckingCandidacy] = useState(true); // Estado para controlar o loading da verificação
+  const [checkingCandidacy, setCheckingCandidacy] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
   // --- ATUALIZAÇÃO: useEffect para verificar candidaturas usando o novo endpoint ---
   useEffect(() => {
@@ -153,7 +159,7 @@ export default function CardVagas({ vaga, onSave, saved }) {
       if (response.ok) {
         setCandidaturaSucesso(true);
         setBotaoCandidaturaTexto("JÁ SE CANDIDATOU");
-        alert("Candidatura feita, parabéns!");
+        setOpenModal(true);
       } else {
         const errorData = await response.json();
         // Se a API retornar uma mensagem específica para "já candidatado" ou um status 409
@@ -285,6 +291,51 @@ export default function CardVagas({ vaga, onSave, saved }) {
             </>
         )}
       </Card>
+
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-success"
+        aria-describedby="modal-success-description"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            borderRadius: 3,
+            boxShadow: 24,
+            p: 4,
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="h5" component="h2" sx={{ color: 'green', mb: 2, fontWeight: 'bold' }}>
+            Parabéns! 🎉
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 3 }}>
+            Você se candidatou com sucesso para a vaga:
+          </Typography>
+          <Typography variant="h6" sx={{ color: 'green', mb: 3, fontWeight: 'bold' }}>
+            {vaga?.titulo || ""}
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={handleCloseModal}
+            sx={{
+              background: 'green',
+              color: '#fff',
+              '&:hover': {
+                background: '#006400',
+              },
+            }}
+          >
+            Fechar
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 }
