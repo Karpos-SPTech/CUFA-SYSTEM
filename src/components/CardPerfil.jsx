@@ -148,9 +148,22 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
               onClick={onAvatarClick}
             >
               {!profileImg && (
-                <svg width="60" height="60" viewBox="0 0 40 40">
-                  <circle cx="20" cy="14" r="10" fill="#90caf9" />
-                  <ellipse cx="20" cy="32" rx="14" ry="8" fill="#e3f2fd" />
+                <svg
+                  width="60"
+                  height="60"
+                  viewBox="0 0 64 64"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  {/* Cabeça */}
+                  <circle cx="32" cy="25" r="12" fill="#90caf9" />
+
+                  {/* Ombros e tronco */}
+                  <path
+                    d="M16,52 C16,40 48,40 48,52"
+                    fill="#90caf9"
+                  />
+
+
                 </svg>
               )}
             </Avatar>
@@ -216,26 +229,9 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: 15 }}>
                   {profileData.cidade || defaultLocationMessage}
                   {profileData.cidade && profileData.estado ? `, ` : ''}
-                  {profileData.estado || (profileData.cidade ? defaultLocationMessage : '')} {/* Condicional para o estado se a cidade existir */}
+                  {profileData.estado || (profileData.cidade ? defaultLocationMessage : '')}
                 </Typography>
               </Box>
-
-              {/* Seção Biografia (Sobre) - REMOVIDA */}
-              {/* <Box sx={{ mt: 2 }}>
-                <Typography variant="body1" sx={{ color: '#333', mb: 1, fontWeight: 'bold' }}>
-                  Sobre:
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: 15 }}>
-                  {profileData.biografia || defaultBiografiaMessage}
-                </Typography>
-                <IconButton
-                  size="small"
-                  sx={{ mt: 1, p: 0 }}
-                  onClick={() => setOpenEditBio(true)}
-                >
-                  <EditIcon fontSize="small" sx={{ color: '#006916' }} />
-                </IconButton>
-              </Box> */}
             </>
           )}
         </CardContent>

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, Typography, Avatar, Box, Divider, Stack, Button, CircularProgress } from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import GroupsIcon from "@mui/icons-material/Groups"; // Ícone para vagas candidatadas (ou outro de sua preferência)
 import SendIcon from '@mui/icons-material/Send'; // Outra opção de ícone para "candidatado"
 
 export default function CardEsquerda({
@@ -115,14 +114,27 @@ export default function CardEsquerda({
               height: 64,
               border: "4px solid #fff",
               boxShadow: 2,
-              bgcolor: "#90caf9",
+              bgcolor: "#e3f2fd",
             }}
-            src={profileImg || "src/assets/avatar1.png"}
+            src={profileImg || undefined}
           >
             {!profileImg && (
-              <svg width="40" height="40" viewBox="0 0 40 40">
-                <circle cx="20" cy="14" r="10" fill="#90caf9" />
-                <ellipse cx="20" cy="32" rx="14" ry="8" fill="#e3f2fd" />
+              <svg
+                width="60"
+                height="60"
+                viewBox="0 0 64 64"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* Cabeça */}
+                <circle cx="32" cy="25" r="10" fill="#90caf9" />
+
+                {/* Ombros e tronco */}
+                <path
+                  d="M16,52 C16,40 48,40 48,52"
+                  fill="#90caf9"
+                />
+
+
               </svg>
             )}
           </Avatar>
