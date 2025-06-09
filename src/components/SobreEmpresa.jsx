@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Paper, 
-  Typography, 
+import {
+  Box,
+  Paper,
+  Typography,
   Modal,
   TextField,
   Button,
@@ -51,6 +51,7 @@ const SobreEmpresa = () => {
       }
 
       const empresaData = await response.json();
+      console.log("Dados da empresa:", empresaData);
       setBiografia(empresaData.biografia || "Adicione uma biografia para sua empresa");
     } catch (err) {
       console.error("Erro ao buscar biografia:", err);
@@ -77,26 +78,22 @@ const SobreEmpresa = () => {
         throw new Error("A biografia não pode estar vazia");
       }
 
-      console.log("[Debug] Atualizando biografia...");
-      
       const response = await fetch("http://localhost:8080/empresas/biografia", {
         method: "PATCH",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ biografia: editingBiografia.trim() }),
+        body: JSON.stringify({
+          biografia: editingBiografia.trim()
+        }),
       });
-
-      console.log("[Debug] Status da resposta:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        console.log("[Debug] Erro recebido:", errorData);
         throw new Error(errorData?.message || "Erro ao atualizar biografia");
       }
 
-      console.log("[Debug] Biografia atualizada com sucesso");
       setBiografia(editingBiografia);
       setSnackbarMessage("Biografia atualizada com sucesso!");
       setSnackbarSeverity("success");
@@ -248,14 +245,13 @@ const SobreEmpresa = () => {
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={6000}
+        autoHideDuration={2000}
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert
           onClose={() => setSnackbarOpen(false)}
           severity={snackbarSeverity}
-          sx={{ width: '100%' }}
         >
           {snackbarMessage}
         </Alert>

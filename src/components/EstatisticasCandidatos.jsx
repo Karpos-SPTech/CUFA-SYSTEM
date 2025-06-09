@@ -38,7 +38,6 @@ const EstatisticasCandidatos = () => {
           throw new Error("Formato de dados inválido para publicações");
         }
         
-        // Buscar candidatos de todas as vagas
         let todosCandidatos = [];
         for (const vaga of vagas) {
           const candidatosResponse = await fetch(`http://localhost:8080/candidatura/${vaga.idPublicacao}`, {
@@ -53,7 +52,6 @@ const EstatisticasCandidatos = () => {
           if (candidatosResponse.ok) {
             const candidatosData = await candidatosResponse.json();
             if (candidatosData.candidatos && Array.isArray(candidatosData.candidatos)) {
-              // Filter out candidates without valid age data
               const validCandidatos = candidatosData.candidatos.filter(c => 
                 typeof c.idade === 'number' && c.idade > 0 && c.idade < 100
               );
@@ -61,8 +59,8 @@ const EstatisticasCandidatos = () => {
             }
           }
         }
+        
 
-        // Se não houver candidatos, definir dados zerados
         if (todosCandidatos.length === 0) {
           setDadosFaixaEtaria([
             { faixa: 'Abaixo de 18', percentual: 0 },
@@ -78,7 +76,6 @@ const EstatisticasCandidatos = () => {
           return;
         }
 
-        // Calcular estatísticas por faixa etária
         const estatisticas = {
           'Abaixo de 18': 0,
           'De 18 a 25': 0,
@@ -94,7 +91,6 @@ const EstatisticasCandidatos = () => {
           else estatisticas['Acima de 40']++;
         });
 
-        // Calcular estatísticas por escolaridade
         const estatisticasEscolaridade = {
           'Nenhuma': 0,
           'Ensino Fundamental': 0,
@@ -104,11 +100,11 @@ const EstatisticasCandidatos = () => {
         todosCandidatos.forEach(candidato => {
           const escolaridade = candidato.escolaridade;
           if (escolaridade) {
-            if (escolaridade.toLowerCase().includes('fundamental')) {
+            if (escolaridade.includes('Nenhuma') || escolaridade.includes('Ensino Fundamental Incompleto')) {
               estatisticasEscolaridade['Nenhuma']++;
-            } else if (escolaridade.toLowerCase().includes('fundamental')) {
+            } else if (escolaridade.includes('Ensino Fundamental Completo') || escolaridade.includes('Ensino Médio Incompleto')) {
               estatisticasEscolaridade['Ensino Fundamental']++;
-            } else if (escolaridade.toLowerCase().includes('pós')){
+            } else if (escolaridade.includes('Ensino Médio Completo')){
               estatisticasEscolaridade['Ensino Médio']++;
             }
           }

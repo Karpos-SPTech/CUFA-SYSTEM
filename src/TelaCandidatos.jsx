@@ -19,10 +19,10 @@ const TelaCandidatos = () => {
         const token = localStorage.getItem('token');
         const response = await fetch(`http://localhost:8080/candidatura/${vagaId}`, {
           method: 'GET',
+          credentials: "include",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
+            "Content-Type": "application/json",
+          },
         });
 
         if (!response.ok) {
