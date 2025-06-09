@@ -13,11 +13,8 @@ import {
   InputLabel, // Importe InputLabel para o Select
   FormControl, // Importe FormControl para o Select
 } from "@mui/material";
+import CampaignIcon from '@mui/icons-material/Campaign';
 import CloseIcon from "@mui/icons-material/Close";
-import mcdonaldsLogo from "../assets/microsoft-logo.png";
-import fotoIcon from "../assets/foto-icon.png";
-import videoIcon from "../assets/video-icon.png";
-import textoIcon from "../assets/text-icon.png";
 import empresaImageManager from "../utils/empresaImageManager";
 
 const ButtonOption = ({ icon, label }) => (
@@ -173,7 +170,7 @@ O que o contratado irá realizar:
 • 
 
 Benefícios:
-• ex(vale refeição, vale transporte, etc)
+• ex: (vale Refeição, Vale Transporte, etc)
 • 
 • 
 
@@ -239,12 +236,8 @@ Frase atrativa:
     <>
       <Paper sx={{ p: 2, borderRadius: 2, mb: 2 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box display="flex" alignItems="center" gap={2}>
-            <img
-              src={empresaLogo || mcdonaldsLogo}
-              alt="Logo"
-              style={{ width: 40, height: 40 }}
-            />
+          <Box display="flex" alignItems="center" gap={1}>
+            <CampaignIcon sx={{ color: '#006916', fontSize: 30 }} />
             <Typography fontWeight={600}>Anunciar nova vaga</Typography>
           </Box>
           <Button
@@ -264,7 +257,7 @@ Frase atrativa:
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 520,
             bgcolor: "background.paper",
             borderRadius: 2,
             p: 4,
@@ -278,7 +271,7 @@ Frase atrativa:
             <CloseIcon />
           </IconButton>
 
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h5" color="#006916" fontWeight={600} textAlign={"center"} gutterBottom>
             {isEdit ? 'Editar Publicação' : 'Nova Publicação'}
           </Typography>
 
@@ -307,6 +300,7 @@ Frase atrativa:
             <TextField
               name="descricao"
               label="Descrição da Vaga"
+              required
               value={publicacao.descricao}
               onChange={(e) => {
                 const linhas = e.target.value.split('\n');
@@ -368,6 +362,7 @@ Frase atrativa:
               value={publicacao.dtExpiracao}
               onChange={handleChange}
               fullWidth
+              required
               margin="dense"
               InputLabelProps={{
                 shrink: true,

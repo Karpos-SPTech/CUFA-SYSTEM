@@ -14,8 +14,6 @@ import {
   Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import googleLogo from "../assets/google-logo.png";
-import microsoftLogo from "../assets/microsoft-logo.png";
 import emailIcon from "../assets/Icon-Email.png";
 import passwordIcon from "../assets/Icon-Senha.png";
 

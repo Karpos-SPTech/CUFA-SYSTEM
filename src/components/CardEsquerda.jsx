@@ -118,23 +118,29 @@ export default function CardEsquerda({
             }}
             src={profileImg || undefined}
           >
-            {!profileImg && (
+            {!profileImg && nome && (
               <svg
                 width="60"
                 height="60"
-                viewBox="0 0 64 64"
+                viewBox="0 0 60 60"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                {/* Cabeça */}
-                <circle cx="32" cy="25" r="10" fill="#90caf9" />
+                {/* Círculo verde de fundo */}
+                <circle cx="30" cy="30" r="30" fill="#006916" />
 
-                {/* Ombros e tronco */}
-                <path
-                  d="M16,52 C16,40 48,40 48,52"
-                  fill="#90caf9"
-                />
-
-
+                {/* Primeira letra do nome centralizada */}
+                <text
+                  x="50%"
+                  y="50%"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize="28"
+                  fontWeight={500}
+                  fill="white"
+                  fontFamily="Arial, sans-serif"
+                >
+                  {nome.charAt(0).toUpperCase()}
+                </text>
               </svg>
             )}
           </Avatar>

@@ -133,8 +133,8 @@ const MembroCard = () => {
         console.error("Resposta não ok:", responseData);
         throw new Error(
           responseData?.message ||
-            responseData?.error ||
-            `Erro ao buscar funcionários (${response.status})`
+          responseData?.error ||
+          `Erro ao buscar funcionários (${response.status})`
         );
       }
 
@@ -167,7 +167,7 @@ const MembroCard = () => {
       console.error("Erro ao buscar funcionários:", error);
       setError(
         error.message ||
-          "Erro ao acessar o servidor. Verifique sua conexão e tente novamente."
+        "Erro ao acessar o servidor. Verifique sua conexão e tente novamente."
       );
       setMembers([]);
 
@@ -257,7 +257,7 @@ const MembroCard = () => {
       console.error("Erro ao cadastrar funcionário:", err);
       setError(
         err.message ||
-          "Não foi possível cadastrar o funcionário. Tente novamente."
+        "Não foi possível cadastrar o funcionário. Tente novamente."
       );
     } finally {
       setLoading(false);
@@ -393,6 +393,7 @@ const MembroCard = () => {
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-cadastro-membro"
+
       >
         <Box
           sx={{
@@ -409,6 +410,7 @@ const MembroCard = () => {
             display: "flex",
             flexDirection: "column",
             gap: 3,
+            borderTop: "5px solid #006916"
           }}
         >
           <IconButton
@@ -426,7 +428,7 @@ const MembroCard = () => {
 
           <Typography
             variant="h6"
-            sx={{ color: "#006916", mb: 3, fontWeight: "bold" }}
+            sx={{ color: "#006916", mb: 1.5, fontWeight: "bold", alignItems: "center", display: "flex", justifyContent: "center" }}
           >
             Preencha os dados para cadastrar
           </Typography>
@@ -453,7 +455,7 @@ const MembroCard = () => {
                   bgcolor: "#E3EEE5",
                   height: "48px",
                   borderRadius: "12px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                  boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.5)",
                   "& fieldset": {
                     border: "none",
                   },
@@ -473,7 +475,7 @@ const MembroCard = () => {
                   bgcolor: "#E3EEE5",
                   height: "48px",
                   borderRadius: "12px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                  boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.5)",
                   "& fieldset": {
                     border: "none",
                   },
@@ -493,7 +495,7 @@ const MembroCard = () => {
                   bgcolor: "#E3EEE5",
                   height: "48px",
                   borderRadius: "12px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                  boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.5)",
                   "& fieldset": {
                     border: "none",
                   },
@@ -515,7 +517,7 @@ const MembroCard = () => {
                   bgcolor: "#E3EEE5",
                   height: "48px",
                   borderRadius: "12px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                  boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.5)",
                   "& fieldset": {
                     border: "none",
                   },

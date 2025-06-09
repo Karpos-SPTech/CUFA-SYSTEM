@@ -167,6 +167,7 @@ const SobreEmpresa = () => {
         <Box
           sx={{
             position: 'absolute',
+            borderTop: "5px solid #006916",
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',

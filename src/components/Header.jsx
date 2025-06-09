@@ -325,8 +325,8 @@ const Header = ({ hideNotifications }) => {
                 src={searchIcon}
                 alt="Pesquisar"
                 sx={{
-                  width: { xs: 22, sm: 28, md: 32 },
-                  height: { xs: 22, sm: 28, md: 32 },
+                  width: { xs: 22, sm: 28, md: 28 },
+                  height: { xs: 22, sm: 28, md: 28 },
                 }}
               />
             </IconButton>

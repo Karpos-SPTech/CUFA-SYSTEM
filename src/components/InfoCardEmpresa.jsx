@@ -306,10 +306,10 @@ const InfoCardEmpresa = () => {
                 sx={{
                   width: 110,
                   height: 110,
-                  bgcolor: "#e3f2fd",
-                  fontSize: "2.2rem",
+                  bgcolor: "#006916",
+                  fontSize: "2.4rem",
                   fontWeight: "bold",
-                  color: "#006916",
+                  color: "white",
                 }}
               >
                 {empresa?.nome ? empresa.nome.charAt(0).toUpperCase() : "E"}

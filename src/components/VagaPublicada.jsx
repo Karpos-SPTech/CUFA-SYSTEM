@@ -3,7 +3,6 @@ import { Box, Paper, Typography, Button, List, ListItem, IconButton, Dialog, Dia
 import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import mcdonaldsLogo from '../assets/microsoft-logo.png';
 import empresaImageManager from '../utils/empresaImageManager';
 import AnunciarVaga from './AnunciarVaga';
 
@@ -26,11 +25,11 @@ const VagaPublicada = () => {
     const agora = new Date();
     const diff = agora - publicacao;
     const horas = Math.floor(diff / (1000 * 60 * 60));
-    
+
     if (horas < 1) return 'Agora mesmo';
     if (horas === 1) return 'Há 1 hora';
     if (horas < 24) return `Há ${horas} horas`;
-    
+
     const dias = Math.floor(horas / 24);
     if (dias === 1) return 'Há 1 dia';
     return `Há ${dias} dias`;
@@ -74,7 +73,7 @@ const VagaPublicada = () => {
 
     return resultado;
   };
-  
+
   useEffect(() => {
     // Carregar logo da empresa ao montar o componente
     const savedLogo = empresaImageManager.getProfileImage();
@@ -92,7 +91,7 @@ const VagaPublicada = () => {
     // Cleanup: remover listener quando o componente for desmontado
     return removeListener;
   }, []);
-  
+
   const fetchPublicacao = async () => {
     try {
       const empresaId = localStorage.getItem("empresaId");
@@ -114,10 +113,10 @@ const VagaPublicada = () => {
 
       const data = await response.json();
       console.log("[Debug] Publicações recebidas:", JSON.stringify(data, null, 2));
-      
+
       if (Array.isArray(data) && data.length > 0) {
         // Ordenamos por data de publicação decrescente
-        const publicacoesSorted = [...data].sort((a, b) => 
+        const publicacoesSorted = [...data].sort((a, b) =>
           new Date(b.dtPublicacao) - new Date(a.dtPublicacao)
         );
         setPublicacoes(publicacoesSorted);
@@ -219,7 +218,7 @@ const VagaPublicada = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {publicacoes.map((publicacao) => {
           const secoes = formatarDescricao(publicacao.descricao);
-          
+
           return (
             <Paper
               key={publicacao.idPublicacao}
@@ -234,17 +233,43 @@ const VagaPublicada = () => {
             >
               {/* Header com Logo e Informações */}
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                <Box
-                  component="img"
-                  src={empresaLogo || mcdonaldsLogo}
-                  alt="Logo da Empresa"
-                  sx={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: '50%',
-                    objectFit: 'cover'
-                  }}
-                />
+                {empresaLogo ? (
+                  <Box
+                    component="img"
+                    src={empresaLogo}
+                    alt="Logo da Empresa"
+                    sx={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 1,
+                      objectFit: 'cover'
+                    }}
+                  />
+                ) : (
+                  <Box
+                    component="svg"
+                    width={70}
+                    height={70}
+                    viewBox="0 0 60 60"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    {/* Fundo quadrado verde */}
+                    <rect width="60" height="60" fill="#006916" rx="4" ry="4" />
+
+                    {/* Primeira letra do nome da empresa */}
+                    <text
+                      x="50%"
+                      y="50%"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fontSize="24"
+                      fill="white"
+                      fontFamily="Arial, sans-serif"
+                    >
+                      {publicacao.nomeEmpresa?.charAt(0).toUpperCase() || "?"}
+                    </text>
+                  </Box>
+                )}
                 <Box sx={{ flex: 1 }}>
                   <Typography
                     variant="h6"
@@ -462,9 +487,9 @@ const VagaPublicada = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button 
+          <Button
             onClick={handleCloseDeleteDialog}
-            sx={{ 
+            sx={{
               color: '#666',
               '&:hover': {
                 backgroundColor: 'rgba(102, 102, 102, 0.1)'

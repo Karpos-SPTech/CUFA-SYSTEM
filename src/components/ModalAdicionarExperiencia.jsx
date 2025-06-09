@@ -109,6 +109,7 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
       <Modal open={open} onClose={onClose}>
         <Box sx={{
           bgcolor: '#fff',
+          borderTop: "5px solid #006916",
           p: 4,
           borderRadius: 3,
           maxWidth: 400,
@@ -165,7 +166,7 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
             />
             {/* Botões de Ação */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-              <Button onClick={onClose} color="secondary" disabled={loading}>
+              <Button onClick={onClose} color="green" disabled={loading}>
                 Cancelar
               </Button>
               <Button

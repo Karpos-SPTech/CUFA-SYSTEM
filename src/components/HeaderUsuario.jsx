@@ -443,7 +443,7 @@ const Header = ({ hideNotifications }) => {
                 component="img"
                 src={searchIcon}
                 alt="Pesquisar"
-                sx={{ width: { xs: 22, sm: 28, md: 32 }, height: { xs: 22, sm: 28, md: 32 } }}
+                sx={{ width: { xs: 22, sm: 28, md: 28 }, height: { xs: 21, sm: 28, md: 28 }, }}
               />
             </IconButton>
           </Box>

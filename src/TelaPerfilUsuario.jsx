@@ -60,7 +60,7 @@ export default function TelaPerfilUsuario() {
 
   return (
     <div className="perfil-usuario-main">
-      <Box sx={{ background: '#e5eee3', minHeight: '100vh', width: '100%', pb: 6 }}>
+      <Box sx={{ background: '#e5eee3', maxHeight: '100vh', width: '100%', pb: 6 }}>
         <HeaderUsuario />
         <Box sx={{
           display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-start',

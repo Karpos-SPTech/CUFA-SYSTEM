@@ -143,27 +143,33 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
             onMouseLeave={onMouseLeave}
           >
             <Avatar
-              sx={{ width: 98, height: 98, boxShadow: 2, bgcolor: '#e3f2fd', cursor: 'pointer' }}
+              sx={{ width: 98, height: 98, boxShadow: 2, bgcolor: '#006916', cursor: 'pointer' }}
               src={profileImg || undefined}
               onClick={onAvatarClick}
             >
-              {!profileImg && (
+              {!profileImg && profileData.nome && (
                 <svg
                   width="60"
                   height="60"
-                  viewBox="0 0 64 64"
+                  viewBox="0 0 60 60"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  {/* Cabeça */}
-                  <circle cx="32" cy="25" r="12" fill="#90caf9" />
+                  {/* Círculo verde de fundo */}
+                  <circle cx="30" cy="30" r="30" fill="#006916" />
 
-                  {/* Ombros e tronco */}
-                  <path
-                    d="M16,52 C16,40 48,40 48,52"
-                    fill="#90caf9"
-                  />
-
-
+                  {/* Primeira letra do nome centralizada */}
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize="2.4rem"
+                    fontWeight={500}
+                    fill="white"
+                    fontFamily="Arial, sans-serif"
+                  >
+                    {profileData.nome.charAt(0).toUpperCase()}
+                  </text>
                 </svg>
               )}
             </Avatar>

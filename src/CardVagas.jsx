@@ -78,20 +78,17 @@ export default function CardVagas({ vaga, onSave, saved }) {
     setOpenModal(false);
   };
 
-  // --- ATUALIZAÇÃO: useEffect para verificar candidaturas usando o novo endpoint ---
   useEffect(() => {
     const checkUserCandidacy = async () => {
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
 
-      // Só tenta verificar se tiver userId e idPublicacao
       if (!userId || !vaga?.idPublicacao) {
         setCheckingCandidacy(false);
         return;
       }
 
       try {
-        // Usando o novo endpoint de verificação: GET /candidatura/verificar/{userId}/{vagaId}
         const response = await fetch(`http://localhost:8080/candidatura/verificar/${userId}/${vaga.idPublicacao}`, {
           method: "GET",
           headers: {
@@ -164,11 +161,11 @@ export default function CardVagas({ vaga, onSave, saved }) {
         const errorData = await response.json();
         // Se a API retornar uma mensagem específica para "já candidatado" ou um status 409
         if (response.status === 409 || (errorData.message && errorData.message.includes("já se candidatou"))) {
-            setCandidaturaSucesso(true);
-            setBotaoCandidaturaTexto("JÁ SE CANDIDATOU");
-            alert("Você já se candidatou a esta vaga.");
+          setCandidaturaSucesso(true);
+          setBotaoCandidaturaTexto("JÁ SE CANDIDATOU");
+          alert("Você já se candidatou a esta vaga.");
         } else {
-            alert(`Erro ao candidatar: ${errorData.message || response.statusText}`);
+          alert(`Erro ao candidatar: ${errorData.message || response.statusText}`);
         }
       }
     } catch (error) {
@@ -181,12 +178,42 @@ export default function CardVagas({ vaga, onSave, saved }) {
     <Box sx={{ width: 550, margin: "0 auto" }}>
       <Card sx={{ borderRadius: 3, boxShadow: 3, p: 2, position: "relative" }}>
         <Stack direction="row" alignItems="flex-start" spacing={2}>
-          <Avatar
-            variant="rounded"
-            src={vaga?.logoUrl || "https://upload.wikimedia.org/wikipedia/commons/4/4f/McDonalds_Logo.svg"}
-            alt={vaga?.nomeEmpresa || "Logo"}
-            sx={{ width: 85, height: 85, bgcolor: "#fff" }}
-          />
+          <Box sx={{ width: 85, height: 85 }}>
+            {vaga?.logoUrl ? (
+              <Avatar
+                variant="rounded"
+                src={vaga.logoUrl}
+                alt={vaga.nomeEmpresa || "Logo"}
+                sx={{ width: 85, height: 85, bgcolor: "#fff" }}
+              />
+            ) : (
+              <Box
+                component="svg"
+                width={82}
+                height={82}
+                viewBox="0 0 60 60"
+                xmlns="http://www.w3.org/2000/svg"
+                sx={{mt: 1}}
+              >
+                {/* Fundo quadrado verde */}
+                <rect width="60" height="60" fill="#006916" rx="6" ry="6" />
+
+                {/* Primeira letra do nome da empresa */}
+                <text
+                  x="50%"
+                  y="50%"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize="28px"
+                  fontWeight={500}
+                  fill="white"
+                  fontFamily="Arial, sans-serif"
+                >
+                  {vaga?.nomeEmpresa?.charAt(0).toUpperCase() || "?"}
+                </text>
+              </Box>
+            )}
+          </Box>
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" sx={{ color: "green", fontWeight: "bold" }}>
               {vaga?.nomeEmpresa || "Nome da Empresa"}
@@ -267,28 +294,28 @@ export default function CardVagas({ vaga, onSave, saved }) {
         </Box>
 
         {checkingCandidacy ? (
-            <Typography variant="body2" align="center" sx={{ color: "gray", mb: 1 }}>
-                Verificando status de candidatura...
-            </Typography>
+          <Typography variant="body2" align="center" sx={{ color: "gray", mb: 1 }}>
+            Verificando status de candidatura...
+          </Typography>
         ) : (
-            <>
-                <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={handleCandidatar}
-                    disabled={candidaturaSucesso}
-                    sx={{
-                        background: candidaturaSucesso ? "#81c784" : "green",
-                        color: "#fff",
-                        fontWeight: "bold",
-                        fontSize: 18,
-                        borderRadius: 2,
-                        mt: 1,
-                    }}
-                >
-                    {botaoCandidaturaTexto}
-                </Button>
-            </>
+          <>
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleCandidatar}
+              disabled={candidaturaSucesso}
+              sx={{
+                background: candidaturaSucesso ? "#81c784" : "green",
+                color: "#fff",
+                fontWeight: "bold",
+                fontSize: 18,
+                borderRadius: 2,
+                mt: 1,
+              }}
+            >
+              {botaoCandidaturaTexto}
+            </Button>
+          </>
         )}
       </Card>
 

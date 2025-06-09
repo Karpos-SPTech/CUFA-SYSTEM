@@ -31,7 +31,13 @@ const TelaUsuario = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setJobs(data);
+
+        // ✅ Ordena do mais recente para o mais antigo
+        const ordenadas = data.sort(
+          (a, b) => new Date(b.dtPublicacao) - new Date(a.dtPublicacao)
+        );
+        setJobs(ordenadas);
+
       } catch (e) {
         setError(e);
       } finally {
@@ -41,7 +47,7 @@ const TelaUsuario = () => {
 
     fetchJobs();
   }, []);
-
+  
   useEffect(() => {
     const fetchAppliedJobs = async () => {
       const userId = localStorage.getItem('userId');

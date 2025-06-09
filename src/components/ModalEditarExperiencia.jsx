@@ -122,6 +122,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
     <>
       <Modal open={open} onClose={onClose}>
         <Box sx={{
+          borderTop: "5px solid #006916",
           bgcolor: '#fff',
           p: 4,
           borderRadius: 3,
@@ -174,7 +175,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
               disabled={loading}
             />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-              <Button onClick={onClose} color="secondary" disabled={loading}>Cancelar</Button>
+              <Button onClick={onClose} color="green" disabled={loading}>Cancelar</Button>
               <Button type="submit" variant="contained" sx={{ bgcolor: '#006916', '&:hover': { bgcolor: '#004d12' } }} disabled={loading}>
                 {loading ? <CircularProgress size={24} color="inherit" /> : "Salvar"}
               </Button>

@@ -11,7 +11,6 @@ import {
   Paper,
 } from "@mui/material";
 import notificationsIcon from "../assets/notification-icon.png";
-import defaultCompanyLogo from "../assets/empresaLogo.png"; // Importe o logo padrão
 
 const Notifications = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,14 +33,25 @@ const Notifications = () => {
         }
         const data = await response.json();
 
-        // Mapear os dados da API para o formato de notificação
-        const formattedNotifications = data.map((vaga) => ({
-          // Assumindo que 'logoUrl' é o campo da URL do logo na sua PublicacaoEntity/DTO
-          avatar: vaga.logoUrl || defaultCompanyLogo,
-          name: vaga.nomeEmpresa || "Empresa Desconhecida", // Assumindo 'nomeEmpresa' na PublicacaoEntity/DTO
-          message: `Nova vaga disponível para ${vaga.titulo}! Pode ser a oportunidade que você está esperando.`, // Assumindo 'titulo'
-          // Você pode adicionar um ID único se quiser, para a key do ListItem
-          id: vaga.idPublicacao, // Assumindo 'idPublicacao' como ID único da vaga
+        // ✅ Ordena do mais recente para o mais antigo
+        const vagasOrdenadas = data.sort(
+          (a, b) => new Date(b.dtPublicacao) - new Date(a.dtPublicacao)
+        );
+
+        // ✅ Mapeia para notificações
+        const formattedNotifications = vagasOrdenadas.map((vaga) => ({
+          avatar: vaga.logoUrl || null,
+          name: vaga.nomeEmpresa || "Empresa Desconhecida",
+          message: (
+            <>
+              Nova vaga disponível para{" "}
+              <span style={{ color: "#006916", fontWeight: 600 }}>
+                {vaga.titulo}
+              </span>
+              ! Pode ser a oportunidade que você está esperando.
+            </>
+          ),
+          id: vaga.idPublicacao,
         }));
 
         setNotifications(formattedNotifications);
@@ -76,7 +86,7 @@ const Notifications = () => {
         onClick={toggleNotifications}
       >
         <Badge
-          badgeContent={unreadCount > 99 ? "99+" : unreadCount} // Exibe "99+" se for maior
+          badgeContent={unreadCount > 99 ? "99+" : unreadCount}
           sx={{
             "& .MuiBadge-badge": {
               backgroundColor: "#006916",
@@ -147,22 +157,34 @@ const Notifications = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                fontWeight: "500",
+                fontWeight: "600",
                 fontFamily: "'Paytone One', sans-serif",
               }}
             >
               Notificações
-              <Typography
-                component="span"
+              <Box
                 sx={{
-                  fontSize: { xs: 14, sm: 16 },
-                  fontFamily: "'Paytone One', sans-serif",
-                  fontWeight: "500",
-                  color: "#006916",
+                  backgroundColor: '#e8f5e9',
+                  padding: '4px 12px',
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  display: 'flex',
+                  borderRadius: '20px',
+                  border: '1px solid #c8e6c9'
                 }}
               >
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: '#006916',
+                    fontSize: '13px',
+                    fontWeight: 'bold',
+                    fontFamily: "'Paytone One', sans-serif",
+                  }}
+                >
+                  {unreadCount > 99 ? "99+ novas" : unreadCount == 1 ? unreadCount + " nova" : unreadCount + " novas"}
+                </Typography>
+              </Box>
             </Typography>
           </Box>
 
@@ -194,19 +216,31 @@ const Notifications = () => {
                   sx={{
                     p: 2,
                     "&:hover": {
-                      bgcolor: "#f5f5f5",
+                      bgcolor: "#f5f9f6",
                     },
                   }}
                 >
                   <ListItemAvatar>
-                    <Avatar
-                      src={notification.avatar}
-                      sx={{
-                        bgcolor: "#white",
-                        width: 40,
-                        height: 40,
-                      }}
-                    />
+                    {notification.avatar ? (
+                      <Avatar
+                        src={notification.avatar}
+                        sx={{ width: 40, height: 40, bgcolor: "#fff" }}
+                      />
+                    ) : (
+                      <Avatar
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          bgcolor: "#006916",
+                          color: "white",
+                          fontWeight: "bold",
+                          fontSize: 18,
+                          fontFamily: "Arial, sans-serif",
+                        }}
+                      >
+                        {notification.name?.charAt(0).toUpperCase() || "?"}
+                      </Avatar>
+                    )}
                   </ListItemAvatar>
                   <ListItemText
                     primary={
