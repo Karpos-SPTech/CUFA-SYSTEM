@@ -91,6 +91,14 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
     }
   };
 
+  // Função utilitária para camel case (primeira letra de cada palavra maiúscula)
+  function toCamelCase(str) {
+    if (!str) return '';
+    return str
+      .toLowerCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
   return (
     <>
       <Card sx={{ borderRadius: 5, boxShadow: 4, background: 'transparent', position: 'relative', p: 0, overflow: 'hidden' }}>
@@ -228,7 +236,7 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
             <>
               {/* Nome do usuário */}
               <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#006916', mb: 0.5 }}>
-                {profileData.nome || defaultNameMessage}
+                {toCamelCase(profileData.nome) || defaultNameMessage}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 {/* Localização (Cidade, Estado) */}

@@ -16,6 +16,14 @@ export default function CardSobre() {
   // Mensagem padrão para a biografia
   const defaultBiografiaMessage = "Nenhuma biografia informada.";
 
+  // Função utilitária para camel case (primeira letra de cada palavra maiúscula)
+  function toCamelCase(str) {
+    if (!str) return '';
+    return str
+      .toLowerCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
   useEffect(() => {
     const fetchBiografia = async () => {
       setLoading(true);
@@ -146,7 +154,7 @@ export default function CardSobre() {
             </Typography>
           ) : (
             <Typography variant="body1" sx={{ color: '#333', fontSize: 17, whiteSpace: 'pre-wrap' }}>
-              {biografia || defaultBiografiaMessage}
+              {toCamelCase(biografia) || defaultBiografiaMessage}
             </Typography>
           )}
         </CardContent>
