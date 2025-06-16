@@ -113,6 +113,26 @@ const Header = ({ hideNotifications }) => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
+  // Estado para foto de perfil
+  const [profileImg, setProfileImg] = useState(null);
+
+  useEffect(() => {
+    // Tenta buscar a foto de perfil do localStorage
+    const saved = localStorage.getItem('profileImg');
+    if (saved) setProfileImg(saved);
+  }, []);
+
+  // Atualiza a foto de perfil automaticamente ao mudar no localStorage
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === 'profileImg') {
+        setProfileImg(e.newValue);
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen((prev) => !prev);
   };
@@ -450,38 +470,28 @@ const Header = ({ hideNotifications }) => {
           <Divider orientation="vertical" flexItem sx={{ height: { xs: 60, sm: 60 }, borderColor: '#006916' }} />
           <Box sx={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <Avatar
-              src={profilePic}
+              src={profileImg || undefined}
               alt="Perfil"
               onClick={toggleProfileMenu}
               sx={{
-                width: { xs: 32, sm: 40, md: 35 },
-                height: { xs: 32, sm: 40, md: 35 },
-                bgcolor: isProfileMenuOpen ? "#e9f1e7" : "transparent",
-                p: 0.5,
+                width: { xs: 48, sm: 56, md: 55 },
+                height: { xs: 48, sm: 56, md: 55 },
+                bgcolor: isProfileMenuOpen ? "#e9f1e7" : "#f0f0f0",
+                p: 0,
                 cursor: "pointer",
                 transition: "background-color 0.2s",
-                "&:hover": {
-                  bgcolor: isProfileMenuOpen ? "#e9f1e7" : "#f0f0f0",
-                }
-              }}
-            />
-            <Typography
-              onClick={toggleProfileMenu}
-              sx={{
-                fontSize: { xs: 10, sm: 12, md: 15 },
-                fontFamily: "'Paytone One', sans-serif",
-                color: "#006916",
-                fontWeight: "bold",
-                textDecoration: "none",
-                transition: "text-decoration 0.2s",
-                cursor: "pointer",
-                "&:hover": {
-                  textDecoration: "underline",
-                },
+                borderRadius: '50%',
+                boxShadow: 2,
+                border: '3px solid #fff',
+                objectFit: 'cover',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              Perfil
-            </Typography>
+              {!profileImg && <PersonIcon sx={{ color: '#006916', fontSize: 36, mx: 'auto', my: 'auto' }} />}
+            </Avatar>
             {isProfileMenuOpen && (
               <Box
                 sx={{
@@ -536,7 +546,7 @@ const Header = ({ hideNotifications }) => {
                   }}
                   onClick={() => { setIsProfileMenuOpen(false); openSettingsModal(); }}
                 >
-                  <SettingsIcon fontSize="small" /> Ajustes
+                  <SettingsIcon fontSize="small" /> Configurações
                 </Box>
                 <Box
                   sx={{
@@ -611,7 +621,7 @@ const Header = ({ hideNotifications }) => {
               fontFamily: "'Paytone One', sans-serif",
             }}
           >
-            Ajustes do Perfil
+            Configurações do Perfil
           </Typography>
           <Typography
             sx={{

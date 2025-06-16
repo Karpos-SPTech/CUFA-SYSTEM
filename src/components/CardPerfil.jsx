@@ -135,8 +135,8 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
           <Box
             sx={{
               position: 'relative',
-              width: 110,
-              height: 110,
+              width: 130, // aumentei para 130px
+              height: 130, // aumentei para 130px
               mt: -7,
               ml: 'auto',
               mr: 'auto',
@@ -145,13 +145,23 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
               background: '#fff',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              overflow: 'hidden',
             }}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
           >
             <Avatar
-              sx={{ width: 98, height: 98, boxShadow: 2, bgcolor: '#006916', cursor: 'pointer' }}
+              sx={{
+                width: 118, // aumentei para ocupar quase todo o círculo
+                height: 118, // aumentei para ocupar quase todo o círculo
+                boxShadow: 2,
+                bgcolor: '#006916',
+                cursor: 'pointer',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: 'none',
+              }}
               src={profileImg || undefined}
               onClick={onAvatarClick}
             >
