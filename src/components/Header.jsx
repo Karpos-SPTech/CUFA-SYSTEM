@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
+import EditIcon from "@mui/icons-material/Edit";
 import LogoutIcon from "@mui/icons-material/Logout";
 import BusinessIcon from "@mui/icons-material/Business";
 import homeIcon from "../assets/home-icon.png";
@@ -500,7 +501,7 @@ const Header = ({ hideNotifications }) => {
                     openSettingsModal();
                   }}
                 >
-                  <SettingsIcon fontSize="small" /> Configurações
+                  <EditIcon fontSize="small" /> Editar
                 </Box>
                 <Box
                   sx={{
@@ -578,7 +579,7 @@ const Header = ({ hideNotifications }) => {
               fontFamily: "'Paytone One', sans-serif",
             }}
           >
-            Configurações do Perfil
+            Ajustes do Perfil
           </Typography>
           <Box
             component="form"

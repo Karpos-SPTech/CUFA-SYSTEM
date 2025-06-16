@@ -206,9 +206,6 @@ export default function Login() {
               ),
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={toggleSenha} edge="end">
-                    {showSenha ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
                 </InputAdornment>
               ),
               sx: {

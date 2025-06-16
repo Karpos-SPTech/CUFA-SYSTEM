@@ -112,15 +112,15 @@ export default function CardDireita({
               <FormControlLabel
                 control={
                   <Checkbox
-                    name="Estágio"
-                    checked={selectedContractTypes.includes("Estágio")}
+                    name="Jovem Aprendiz"
+                    checked={selectedContractTypes.includes("Jovem Aprendiz")}
                     onChange={handleContractChange}
                     sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                   />
                 }
                 label={
                   <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
-                    Estágio
+                    Jovem Aprendiz
                   </Typography>
                 }
               />

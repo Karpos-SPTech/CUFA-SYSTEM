@@ -205,7 +205,7 @@ export default function CardExperiencia() {
               experiencias.map(exp => (
                 <Card key={exp.id} sx={{ background: '#f9f9f9', p: 2, borderRadius: 2, boxShadow: 1, position: 'relative', minHeight: 70, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <Typography variant="body1" sx={{ color: '#333', fontSize: 16, wordBreak: 'break-word' }}>
-                    {toCamelCase(exp.cargo)} na {toCamelCase(exp.empresa)}
+                    {toCamelCase(exp.cargo)} no(a) {toCamelCase(exp.empresa)}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#666', fontSize: 14, wordBreak: 'break-word' }}>
                     {toCamelCase(exp.dtInicio)} - {exp.dtFim ? toCamelCase(exp.dtFim) : 'Atual'}

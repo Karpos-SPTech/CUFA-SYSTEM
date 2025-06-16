@@ -182,7 +182,7 @@ const VagaCard = () => {
             <Checkbox
               checked={selectedTypes.Estagio}
               onChange={handleCheckboxChange}
-              name="Estagio"
+              name="Jovem Aprendiz"
               size="small"
               sx={{
                 color: '#006916',
@@ -192,7 +192,7 @@ const VagaCard = () => {
               }}
             />
           }
-          label={<Typography sx={{ fontSize: '12px' }}>Estágio</Typography>}
+          label={<Typography sx={{ fontSize: '12px' }}>Jovem Aprendiz</Typography>}
         />
       </FormGroup>
 
