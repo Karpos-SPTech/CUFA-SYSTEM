@@ -167,19 +167,12 @@ export default function CardExperiencia() {
     setSnackbarOpen(false);
   };
 
-<<<<<<< HEAD
   // Função utilitária para camel case (primeira letra de cada palavra maiúscula)
   function toCamelCase(str) {
     if (!str) return '';
     return str
       .toLowerCase()
       .replace(/\b\w/g, (char) => char.toUpperCase());
-=======
-  // Função utilitária para formatar texto em lowercase
-  function formatarTexto(str) {
-    if (!str) return '';
-    return str.toLowerCase();
->>>>>>> c976ea4c2b5119143dc991a33ca271f65eda21ab
   }
 
   return (
