@@ -46,9 +46,7 @@ const AnunciarVaga = ({ isEdit = false, open: propOpen, onClose, publicacaoParaE
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [empresaLogo, setEmpresaLogo] = useState(null);
-  const [publicacao, setPublicacao] = useState({
-    titulo: "",
-    descricao: `Descrição da vaga:
+  const initialDescription = `Descrição da vaga:
 (Descreva brevemente sobre a vaga e a empresa)
 
 O que o contratado irá realizar:
@@ -57,19 +55,23 @@ O que o contratado irá realizar:
 • 
 
 Benefícios:
-• ex(vale refeição, vale transporte, etc)
+• ex: (vale Refeição, Vale Transporte, etc)
 • 
 • 
 
 Frase atrativa:
-(Adicione uma frase chamativa para atrair candidatos)`,
+(Adicione uma frase chamativa para atrair candidatos)`;
+
+  const [publicacao, setPublicacao] = useState({
+    titulo: "",
+    descricao: initialDescription,
     tipoContrato: "",
     dtExpiracao: "",
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Se for edição, preenche o formulário com os dados da publicação
+    // Se for edição e tiver publicação para editar, preenche o formulário
     if (isEdit && publicacaoParaEditar) {
       setPublicacao({
         titulo: publicacaoParaEditar.titulo || "",
@@ -84,64 +86,6 @@ Frase atrativa:
   useEffect(() => {
     setOpen(propOpen);
   }, [propOpen]);
-
-  const fetchPublicacoes = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const empresaId = localStorage.getItem("empresaId");
-      console.log("[Debug] Iniciando busca de publicações");
-      console.log("[Debug] EmpresaId encontrado:", empresaId);
-
-      if (!empresaId) throw new Error("ID da empresa não encontrado");
-
-      const url = "http://localhost:8080/publicacao";
-      console.log("[Debug] Fazendo requisição GET para:", url);
-
-      const response = await fetch(url, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log("[Debug] Status da resposta:", response.status);
-      console.log("[Debug] Headers da resposta:", Object.fromEntries(response.headers.entries()));
-
-      const contentType = response.headers.get("content-type");
-      console.log("[Debug] Content-Type da resposta:", contentType);
-
-      if (!response.ok) {
-        console.log("[Debug] Resposta não ok. Status:", response.status);
-        const errorText = await response.text();
-        console.log("[Debug] Corpo do erro:", errorText);
-        throw new Error(`Erro ${response.status}: ${errorText || 'Sem mensagem de erro'}`);
-      }
-
-      if (!contentType || !contentType.includes("application/json")) {
-        const textContent = await response.text();
-        console.log("[Debug] Resposta não-JSON recebida:", textContent);
-        throw new Error("Resposta inesperada do servidor (não é JSON)");
-      }
-
-      const data = await response.json();
-      console.log("[Debug] Dados recebidos:", JSON.stringify(data, null, 2));
-
-      // Note: setPublicacoes here refers to the state variable for the form,
-      // but fetchPublicacoes was likely intended to update a list of publications.
-      // If this function is meant to update a list, you'll need to pass a setter
-      // from the parent component or manage the list state here.
-      // For now, I'm assuming this fetch is not directly related to updating the form's publicacao state.
-      // If it was, the logic would need to change.
-    } catch (err) {
-      console.error("Erro ao buscar publicações:", err);
-      setError(err.message || "Erro ao carregar publicações");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     const savedLogo = empresaImageManager.getProfileImage();
@@ -159,27 +103,16 @@ Frase atrativa:
     setOpen(false);
     setError("");
     setSuccess("");
-    setPublicacao({
-      titulo: "",
-      descricao: `Descrição da vaga:
-(Descreva brevemente sobre a vaga e a empresa)
-
-O que o contratado irá realizar:
-• 
-• 
-• 
-
-Benefícios:
-• ex: (vale Refeição, Vale Transporte, etc)
-• 
-• 
-
-Frase atrativa:
-(Adicione uma frase chamativa para atrair candidatos)`,
-      tipoContrato: "",
-      dtExpiracao: "",
-    });
-    onClose(); // Chama o onClose que pode vir do componente pai
+    // Only reset form data if not in edit mode
+    if (!isEdit) {
+      setPublicacao({
+        titulo: "",
+        descricao: initialDescription,
+        tipoContrato: "",
+        dtExpiracao: "",
+      });
+    }
+    if (onClose) onClose();
   };
 
   const handleChange = (e) => {

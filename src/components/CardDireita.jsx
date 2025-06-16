@@ -79,16 +79,15 @@ export default function CardDireita({
               />
               <FormControlLabel
                 control={
-                  <Checkbox
-                    name="Freelancer"
-                    checked={selectedContractTypes.includes("Freelancer")}
+                  <Checkbox                    name="FreeLancer"
+                    checked={selectedContractTypes.includes("FreeLancer")}
                     onChange={handleContractChange}
                     sx={{ color: "green", "&.Mui-checked": { color: "green" } }}
                   />
                 }
                 label={
                   <Typography sx={{ fontSize: 14, color: "black", fontWeight: 600 }}>
-                    Freelancer
+                    FreeLancer
                   </Typography>
                 }
               />

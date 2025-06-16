@@ -22,6 +22,14 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
       return;
     }
 
+    // Validate date relationship
+    if (dtFim && new Date(dtFim) < new Date(dtInicio)) {
+      setSnackbarMessage('A data de término não pode ser anterior à data de início.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
     setLoading(true);
 
     const userToken = localStorage.getItem('token');
@@ -33,11 +41,12 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
       setLoading(false);
       return;
     }
+
     const experienceData = {
       cargo: cargo,
       empresa: empresa,
       dtInicio: dtInicio,
-      dtFim: dtFim,
+      dtFim: dtFim || null, // Send null if dtFim is empty
     };
 
     console.log("Enviando dados da experiência:", experienceData);
@@ -60,6 +69,7 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
         }
         throw new Error(responseData?.message || `Erro HTTP: ${response.status}`);
       }
+
       if (response.status === 204) {
         responseData = {};
         console.log('Experiência adicionada com sucesso (204 No Content).');
@@ -103,6 +113,9 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
     setSnackbarOpen(false);
   };
 
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+
   return (
     <>
       {/* Componente Modal do Material-UI */}
@@ -137,6 +150,7 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
               value={cargo}
               onChange={e => setCargo(e.target.value)}
               disabled={loading} // Desabilita campos durante o carregamento
+              required
             />
             <TextField
               label="Empresa"
@@ -145,24 +159,38 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
               value={empresa}
               onChange={e => setEmpresa(e.target.value)}
               disabled={loading}
+              required
             />
             <TextField
-              label="Início"
-              fullWidth
-              sx={{ mb: 2 }}
+              label="Data de Início"
+              type="date"
               value={dtInicio}
               onChange={e => setDtInicio(e.target.value)}
-              placeholder="Ex: Janeiro 2020"
+              fullWidth
+              required
+              InputLabelProps={{ shrink: true }}
+              inputProps={{
+                max: today,
+                min: "1900-01-01"
+              }}
+              sx={{ mb: 2 }}
               disabled={loading}
+              helperText="Selecione a data de início da experiência"
             />
             <TextField
-              label="Fim"
-              fullWidth
-              sx={{ mb: 2 }}
+              label="Data de Término"
+              type="date"
               value={dtFim}
               onChange={e => setDtFim(e.target.value)}
-              placeholder="Ex: Atual ou Dezembro 2020"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              inputProps={{
+                max: today,
+                min: dtInicio || "1900-01-01"
+              }}
+              sx={{ mb: 2 }}
               disabled={loading}
+              helperText="Deixe em branco se for sua experiência atual"
             />
             {/* Botões de Ação */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>

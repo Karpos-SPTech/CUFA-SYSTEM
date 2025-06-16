@@ -138,66 +138,82 @@ export default function CadastroEmpresa() {
       return false;
     }
     return true;
-  };
-
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  if (!validarCadastroEmpresa()) {
-    return;
-  }
-
-  // Remove formatação do CEP e CNPJ
-  const cepLimpo = cep.replace(/\D/g, "");
-  const cnpjLimpo = cnpj.replace(/\D/g, "");
-
-  const dados = {
-    nome,
-    email,
-    senha,
-    cep: cepLimpo,
-    numero,
-    endereco,
-    cnpj: cnpjLimpo,
-    area,
-    biografia: "",
-    dtCadastro: new Date().toISOString().split('T')[0]
-  };
-
-  try {
-    const response = await fetch("http://localhost:8080/empresas", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(dados),
-    });
-    
-    if (response.status === 201) {
-      setMensagem("Cadastro realizado com sucesso!");
-      // Aguarda 2 segundos antes de redirecionar
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
-      return;
-    }
-
-    // Se não for 201, tenta ler o corpo da resposta para erro
-    const responseData = await response.text();
-    let errorMessage = "Erro ao cadastrar empresa.";
+  };  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMensagem(""); // Limpa mensagens existentes
     
     try {
-      const errorJson = JSON.parse(responseData);
-      errorMessage = errorJson.message || errorMessage;
-    } catch (e) {
-      // Se não conseguir parsear como JSON, usa o texto da resposta
-      errorMessage = responseData || errorMessage;
-    }
+      // Primeiro valida o formulário
+      const isValid = await validarCadastroEmpresa();
+      if (!isValid) {
+        return; // Se não for válido, retorna mantendo a mensagem de validação
+      }
 
-    throw new Error(errorMessage);
-  } catch (error) {
-    console.error("Erro ao cadastrar empresa:", error);
-    setMensagem(error.message || "Erro ao cadastrar empresa. Tente novamente.");
-  }
-};
+      // Valida o CNPJ antes de enviar
+      const cnpjValido = await validarCNPJ(cnpj);
+      if (!cnpjValido) {
+        return; // Retorna se o CNPJ for inválido
+      }
+
+      // Remove formatação do CEP e CNPJ
+      const cepLimpo = cep.replace(/\D/g, "");
+      const cnpjLimpo = cnpj.replace(/\D/g, "");
+
+      const dados = {
+        nome,
+        email,
+        senha,
+        cep: cepLimpo,
+        numero,
+        endereco,
+        cnpj: cnpjLimpo,
+        area,
+        biografia: "",
+        dtCadastro: new Date().toISOString().split('T')[0]
+      };
+
+      const response = await fetch("http://localhost:8080/empresas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados),
+      });
+      
+      const responseData = await response.text();
+      let responseJson;
+      
+      try {
+        responseJson = JSON.parse(responseData);
+      } catch (e) {
+        // Se não for JSON válido, usa o texto como está
+        responseJson = { message: responseData };
+      }
+
+      if (response.status === 201) {
+        setMensagem("Cadastro realizado com sucesso!");
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+        return;
+      }
+
+      // Tratamento específico para diferentes tipos de erro
+      if (responseJson.message) {
+        if (responseJson.message.includes("já existe")) {
+          setMensagem(responseJson.message);
+        } else if (responseJson.message.includes("Falha em cadastrar empresa")) {
+          const match = responseJson.message.match(/Falha em cadastrar empresa: (.*)/);
+          setMensagem(match ? match[1] : responseJson.message);
+        } else {
+          setMensagem(responseJson.message);
+        }
+      } else {
+        setMensagem("Erro ao cadastrar empresa. Por favor, verifique os dados e tente novamente.");
+      }
+    } catch (error) {
+      console.error("Erro ao cadastrar empresa:", error);
+      setMensagem("Erro de conexão. Por favor, tente novamente mais tarde.");
+    }
+  };
 
   return (
     <Container

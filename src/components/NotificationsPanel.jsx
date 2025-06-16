@@ -68,12 +68,13 @@ const NotificationItem = ({ candidato, vaga, data, vagaId }) => {
             alignItems: 'center',
             gap: 0.5
           }}
-        >
-          {new Date(data).toLocaleDateString('pt-BR', {
+        >          {new Date(data).toLocaleString('pt-BR', {
             day: '2-digit',
             month: 'long',
+            year: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            hour12: false
           })}
           <ArrowForwardIcon sx={{ fontSize: 14, color: '#006916', ml: 1 }} />
         </Typography>
@@ -137,12 +138,10 @@ const NotificationsPanel = () => {
               });
             }
           }
-        }
-
-        // Ordenar por data mais recente
+        }        // Ordenar por data mais recente (invertendo a ordem para mais recentes primeiro)
         todasNotificacoes.sort((a, b) => 
-          new Date(b.dataCandidatura) - new Date(a.dataCandidatura)
-        );
+          new Date(a.dataCandidatura) - new Date(b.dataCandidatura)
+        ).reverse();
         
         setNotifications(todasNotificacoes);
       } catch (err) {
