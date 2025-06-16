@@ -167,6 +167,12 @@ export default function CardExperiencia() {
     setSnackbarOpen(false);
   };
 
+  // Função utilitária para formatar texto em lowercase
+  function formatarTexto(str) {
+    if (!str) return '';
+    return str.toLowerCase();
+  }
+
   return (
     <>
       <Card className="perfil-usuario-card" sx={{ borderRadius: 5, boxShadow: 4, background: '#fff', minHeight: 555, height: 555, position: 'relative', p: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', maxWidth: '95%', width: '100%', mx: 'auto' }}>
@@ -197,10 +203,10 @@ export default function CardExperiencia() {
               experiencias.map(exp => (
                 <Card key={exp.id} sx={{ background: '#f9f9f9', p: 2, borderRadius: 2, boxShadow: 1, position: 'relative', minHeight: 70, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <Typography variant="body1" sx={{ color: '#333', fontSize: 16, wordBreak: 'break-word' }}>
-                    {exp.cargo} na {exp.empresa}
+                    {formatarTexto(exp.cargo)} na {formatarTexto(exp.empresa)}
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#666', fontSize: 14, wordBreak: 'break-word' }}>
-                    {exp.dtInicio} - {exp.dtFim || 'Atual'}
+                    {formatarTexto(exp.dtInicio)} - {exp.dtFim ? formatarTexto(exp.dtFim) : 'atual'}
                   </Typography>
                   <Box sx={{ position: 'absolute', top: 8, right: 8, display: 'flex', gap: 1 }}>
                     <IconButton size="small" sx={{ color: '#006916', background: '#e5eee3', boxShadow: 1 }} onClick={() => handleEditClick(exp)}>
