@@ -147,21 +147,23 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
               disabled={loading}
             />
             <TextField
-              label="Início"
-              fullWidth
-              sx={{ mb: 2 }}
+              label="Data de Início"
+              type="date"
               value={dtInicio}
               onChange={e => setDtInicio(e.target.value)}
-              placeholder="Ex: Janeiro 2020"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              sx={{ mb: 2 }}
               disabled={loading}
             />
             <TextField
-              label="Fim"
-              fullWidth
-              sx={{ mb: 2 }}
+              label="Data de Término"
+              type="date"
               value={dtFim}
               onChange={e => setDtFim(e.target.value)}
-              placeholder="Ex: Atual ou Dezembro 2020"
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              sx={{ mb: 2 }}
               disabled={loading}
             />
             {/* Botões de Ação */}

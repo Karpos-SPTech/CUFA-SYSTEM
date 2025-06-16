@@ -157,21 +157,23 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
               disabled={loading}
             />
             <TextField
-              label="Início" // Label permanece "Início" para o usuário
-              fullWidth
-              sx={{ mb: 2 }}
-              value={dtInicio} // Estado é dtInicio
+              label="Data de Início"
+              type="date"
+              value={dtInicio}
               onChange={e => setDtInicio(e.target.value)}
-              placeholder="Ex: YYYY-MM-DD" // Sugestão de formato
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              sx={{ mb: 2 }}
               disabled={loading}
             />
             <TextField
-              label="Fim" // Label permanece "Fim" para o usuário
-              fullWidth
-              sx={{ mb: 2 }}
-              value={dtFim} // Estado é dtFim
+              label="Data de Término"
+              type="date"
+              value={dtFim}
               onChange={e => setDtFim(e.target.value)}
-              placeholder="Ex: YYYY-MM-DD ou deixe vazio para 'Atual'" // Sugestão de formato
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              sx={{ mb: 2 }}
               disabled={loading}
             />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
