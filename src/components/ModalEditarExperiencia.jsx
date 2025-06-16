@@ -4,10 +4,10 @@ import { Modal, Box, Typography, TextField, Button, CircularProgress, Snackbar, 
 export default function ModalEditarExperiencia({ open, onClose, experiencia, onEdit }) {
   const [cargo, setCargo] = useState('');
   const [empresa, setEmpresa] = useState('');
-  const [dtInicio, setDtInicio] = useState(''); // Renomeado para dtInicio
-  const [dtFim, setDtFim] = useState('');       // Renomeado para dtFim
+  const [dtInicio, setDtInicio] = useState('');
+  const [dtFim, setDtFim] = useState('');
 
-  const [loading, setLoading] = useState(false); // Estado de carregamento
+  const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -17,8 +17,8 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
     if (experiencia) {
       setCargo(experiencia.cargo || '');
       setEmpresa(experiencia.empresa || '');
-      setDtInicio(experiencia.dtInicio || ''); // Usa dtInicio da prop
-      setDtFim(experiencia.dtFim || '');       // Usa dtFim da prop
+      setDtInicio(experiencia.dtInicio || '');
+      setDtFim(experiencia.dtFim || '');
     }
   }, [experiencia, open]); // Dependências: re-executa se 'experiencia' ou 'open' mudar
 
@@ -29,6 +29,14 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
     // Validação básica dos campos
     if (!cargo || !empresa || !dtInicio) { // dtFim pode ser opcional
       setSnackbarMessage('Por favor, preencha Cargo, Empresa e Data de Início.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    // Validate date relationship
+    if (dtFim && new Date(dtFim) < new Date(dtInicio)) {
+      setSnackbarMessage('A data de término não pode ser anterior à data de início.');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       return;
@@ -51,8 +59,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
       cargo: cargo,
       empresa: empresa,
       dtInicio: dtInicio,
-      dtFim: dtFim, // Inclui dtFim (pode ser null ou string vazia se o usuário remover/não preencher)
-      // O fk_usuario não é enviado no body, conforme a regra estabelecida
+      dtFim: dtFim || null, // Envia null se dtFim estiver vazio
     };
 
     console.log("Enviando dados da experiência para PUT:", updatedExperienceData);
@@ -117,6 +124,8 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
     setSnackbarOpen(false);
   };
 
+  // Obtém a data de hoje no formato YYYY-MM-DD
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <>
@@ -147,6 +156,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
               value={cargo}
               onChange={e => setCargo(e.target.value)}
               disabled={loading}
+              required
             />
             <TextField
               label="Empresa"
@@ -155,6 +165,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
               value={empresa}
               onChange={e => setEmpresa(e.target.value)}
               disabled={loading}
+              required
             />
             <TextField
               label="Data de Início"
@@ -165,6 +176,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
               InputLabelProps={{ shrink: true }}
               sx={{ mb: 2 }}
               disabled={loading}
+              helperText="Selecione a data de início da experiência"
             />
             <TextField
               label="Data de Término"
@@ -173,8 +185,16 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
               onChange={e => setDtFim(e.target.value)}
               fullWidth
               InputLabelProps={{ shrink: true }}
+<<<<<<< HEAD
+=======
+              inputProps={{
+                max: today,
+                min: dtInicio || "1900-01-01"
+              }}
+>>>>>>> c976ea4c2b5119143dc991a33ca271f65eda21ab
               sx={{ mb: 2 }}
               disabled={loading}
+              helperText="Deixe em branco se for sua experiência atual"
             />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
               <Button onClick={onClose} color="green" disabled={loading}>Cancelar</Button>

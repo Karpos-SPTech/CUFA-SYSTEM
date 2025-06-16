@@ -11,6 +11,30 @@ const NotificationItem = ({ candidato, vaga, data, vagaId }) => {
     navigate(`/telaCandidatos?vagaId=${vagaId}`);
   };
 
+  const formatarData = (data) => {
+    const dataObj = new Date(data);
+    const agora = new Date();
+    const diff = agora - dataObj;
+    const segundos = Math.floor(diff / 1000);
+    const minutos = Math.floor(segundos / 60);
+    const horas = Math.floor(minutos / 60);
+    const dias = Math.floor(horas / 24);
+
+    if (segundos < 60) return "Agora mesmo";
+    if (minutos < 60) return `Há ${minutos} ${minutos === 1 ? "minuto" : "minutos"}`;
+    if (horas < 24) return `Há ${horas} ${horas === 1 ? "hora" : "horas"}`;
+    if (dias < 7) return `Há ${dias} ${dias === 1 ? "dia" : "dias"}`;
+    
+    return dataObj.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  };
+
   return (
     <ListItem
       onClick={handleClick}
@@ -69,12 +93,7 @@ const NotificationItem = ({ candidato, vaga, data, vagaId }) => {
             gap: 0.5
           }}
         >
-          {new Date(data).toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: 'long',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
+          {formatarData(data)}
           <ArrowForwardIcon sx={{ fontSize: 14, color: '#006916', ml: 1 }} />
         </Typography>
       </Box>
@@ -88,7 +107,6 @@ const NotificationsPanel = () => {
   const [error, setError] = useState(null);
   const [vagas, setVagas] = useState([]);
 
-  // Primeiro, buscar todas as vagas da empresa
   useEffect(() => {
     const fetchVagas = async () => {
       try {
@@ -111,7 +129,7 @@ const NotificationsPanel = () => {
         const data = await response.json();
         setVagas(data);
 
-        // Depois de buscar as vagas, buscar os candidatos de cada vaga
+        // Buscar os candidatos de cada vaga
         const todasNotificacoes = [];
         for (const vaga of data) {
           const candidatosResponse = await fetch(`http://localhost:8080/candidatura/${vaga.idPublicacao}`, {
@@ -127,21 +145,26 @@ const NotificationsPanel = () => {
             const candidatosData = await candidatosResponse.json();
             if (candidatosData.candidatos && Array.isArray(candidatosData.candidatos)) {
               candidatosData.candidatos.forEach(candidato => {
+                // Verifica se a data da candidatura existe e é válida
+                const dataCandidatura = candidato.dataCandidatura && !isNaN(new Date(candidato.dataCandidatura)) 
+                  ? candidato.dataCandidatura 
+                  : new Date().toISOString();
+
                 todasNotificacoes.push({
                   id: candidato.id || Math.random(),
                   candidato: candidato,
                   vaga: vaga.titulo,
                   vagaId: vaga.idPublicacao,
-                  dataCandidatura: candidato.dataCandidatura || new Date().toISOString()
+                  dataCandidatura: dataCandidatura
                 });
               });
             }
           }
         }
 
-        // Ordenar por data mais recente
+        // Ordenar notificações da mais recente para a mais antiga
         todasNotificacoes.sort((a, b) => 
-          new Date(b.dataCandidatura) - new Date(a.dataCandidatura)
+          new Date(b.dataCandidatura).getTime() - new Date(a.dataCandidatura).getTime()
         );
         
         setNotifications(todasNotificacoes);
@@ -156,45 +179,41 @@ const NotificationsPanel = () => {
     fetchVagas();
     // Atualiza a cada 30 segundos
     const interval = setInterval(fetchVagas, 30000);
+
     return () => clearInterval(interval);
   }, []);
 
   return (
     <Paper
+      elevation={3}
       sx={{
-        backgroundColor: '#fff',
-        borderRadius: '15px',
-        p: 0,
         width: '100%',
-        border: '1px solid #e0e0e0',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
-        overflow: 'hidden'
+        borderRadius: 2,
+        borderTop: '5px solid #006916',
+        overflow: 'hidden',
+        maxHeight: 'calc(100vh - 100px)',
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2.5,
-          borderBottom: '2px solid #f0f0f0',
-          backgroundColor: '#ffffff'
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <NotificationsIcon sx={{ color: '#006916', fontSize: 24 }} />
-          <Typography
-            variant="h6"
-            sx={{
-              color: '#006916',
-              fontSize: '18px',
-              fontWeight: 'bold',
-              fontFamily: "'Paytone One', sans-serif",
-            }}
-          >
-            Notificações
-          </Typography>
-        </Box>
+      <Box sx={{
+        p: 2,
+        borderBottom: '1px solid #eee',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <Typography
+          variant="h6"
+          sx={{
+            color: '#006916',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            fontFamily: "'Paytone One', sans-serif",
+          }}
+        >
+          Notificações
+        </Typography>
         {notifications.length > 0 && (
           <Box
             sx={{
@@ -220,31 +239,24 @@ const NotificationsPanel = () => {
       </Box>
 
       <List sx={{ 
-        p: 0, 
-        maxHeight: '400px', 
-        overflowY: 'auto',
-        '&::-webkit-scrollbar': {
-          width: '8px',
-        },
-        '&::-webkit-scrollbar-track': {
-          background: '#f1f1f1',
-        },
-        '&::-webkit-scrollbar-thumb': {
-          background: '#c1e3c5',
-          borderRadius: '4px',
-          '&:hover': {
-            background: '#92c49a'
-          }
-        }
+        overflow: 'auto',
+        flexGrow: 1,
+        p: 0,
       }}>
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-            <CircularProgress sx={{ color: '#006916' }} />
+          <Box sx={{ 
+            p: 4, 
+            textAlign: 'center' 
+          }}>
+            <CircularProgress size={30} sx={{ color: '#006916' }} />
           </Box>
         ) : error ? (
-          <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Box sx={{ 
+            p: 4, 
+            textAlign: 'center',
+            color: '#d32f2f'
+          }}>
             <Typography sx={{ 
-              color: '#d32f2f', 
               fontFamily: "'Paytone One', sans-serif",
               fontSize: '14px'
             }}>

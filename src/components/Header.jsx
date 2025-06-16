@@ -89,9 +89,7 @@ const Header = ({ hideNotifications }) => {
       .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
       .replace(/\.(\d{3})(\d)/, ".$1/$2")
       .replace(/(\d{4})(\d)/, "$1-$2");
-  };
-
-  const handleInputChange = (e) => {
+  };  const handleInputChange = (e) => {
     const { name, value } = e.target;
 
     if (name === "cnpj") {
@@ -105,18 +103,16 @@ const Header = ({ hideNotifications }) => {
       let cep = value.replace(/\D/g, "");
       if (cep.length > 8) return; // Limita a 8 dígitos
 
-      // Formata o CEP
-      if (cep.length > 5) {
-        const cepFormatado = `${cep.slice(0, 5)}-${cep.slice(5, 8)}`;
+      // Formata o CEP quando tiver 8 dígitos
+      if (cep.length === 8) {        // Formata o CEP e busca o endereço automaticamente
+        const cepFormatado = `${cep.slice(0, 5)}-${cep.slice(5)}`;
         setEmpresaData((prev) => ({
           ...prev,
           cep: cepFormatado,
         }));
-
-        // Se o CEP estiver completo (8 dígitos), busca o endereço
-        if (cep.length === 8) {
-          buscarEndereco(cep);
-        }
+        
+        // Busca o endereço quando o CEP estiver completo
+        buscarEndereco(cep);
       } else {
         setEmpresaData((prev) => ({
           ...prev,
@@ -130,30 +126,83 @@ const Header = ({ hideNotifications }) => {
       }));
     }
   };
-
-  const buscarEndereco = async (cep) => {
-    try {
-      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-      const data = await response.json();
-
-      if (!data.erro) {
-        setEmpresaData((prev) => ({
-          ...prev,
-          endereco: data.logradouro || prev.endereco,
-        }));
-      }
-    } catch (error) {
-      console.error("Erro ao buscar CEP:", error);
-    }
+  const validarCep = (cepValue) => {
+    if (!cepValue) return false;
+    cepValue = cepValue.replace(/\D/g, ""); // Remove não dígitos
+    return cepValue.length === 8; // Valida se tem exatamente 8 dígitos
   };
 
-  const handleSubmit = async (e) => {
+  const buscarEndereco = async (cepValue) => {
+    if (!validarCep(cepValue)) {
+      setSnackbar({
+        open: true,
+        message: "CEP inválido! Deve conter exatamente 8 dígitos.",
+        severity: "error"
+      });
+      return false;
+    }
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepValue}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        setSnackbar({
+          open: true,
+          message: "CEP não encontrado!",
+          severity: "error"
+        });
+        return false;
+      }
+
+      const enderecoFormatado = `${data.logradouro} - ${data.bairro}, ${data.localidade} - ${data.uf}`;
+      setEmpresaData((prev) => ({
+        ...prev,
+        endereco: enderecoFormatado,
+      }));
+      return true;
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+      setSnackbar({
+        open: true,
+        message: "Erro ao buscar o endereço. Tente novamente.",
+        severity: "error"
+      });
+      return false;
+    }
+  };  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const cepLimpo = empresaData.cep ? empresaData.cep.replace(/\D/g, "") : undefined;
+      
+      if (!cepLimpo) {
+        setSnackbar({
+          open: true,
+          message: "O CEP é obrigatório.",
+          severity: "error"
+        });
+        return;
+      }
+
+      if (!validarCep(cepLimpo)) {
+        setSnackbar({
+          open: true,
+          message: "CEP inválido! Deve conter exatamente 8 dígitos.",
+          severity: "error"
+        });
+        return;
+      }
+
+      // Valida se o CEP existe antes de submeter
+      const cepValido = await buscarEndereco(cepLimpo);
+      if (!cepValido) {
+        return;
+      }
+
       // Envia apenas os campos editáveis permitidos pelo PATCH
       const dataToSend = {
         nome: empresaData.nome,
-        cep: empresaData.cep ? removeMascara(empresaData.cep) : undefined,
+        cep: cepLimpo,
         endereco: empresaData.endereco,
         numero: empresaData.numero,
       };
