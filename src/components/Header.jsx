@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -15,12 +15,14 @@ import {
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
+import BusinessIcon from "@mui/icons-material/Business";
 import homeIcon from "../assets/home-icon.png";
 import searchIcon from "../assets/search-icon.png";
 import profilePic from "../assets/profile-icon.png";
 import logo from "../assets/cufaLogo.png";
 import Notifications from "./Notifications";
 import { formatCNPJ, removeMascara } from "../utils/formatters";
+import empresaImageManager from "../utils/empresaImageManager";
 
 const Header = ({ hideNotifications }) => {
   const navigate = useNavigate();
@@ -35,6 +37,7 @@ const Header = ({ hideNotifications }) => {
     endereco: "",
     numero: "",
   });
+  const [empresaProfileImg, setEmpresaProfileImg] = useState(null);
 
   const fetchEmpresaData = async () => {
     try {
@@ -198,6 +201,24 @@ const Header = ({ hideNotifications }) => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  useEffect(() => {
+    // Carrega a imagem de perfil da empresa do localStorage
+    setEmpresaProfileImg(empresaImageManager.getProfileImage());
+    // Listener para atualização automática
+    const removeListener = empresaImageManager.addListener((type, imageData) => {
+      if (type === 'profile') setEmpresaProfileImg(imageData);
+    });
+    // Listener do localStorage (caso a imagem seja alterada em outra aba)
+    const onStorage = (e) => {
+      if (e.key === 'empresaProfileImg') setEmpresaProfileImg(e.newValue);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => {
+      removeListener();
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
+
   return (
     <>
       <Box
@@ -346,38 +367,30 @@ const Header = ({ hideNotifications }) => {
             }}
           >
             <Avatar
-              src={profilePic}
-              alt="Perfil"
+              src={empresaProfileImg || undefined}
+              alt="Logo da empresa"
               onClick={toggleProfileMenu}
               sx={{
-                width: { xs: 32, sm: 40, md: 35 },
-                height: { xs: 32, sm: 40, md: 35 },
-                bgcolor: isProfileMenuOpen ? "#e9f1e7" : "transparent",
-                p: 0.5,
+                width: { xs: 48, sm: 56, md: 55 },
+                height: { xs: 48, sm: 56, md: 55 },
+                bgcolor: isProfileMenuOpen ? "#e9f1e7" : "#f0f0f0",
+                p: 0,
                 cursor: "pointer",
                 transition: "background-color 0.2s",
-                "&:hover": {
-                  bgcolor: isProfileMenuOpen ? "#e9f1e7" : "#f0f0f0",
-                },
-              }}
-            />
-            <Typography
-              onClick={toggleProfileMenu}
-              sx={{
-                fontSize: { xs: 10, sm: 12, md: 15 },
-                fontFamily: "'Paytone One', sans-serif",
-                color: "#006916",
-                fontWeight: "bold",
-                textDecoration: "none",
-                transition: "text-decoration 0.2s",
-                cursor: "pointer",
-                "&:hover": {
-                  textDecoration: "underline",
-                },
+                borderRadius: '50%',
+                boxShadow: 2,
+                border: '3px solid #fff',
+                objectFit: 'cover',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              Perfil
-            </Typography>
+              {!empresaProfileImg && (
+                <BusinessIcon sx={{ color: '#006916', fontSize: 36, mx: 'auto', my: 'auto' }} />
+              )}
+            </Avatar>
             {isProfileMenuOpen && (
               <Box
                 sx={{
@@ -438,7 +451,7 @@ const Header = ({ hideNotifications }) => {
                     openSettingsModal();
                   }}
                 >
-                  <SettingsIcon fontSize="small" /> Ajustes
+                  <SettingsIcon fontSize="small" /> Configurações
                 </Box>
                 <Box
                   sx={{
@@ -516,7 +529,7 @@ const Header = ({ hideNotifications }) => {
               fontFamily: "'Paytone One', sans-serif",
             }}
           >
-            Atualize seu Perfil
+            Configurações do Perfil
           </Typography>
           <Box
             component="form"
