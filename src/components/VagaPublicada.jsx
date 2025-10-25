@@ -31,7 +31,6 @@ const VagaPublicada = () => {
     titulo: "",
   });
 
-  // Paginação
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
