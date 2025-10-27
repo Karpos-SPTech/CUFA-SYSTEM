@@ -105,11 +105,11 @@ const MembroCard = () => {
 
       console.log("Fazendo request com:", {
         empresaId,
-        url: `http://localhost:8080/funcionarios/${empresaId}`,
+        url: `http://10.0.140.104/funcionarios/${empresaId}`,
       });
 
       const response = await fetch(
-        `http://localhost:8080/funcionarios/${empresaId}`,
+        `http://10.0.140.104/funcionarios/${empresaId}`,
         {
           method: "GET",
           credentials: "include", // Importante: inclui os cookies na requisição
@@ -227,7 +227,7 @@ const MembroCard = () => {
         fkEmpresa: parseInt(empresaId),
       };
 
-      const response = await fetch("http://localhost:8080/funcionarios", {
+      const response = await fetch("http://10.0.140.104/funcionarios", {
         method: "POST",
         credentials: "include", // Importante: inclui os cookies na requisição
         headers: {
@@ -270,7 +270,7 @@ const MembroCard = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`http://localhost:8080/funcionarios/${id}`, {
+      const response = await fetch(`http://10.0.140.104/funcionarios/${id}`, {
         method: "DELETE",
         credentials: "include",
         headers: {
