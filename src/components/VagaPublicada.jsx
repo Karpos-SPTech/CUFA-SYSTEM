@@ -85,7 +85,7 @@ const VagaPublicada = () => {
       const empresaId = localStorage.getItem("empresaId");
       if (!empresaId) throw new Error("ID da empresa não encontrado");
 
-      const response = await fetch("http://localhost:8080/publicacao", {
+      const response = await fetch("http://10.0.132.210/publicacao", {
         method: "GET",
         credentials: "include",
         headers: {
@@ -115,7 +115,7 @@ const VagaPublicada = () => {
   const handleCloseDeleteDialog = () => setDeleteDialog({ open: false, publicacaoId: null, titulo: '' });
   const handleDeletarPublicacao = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/publicacao/${deleteDialog.publicacaoId}`, {
+      const response = await fetch(`http://10.0.132.210/publicacao/${deleteDialog.publicacaoId}`, {
         method: "DELETE",
         credentials: "include",
         headers: {

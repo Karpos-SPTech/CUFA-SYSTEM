@@ -136,8 +136,8 @@ Frase atrativa:
       };
 
       const url = isEdit ?
-        `http://localhost:8080/publicacao/${publicacaoParaEditar.idPublicacao}` :
-        "http://localhost:8080/publicacao";
+        `http://10.0.132.210/publicacao/${publicacaoParaEditar.idPublicacao}` :
+        "http://10.0.132.210/publicacao";
 
       const response = await fetch(url, {
         method: isEdit ? "PUT" : "POST",

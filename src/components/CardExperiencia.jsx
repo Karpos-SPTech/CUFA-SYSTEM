@@ -33,7 +33,7 @@ export default function CardExperiencia() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/experiencias/${userId}`, {
+      const response = await fetch(`http://10.0.132.210/experiencias/${userId}`, {
         method: 'GET',
         credentials: "include",
         headers: {
@@ -133,7 +133,7 @@ export default function CardExperiencia() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/experiencias/${id}`, {
+      const response = await fetch(`http://10.0.132.210/experiencias/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${userToken}`

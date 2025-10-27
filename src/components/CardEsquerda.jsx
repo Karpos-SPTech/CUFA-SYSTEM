@@ -40,7 +40,7 @@ export default function CardEsquerda({
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+        const response = await fetch(`http://10.0.132.210/usuarios/${userId}`, {
           method: 'GET',
           credentials: "include",
           headers: {
