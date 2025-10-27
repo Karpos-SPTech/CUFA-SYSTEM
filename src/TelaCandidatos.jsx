@@ -152,4 +152,4 @@ const TelaCandidatos = () => {
   );
 };
 
-export default TelaCandidatos;
+export default TelaCandidatos; 
