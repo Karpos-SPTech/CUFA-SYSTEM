@@ -44,10 +44,11 @@ export default function Login() {
     const loginData = { email, senha };
 
     try {
-      let response = await fetch("http://localhost:8080/usuarios/login", {
+      let response = await fetch("http://10.0.140.104/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData)
+        body: JSON.stringify(loginData),
+        credentials: "include"
       });
 
       if (response.ok) {
@@ -63,7 +64,7 @@ export default function Login() {
       }
 
       // ... (restante do seu código para login de empresas/funcionários)
-      response = await fetch("http://localhost:8080/empresas/login", {
+      response = await fetch("http://10.0.140.104/empresas/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
@@ -79,23 +80,6 @@ export default function Login() {
         navigate("/telaEmpresa");
         return;
       }
-
-      response = await fetch("http://localhost:8080/funcionarios/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData)
-      });
-
-      if (response.ok) {
-        const funcionario = await response.json();
-        console.log("Funcionário logado com sucesso:", funcionario);
-        // Se quiser guardar o ID do funcionário
-        localStorage.setItem("funcionarioId", funcionario.id);
-        localStorage.setItem("funcionarioId", funcionario.token); // Exemplo para funcionário
-        navigate("/telaEmpresa");
-        return;
-      }
-
 
       setMensagem("Email ou senha incorretos.");
 

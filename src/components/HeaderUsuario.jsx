@@ -176,7 +176,7 @@ const Header = ({ hideNotifications }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+      const response = await fetch(`http://10.0.140.104/usuarios/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -294,7 +294,7 @@ const Header = ({ hideNotifications }) => {
     console.log("Dados do formulário para atualização (PUT):", filteredDataToSubmit);
 
     try {
-      const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+      const response = await fetch(`http://10.0.140.104/usuarios/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -336,9 +336,16 @@ const Header = ({ hideNotifications }) => {
 
   // Função para lidar com o logout
   const handleLogout = () => {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('token');
-    navigate('/');
+     try {
+      const response = fetch("http://10.0.140.104/usuarios/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+    } catch (err) {
+      console.error("Erro de rede ao tentar logout:", err);
+    }
+    navigate("/");
   };
 
   return (

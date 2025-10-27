@@ -48,7 +48,7 @@ const Header = ({ hideNotifications }) => {
       }
 
       const response = await fetch(
-        `http://localhost:8080/empresas/${empresaId}`,
+        `http://10.0.140.104/empresas/${empresaId}`,
         {
           method: "GET",
           credentials: "include",
@@ -209,7 +209,7 @@ const Header = ({ hideNotifications }) => {
       };
 
       const response = await fetch(
-        `http://localhost:8080/empresas/${empresaData.id}`,
+        `http://10.0.140.104/empresas/${empresaData.id}`,
         {
           method: "PATCH",
           credentials: "include",
@@ -250,6 +250,20 @@ const Header = ({ hideNotifications }) => {
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
   };
+
+  const handleLogout = () => {
+     try {
+      const response = fetch("http://10.0.140.104/empresas/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+    } catch (err) {
+      console.error("Erro de rede ao tentar logout:", err);
+    }
+    navigate("/");
+  };
+    
 
   useEffect(() => {
     // Carrega a imagem de perfil da empresa do localStorage
@@ -519,10 +533,7 @@ const Header = ({ hideNotifications }) => {
                       backgroundColor: "#f0f0f0",
                     },
                   }}
-                  onClick={() => {
-                    setIsProfileMenuOpen(false);
-                    navigate("/");
-                  }}
+                  onClick={handleLogout}
                 >
                   <LogoutIcon fontSize="small" /> Sair
                 </Box>

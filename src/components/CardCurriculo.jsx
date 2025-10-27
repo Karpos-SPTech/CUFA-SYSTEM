@@ -47,8 +47,9 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+      const response = await fetch(`http://10.0.140.104/usuarios/${userId}`, {
         method: "GET",
+        credentials: "include",
         headers: {
           "Authorization": `Bearer ${userToken}`
         }
@@ -104,7 +105,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     formData.append("file", file);
 
     try {
-      const response = await fetch(`http://localhost:8080/usuarios/${userId}/curriculo/upload`, {
+      const response = await fetch(`http://10.0.140.104/usuarios/${userId}/curriculo/upload`, {
         method: "POST",
         body: formData,
         headers: {
@@ -157,7 +158,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/usuarios/${userId}/curriculo/delete`, {
+      const response = await fetch(`http://10.0.140.104/usuarios/${userId}/curriculo/delete`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${userToken}`
