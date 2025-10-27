@@ -40,13 +40,10 @@ export default function CardSobre() {
       }
 
       try {
-        const response = await fetch(`http://10.0.140.104/usuarios/${userId}`, {
+        const response = await fetch(`http://localhost:8080/usuarios`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            credentials: "include",
-            'Authorization': `Bearer ${userToken}`
-          },
+          credentials: 'include',
+          headers: {'Content-Type': 'application/json'},
         });
 
         if (!response.ok) {
@@ -93,12 +90,10 @@ export default function CardSobre() {
     }
 
     try {
-      const response = await fetch(`http://10.0.140.104/usuarios/${userId}`, {
+      const response = await fetch(`http://localhost:8080/usuarios`, {
         method: 'PUT', // Usamos PUT para atualizar o recurso
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userToken}`
-        },
+        credentials: "include",
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ biografia: biografiaDraft }) // Enviamos apenas a biografia
       });
 

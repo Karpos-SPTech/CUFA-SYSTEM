@@ -66,12 +66,10 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
 
     try {
       // Faz a requisição PUT para o endpoint com o ID da experiência
-      const response = await fetch(`http://10.0.140.104/experiencias/${experiencia.id}`, {
+      const response = await fetch(`http://localhost:8080/experiencias`, {
         method: 'PUT', // Método HTTP PUT para atualização
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userToken}`
-        },
+        credentials: 'include',
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(updatedExperienceData),
       });
 

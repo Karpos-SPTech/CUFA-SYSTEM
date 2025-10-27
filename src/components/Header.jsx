@@ -42,13 +42,8 @@ const Header = ({ hideNotifications }) => {
 
   const fetchEmpresaData = async () => {
     try {
-      const empresaId = localStorage.getItem("empresaId");
-      if (!empresaId) {
-        throw new Error("ID da empresa não encontrado");
-      }
-
       const response = await fetch(
-        `http://10.0.140.104/empresas/${empresaId}`,
+        `http://localhost:8080/empresas`,
         {
           method: "GET",
           credentials: "include",
@@ -209,9 +204,9 @@ const Header = ({ hideNotifications }) => {
       };
 
       const response = await fetch(
-        `http://10.0.140.104/empresas/${empresaData.id}`,
+        `http://localhost:8080/empresas`,
         {
-          method: "PATCH",
+          method: "PUT",
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
@@ -250,20 +245,6 @@ const Header = ({ hideNotifications }) => {
   const handleSnackbarClose = () => {
     setSnackbar({ ...snackbar, open: false });
   };
-
-  const handleLogout = () => {
-     try {
-      const response = fetch("http://10.0.140.104/empresas/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-    } catch (err) {
-      console.error("Erro de rede ao tentar logout:", err);
-    }
-    navigate("/");
-  };
-    
 
   useEffect(() => {
     // Carrega a imagem de perfil da empresa do localStorage
@@ -533,7 +514,10 @@ const Header = ({ hideNotifications }) => {
                       backgroundColor: "#f0f0f0",
                     },
                   }}
-                  onClick={handleLogout}
+                  onClick={() => {
+                    setIsProfileMenuOpen(false);
+                    navigate("/");
+                  }}
                 >
                   <LogoutIcon fontSize="small" /> Sair
                 </Box>

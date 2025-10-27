@@ -40,13 +40,10 @@ export default function CardEsquerda({
       }
 
       try {
-        const response = await fetch(`http://10.0.140.104/usuarios/${userId}`, {
+        const response = await fetch(`http://localhost:8080/usuarios`, {
           method: 'GET',
-          credentials: "include",
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
+          credentials: 'include',
+          headers: {'Content-Type': 'application/json'},
         });
 
         if (!response.ok) {

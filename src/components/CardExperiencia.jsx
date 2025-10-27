@@ -33,12 +33,11 @@ export default function CardExperiencia() {
     }
 
     try {
-      const response = await fetch(`http://10.0.140.104/experiencias/${userId}`, {
+      const response = await fetch(`http://localhost:8080/experiencias`, {
         method: 'GET',
-        credentials: "include",
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json', // Este cabeçalho é para a REQUISIÇÃO, não para a RESPOSTA
-          'Authorization': `Bearer ${userToken}`
         },
       });
 
@@ -133,11 +132,9 @@ export default function CardExperiencia() {
     }
 
     try {
-      const response = await fetch(`http://10.0.140.104/experiencias/${id}`, {
+      const response = await fetch(`http://localhost:8080/experiencias/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${userToken}`
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -178,7 +175,7 @@ export default function CardExperiencia() {
 
   return (
     <>
-      <Card className="perfil-usuario-card" sx={{ borderRadius: 5, boxShadow: 4, background: '#fff', minHeight: 555, height: 575, position: 'relative', p: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', maxWidth: '95%', width: '100%', mx: 'auto' }}>
+      <Card className="perfil-usuario-card" sx={{ borderRadius: 5, boxShadow: 4, background: '#fff', minHeight: 555, height: 555, position: 'relative', p: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', maxWidth: '95%', width: '100%', mx: 'auto' }}>
         <CardContent sx={{ px: 4, pt: 3, pb: 2, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: experiencias.length || loading || error ? 'flex-start' : 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#006916', fontSize: 24 }}>Experiência</Typography>
