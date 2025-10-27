@@ -129,8 +129,4 @@ const TelaCandidatos = () => {
   );
 };
 
-<<<<<<< HEAD
-export default TelaCandidatos; 
-=======
 export default TelaCandidatos;
->>>>>>> 3ad9e4bb80cc48d991454c2b507fa602f133d741
