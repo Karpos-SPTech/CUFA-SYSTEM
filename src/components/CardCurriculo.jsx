@@ -49,6 +49,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     try {
       const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
         method: "GET",
+        credentials: "include",
         headers: {
           "Authorization": `Bearer ${userToken}`
         }

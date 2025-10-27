@@ -348,6 +348,32 @@ export default function CadastroEmpresa() {
             />
           </Grid>
 
+          <Grid item sx={{ width: '93%' }}>
+            <TextField
+              fullWidth
+              label="Endereço"
+              value={endereco}
+              onChange={(e) => setEndereco(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "50px",
+                  marginLeft: "10px",
+                  borderRadius: "25px",
+                  backgroundColor: "var(--white)",
+                  padding: "0 20px",
+                  color: "var(--dark-green)",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "var(--dark-green)",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                },
+              }}
+            />
+          </Grid>
+
+
           {/* CNPJ já foi movido para outra posição */}
 
           <Grid item xs={12} sm={6}>
@@ -399,32 +425,6 @@ export default function CadastroEmpresa() {
               }}
             />
           </Grid>
-
-          <Grid item sx={{ width: '93%' }}>
-            <TextField
-              fullWidth
-              label="Endereço"
-              value={endereco}
-              onChange={(e) => setEndereco(e.target.value)}
-              sx={{
-                "& .MuiInputBase-root": {
-                  height: "50px",
-                  marginLeft: "10px",
-                  borderRadius: "25px",
-                  backgroundColor: "var(--white)",
-                  padding: "0 20px",
-                  color: "var(--dark-green)",
-                },
-                "& .MuiInputLabel-root": {
-                  color: "var(--dark-green)",
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  border: "none",
-                },
-              }}
-            />
-          </Grid>
-
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth

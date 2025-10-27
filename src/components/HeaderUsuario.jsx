@@ -336,9 +336,16 @@ const Header = ({ hideNotifications }) => {
 
   // Função para lidar com o logout
   const handleLogout = () => {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('token');
-    navigate('/');
+     try {
+      const response = fetch("http://localhost:8080/usuarios/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+    } catch (err) {
+      console.error("Erro de rede ao tentar logout:", err);
+    }
+    navigate("/");
   };
 
   return (

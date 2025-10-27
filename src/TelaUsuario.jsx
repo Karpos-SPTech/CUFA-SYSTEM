@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import HeaderUsuario from './components/HeaderUsuario';
 import CardVagas from './CardVagas';
 import CardEsquerda from './components/CardEsquerda';
 import CardDireita from './components/CardDireita';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material'; // Importado Button para a paginação
 
 const TelaUsuario = () => {
   const [jobs, setJobs] = useState([]);
@@ -16,6 +16,11 @@ const TelaUsuario = () => {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [showApplied, setShowApplied] = useState(false);
 
+  // Estados de Paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const vagasPorPagina = 5; // Constante para o número de vagas por página
+
+  // Efeito para buscar todas as vagas
   useEffect(() => {
     const fetchJobs = async () => {
       setLoading(true);
@@ -47,7 +52,8 @@ const TelaUsuario = () => {
 
     fetchJobs();
   }, []);
-  
+
+  // Efeito para buscar vagas candidatas
   useEffect(() => {
     const fetchAppliedJobs = async () => {
       const userId = localStorage.getItem('userId');
@@ -58,6 +64,7 @@ const TelaUsuario = () => {
       try {
         const response = await fetch(`http://localhost:8080/candidatura/usuario/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
+          credentials: "include"
         });
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -72,6 +79,7 @@ const TelaUsuario = () => {
     fetchAppliedJobs();
   }, []);
 
+  // Handlers para salvar/exibir vagas
   const handleToggleSaveJob = (vagaToSave) => {
     setSavedJobs((prevSavedJobs) => {
       const isSaved = prevSavedJobs.some(
@@ -85,25 +93,34 @@ const TelaUsuario = () => {
 
   const handleToggleShowSaved = () => {
     setShowSaved(!showSaved);
-    if (!showSaved) setShowApplied(false);
+    if (!showSaved) {
+      setShowApplied(false);
+      setCurrentPage(1); // Resetar paginação ao trocar de tela
+    }
   };
 
   const handleToggleShowApplied = () => {
     setShowApplied(!showApplied);
-    if (!showApplied) setShowSaved(false);
+    if (!showApplied) {
+      setShowSaved(false);
+      setCurrentPage(1); // Resetar paginação ao trocar de tela
+    }
   };
 
+  // Handlers de filtro
   const handleContractFilterChange = (type, isChecked) => {
     setSelectedContractTypes((prevTypes) =>
       isChecked ? [...prevTypes, type] : prevTypes.filter((t) => t !== type)
     );
+    setCurrentPage(1); // Resetar paginação ao aplicar filtro
   };
 
   const handleDateFilterChange = (filterValue) => {
     setSelectedDateFilter(filterValue);
+    setCurrentPage(1); // Resetar paginação ao aplicar filtro
   };
 
-  // Reutilizável para qualquer array de vagas
+  // Lógica de filtragem (função reutilizável)
   const filtrarVagas = (vagas) => {
     return vagas.filter((vaga) => {
       const matchesContractType =
@@ -137,7 +154,68 @@ const TelaUsuario = () => {
     });
   };
 
-  const filteredJobs = filtrarVagas(jobs);
+  // Vagas a serem exibidas na tela (Todas/Salvas/Candidatadas) APÓS a aplicação dos filtros
+  const vagasParaExibir = useMemo(() => {
+    if (showSaved) {
+      return filtrarVagas(savedJobs);
+    }
+    if (showApplied) {
+      return filtrarVagas(appliedJobs);
+    }
+    return filtrarVagas(jobs);
+  }, [jobs, savedJobs, appliedJobs, showSaved, showApplied, selectedContractTypes, selectedDateFilter]);
+
+  // Lógica de Paginação
+  const totalPages = Math.ceil(vagasParaExibir.length / vagasPorPagina);
+  const indexUltimaVaga = currentPage * vagasPorPagina;
+  const indexPrimeiraVaga = indexUltimaVaga - vagasPorPagina;
+  const vagasAtuais = vagasParaExibir.slice(indexPrimeiraVaga, indexUltimaVaga);
+
+  const handlePageChange = (novaPagina) => {
+    setCurrentPage(novaPagina);
+    // Tenta rolar a tela para o topo da lista de vagas
+    const vagasContainer = document.getElementById('vagas-container');
+    if (vagasContainer) {
+        vagasContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // fallback
+    }
+  };
+
+  // Renderização da lista de vagas
+  const renderVagas = () => {
+    if (loading) {
+      return <Typography color="primary" fontWeight={600}>Carregando vagas...</Typography>;
+    }
+    if (error) {
+      return <Typography color="error" fontWeight={600}>Erro ao carregar vagas: {error.message}</Typography>;
+    }
+    
+    // Texto de "Nenhuma vaga"
+    if (vagasParaExibir.length === 0) {
+        const baseMessage = showSaved
+            ? 'Nenhuma vaga salva'
+            : showApplied
+            ? 'Nenhuma vaga candidatada'
+            : 'Nenhuma vaga disponível';
+        const filterMessage = (selectedContractTypes.length > 0 || selectedDateFilter)
+            ? ' com os filtros selecionados.'
+            : '.';
+        
+        return <Typography color="green" fontWeight={600}>{baseMessage}{filterMessage}</Typography>;
+    }
+
+    // Renderiza as vagas da página atual
+    return vagasAtuais.map((vaga) => (
+        <CardVagas
+            key={vaga.idPublicacao}
+            vaga={vaga}
+            onSave={handleToggleSaveJob}
+            saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)}
+        />
+    ));
+  };
+
 
   return (
     <div className="tela-usuario-main">
@@ -156,6 +234,7 @@ const TelaUsuario = () => {
         maxWidth: 1400,
         margin: '0 auto',
       }}>
+        {/* Coluna Esquerda: Filtros/Status */}
         <div style={{ flex: '0 1 350px', maxWidth: 500, minWidth: 300, marginTop: 2 }}>
           <CardEsquerda
             showSaved={showSaved}
@@ -167,15 +246,20 @@ const TelaUsuario = () => {
           />
         </div>
 
-        <div style={{
-          flex: '1 1 600px',
-          maxWidth: 700,
-          minWidth: 350,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 32
-        }}>
+        {/* Coluna Central: Listagem de Vagas e Paginação */}
+        <div 
+            id="vagas-container" // Adicionamos um ID para facilitar o scroll na mudança de página
+            style={{
+                flex: '1 1 600px',
+                maxWidth: 700,
+                minWidth: 350,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 32
+            }}
+        >
+          {/* Título da Seção */}
           <Box sx={{
             textAlign: 'center',
             display: 'flex',
@@ -199,47 +283,34 @@ const TelaUsuario = () => {
             </Typography>
           </Box>
 
-          {loading ? (
-            <Typography color="primary" fontWeight={600}>Carregando vagas...</Typography>
-          ) : error ? (
-            <Typography color="error" fontWeight={600}>Erro ao carregar vagas: {error.message}</Typography>
-          ) : showSaved ? (
-            filtrarVagas(savedJobs).length > 0 ? (
-              filtrarVagas(savedJobs).map((vaga) => (
-                <CardVagas key={vaga.idPublicacao} vaga={vaga} onSave={handleToggleSaveJob} saved />
-              ))
-            ) : (
-              <Typography color="green" fontWeight={600}>Nenhuma vaga salva com os filtros selecionados.</Typography>
-            )
-          ) : showApplied ? (
-            filtrarVagas(appliedJobs).length > 0 ? (
-              filtrarVagas(appliedJobs).map((vaga) => (
-                <CardVagas
-                  key={vaga.idPublicacao}
-                  vaga={vaga}
-                  onSave={handleToggleSaveJob}
-                  saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)}
-                />
-              ))
-            ) : (
-              <Typography color="green" fontWeight={600}>Nenhuma vaga candidatada com os filtros selecionados.</Typography>
-            )
-          ) : (
-            filteredJobs.length > 0 ? (
-              filteredJobs.map((vaga) => (
-                <CardVagas
-                  key={vaga.idPublicacao}
-                  vaga={vaga}
-                  onSave={handleToggleSaveJob}
-                  saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)}
-                />
-              ))
-            ) : (
-              <Typography color="green" fontWeight={600}>Nenhuma vaga disponível com os filtros selecionados.</Typography>
-            )
+          {/* Renderização das Vagas */}
+          {renderVagas()}
+          
+          {/* Paginação */}
+          {totalPages > 1 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 4, gap: 1 }}>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <Button
+                  key={i + 1}
+                  onClick={() => handlePageChange(i + 1)}
+                  sx={{
+                    backgroundColor: currentPage === i + 1 ? '#006916' : '#f5f5f5',
+                    color: currentPage === i + 1 ? '#fff' : '#006916',
+                    border: '1px solid #006916',
+                    borderRadius: '5px',
+                    fontWeight: 'bold',
+                    minWidth: 35,
+                    '&:hover': { backgroundColor: '#005713', color: '#fff' }
+                  }}
+                >
+                  {i + 1}
+                </Button>
+              ))}
+            </Box>
           )}
         </div>
 
+        {/* Coluna Direita: Filtros */}
         <div style={{ flex: '0 1 380px', maxWidth: 420, minWidth: 360 }}>
           <CardDireita
             onContractFilterChange={handleContractFilterChange}

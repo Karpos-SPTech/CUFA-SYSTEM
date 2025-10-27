@@ -283,7 +283,7 @@ Frase atrativa:
                 <MenuItem value="CLT">CLT</MenuItem>
                 <MenuItem value="PJ">PJ</MenuItem>
                 <MenuItem value="FreeLancer">FreeLancer</MenuItem>
-                <MenuItem value="Estágio">Estágio</MenuItem>
+                <MenuItem value="Jovem Aprendiz">Jovem Aprendiz</MenuItem>
               </Select>
             </FormControl>
             {/* Fim da alteração */}

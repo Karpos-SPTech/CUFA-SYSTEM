@@ -115,7 +115,7 @@ export default function EscolherPerfil() {
                   },
                 }}
               >
-                USUÁRIO
+                CANDIDATO
               </Button>
             </Link>
           </Card>

@@ -44,6 +44,7 @@ export default function CardSobre() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            credentials: "include",
             'Authorization': `Bearer ${userToken}`
           },
         });

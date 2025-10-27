@@ -251,6 +251,20 @@ const Header = ({ hideNotifications }) => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const handleLogout = () => {
+     try {
+      const response = fetch("http://localhost:8080/empresas/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+    } catch (err) {
+      console.error("Erro de rede ao tentar logout:", err);
+    }
+    navigate("/");
+  };
+    
+
   useEffect(() => {
     // Carrega a imagem de perfil da empresa do localStorage
     setEmpresaProfileImg(empresaImageManager.getProfileImage());
@@ -519,10 +533,7 @@ const Header = ({ hideNotifications }) => {
                       backgroundColor: "#f0f0f0",
                     },
                   }}
-                  onClick={() => {
-                    setIsProfileMenuOpen(false);
-                    navigate("/");
-                  }}
+                  onClick={handleLogout}
                 >
                   <LogoutIcon fontSize="small" /> Sair
                 </Box>
