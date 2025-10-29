@@ -50,7 +50,7 @@ export default function CadastroUsuario() {
 
     const dados = { nome, email, senha };
     try {
-      const response = await fetch("http://localhost:8080/usuarios", {
+      const response = await fetch("http://3.84.239.87/usuarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dados),

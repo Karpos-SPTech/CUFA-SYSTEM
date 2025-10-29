@@ -21,7 +21,7 @@ const TelaCandidatos = () => {
     const fetchCandidatos = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8080/candidaturas/${vagaId}`, {
+        const response = await fetch(`http://3.84.239.87/candidaturas/${vagaId}`, {
           method: 'GET',
           credentials: "include",
           headers: { "Content-Type": "application/json" },

@@ -144,7 +144,7 @@ export default function CardVagas({ vaga, onSave, saved }) {
         fkEmpresa: vaga.fkEmpresa,
       };
 
-      const response = await fetch("http://localhost:8080/candidaturas", {
+      const response = await fetch("http://3.84.239.87/candidaturas", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

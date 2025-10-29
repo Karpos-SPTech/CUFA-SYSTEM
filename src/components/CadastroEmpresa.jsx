@@ -172,7 +172,7 @@ export default function CadastroEmpresa() {
         dtCadastro: new Date().toISOString().split('T')[0]
       };
 
-      const response = await fetch("http://localhost:8080/empresas", {
+      const response = await fetch("http://3.84.239.87/empresas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dados),

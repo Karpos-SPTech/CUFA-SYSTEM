@@ -22,7 +22,7 @@ const TelaUsuario = () => {
       setError(null);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8080/publicacoes/all', {
+        const response = await fetch('http://3.84.239.87/publicacoes/all', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -56,7 +56,7 @@ const TelaUsuario = () => {
       if (!userId || !token) return;
 
       try {
-        const response = await fetch(`http://localhost:8080/candidaturas/usuario`, {
+        const response = await fetch(`http://3.84.239.87/candidaturas/usuario`, {
           credentials: 'include',
         });
 
