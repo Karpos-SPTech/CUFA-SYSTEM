@@ -16,7 +16,7 @@ const TelaEmpresa = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://3.84.239.87:8080/empresas", {
+        const response = await fetch("/empresas", {
           credentials: "include",
         });
 

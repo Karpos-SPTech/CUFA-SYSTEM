@@ -33,7 +33,7 @@ export default function CardExperiencia() {
     }
 
     try {
-      const response = await fetch(`http://3.84.239.87:8080/experiencias/${userId}`, {
+      const response = await fetch(`/experiencias/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json', // Este cabeçalho é para a REQUISIÇÃO, não para a RESPOSTA
@@ -131,7 +131,7 @@ export default function CardExperiencia() {
     }
 
     try {
-      const response = await fetch(`http://3.84.239.87:8080/experiencias/${id}`, {
+      const response = await fetch(`/experiencias/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });

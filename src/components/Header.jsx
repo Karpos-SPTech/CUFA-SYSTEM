@@ -39,7 +39,7 @@ const Header = ({ hideNotifications }) => {
   const fetchEmpresaData = async () => {
     try {
       const response = await fetch(
-        `http://3.84.239.87:8080/empresas/${empresaId}`,
+        `/empresas/${empresaId}`,
         {
           method: "GET",
           credentials: "include",
@@ -200,7 +200,7 @@ const Header = ({ hideNotifications }) => {
       };
 
       const response = await fetch(
-        `http://3.84.239.87:8080/empresas/${empresaData.id}`,
+        `/empresas/${empresaData.id}`,
         {
           method: "PUT",
           credentials: "include",

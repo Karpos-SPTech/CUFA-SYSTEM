@@ -136,13 +136,8 @@ Frase atrativa:
       };
 
       const url = isEdit ?
-<<<<<<< HEAD
-        `http://localhost:8080/publicacoes/${publicacaoParaEditar.idPublicacao}` :
-        "http://localhost:8080/publicacoes";
-=======
-        `http://3.84.239.87:8080/publicacao/${publicacaoParaEditar.idPublicacao}` :
-        "http://3.84.239.87:8080/publicacao";
->>>>>>> 2c5c914897779e5c56755dbbdb87e0712d838535
+        `/publicacao/${publicacaoParaEditar.idPublicacao}` :
+        "/publicacao";
 
       const response = await fetch(url, {
         method: isEdit ? "PUT" : "POST",

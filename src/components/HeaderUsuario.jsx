@@ -176,7 +176,7 @@ const Header = ({ hideNotifications }) => {
     }
 
     try {
-      const response = await fetch(`http://3.84.239.87:8080/usuarios/${userId}`, {
+      const response = await fetch(`/usuarios/${userId}`, {
         method: 'GET',
         credentials: "include",
         headers: {'Content-Type': 'application/json'},
@@ -292,7 +292,7 @@ const Header = ({ hideNotifications }) => {
     console.log("Dados do formulário para atualização (PUT):", filteredDataToSubmit);
 
     try {
-      const response = await fetch(`http://3.84.239.87:8080/usuarios/${userId}`, {
+      const response = await fetch(`/usuarios/${userId}`, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(filteredDataToSubmit),
@@ -332,7 +332,7 @@ const Header = ({ hideNotifications }) => {
   // Função para lidar com o logout
   const handleLogout = () => {
      try {
-      const response = fetch("http://3.84.239.87:8080/usuarios/logout", {
+      const response = fetch("/usuarios/logout", {
         method: "POST",
         credentials: "include",
       });

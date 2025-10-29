@@ -113,7 +113,7 @@ const NotificationsPanel = () => {
         const empresaId = localStorage.getItem("empresaId");
         if (!empresaId) throw new Error("ID da empresa não encontrado");
 
-        const response = await fetch("http://3.84.239.87:8080/publicacao", {
+        const response = await fetch("/publicacao", {
           method: "GET",
           credentials: "include",
           headers: {
@@ -132,7 +132,7 @@ const NotificationsPanel = () => {
         // Buscar os candidatos de cada vaga
         const todasNotificacoes = [];
         for (const vaga of data) {
-          const candidatosResponse = await fetch(`http://3.84.239.87:8080/candidatura/${vaga.idPublicacao}`, {
+          const candidatosResponse = await fetch(`/candidatura/${vaga.idPublicacao}`, {
             method: "GET",
             credentials: "include",
             headers: {
