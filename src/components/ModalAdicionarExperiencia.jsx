@@ -52,7 +52,7 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
     console.log("Enviando dados da experiência:", experienceData);
 
     try {
-      const response = await fetch(`http://localhost:8080/experiencias`, {
+      const response = await fetch(`http://3.84.239.87:8080/experiencias`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -167,12 +167,6 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
               value={dtInicio}
               onChange={e => setDtInicio(e.target.value)}
               fullWidth
-              required
-              InputLabelProps={{ shrink: true }}
-              inputProps={{
-                max: today,
-                min: "1900-01-01"
-              }}
               sx={{ mb: 2 }}
               disabled={loading}
               helperText="Selecione a data de início da experiência"
@@ -184,10 +178,6 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
               onChange={e => setDtFim(e.target.value)}
               fullWidth
               InputLabelProps={{ shrink: true }}
-              inputProps={{
-                max: today,
-                min: dtInicio || "1900-01-01"
-              }}
               sx={{ mb: 2 }}
               disabled={loading}
               helperText="Deixe em branco se for sua experiência atual"

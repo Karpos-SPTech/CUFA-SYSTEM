@@ -40,9 +40,8 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+        const response = await fetch(`http://3.84.239.87:8080/usuarios/${userId}`, {
           method: 'GET',
-          credentials: "include",
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${userToken}`
