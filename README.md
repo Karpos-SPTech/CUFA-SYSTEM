@@ -40,7 +40,7 @@ cufa-karpos-react
    ```
 
 4. **Open your browser**:
-   Navigate to `http://3.84.239.87:3000` to view the application.
+   Navigate to `http://localhost:3000` to view the application.
 
 ## Usage
 - The application allows users to register their companies by filling out the registration form.

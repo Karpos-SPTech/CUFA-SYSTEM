@@ -44,7 +44,7 @@ export default function Login() {
     const loginData = { email, senha };
 
     try {
-      let response = await fetch("http://3.84.239.87:8080/usuarios/login", {
+      let response = await fetch("http://localhost:8080/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
@@ -64,7 +64,7 @@ export default function Login() {
       }
 
       // ... (restante do seu código para login de empresas/funcionários)
-      response = await fetch("http://3.84.239.87:8080/empresas/login", {
+      response = await fetch("http://localhost:8080/empresas/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),

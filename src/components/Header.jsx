@@ -44,7 +44,7 @@ const Header = ({ hideNotifications }) => {
       }
 
       const response = await fetch(
-        `http://3.84.239.87:8080/empresas/${empresaId}`,
+        `http://localhost:8080/empresas/${empresaId}`,
         {
           method: "GET",
           credentials: "include",
@@ -205,7 +205,7 @@ const Header = ({ hideNotifications }) => {
       };
 
       const response = await fetch(
-        `http://3.84.239.87:8080/empresas/${empresaData.id}`,
+        `http://localhost:8080/empresas/${empresaData.id}`,
         {
           method: "PATCH",
           credentials: "include",

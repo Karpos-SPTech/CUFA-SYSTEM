@@ -36,7 +36,7 @@ const SobreEmpresa = () => {
       }
 
       const response = await fetch(
-        `http://3.84.239.87:8080/empresas/${empresaId}`,
+        `http://localhost:8080/empresas/${empresaId}`,
         {
           method: "GET",
           credentials: "include",
@@ -78,7 +78,7 @@ const SobreEmpresa = () => {
         throw new Error("A biografia não pode estar vazia");
       }
 
-      const response = await fetch("http://3.84.239.87:8080/empresas/biografia", {
+      const response = await fetch("http://localhost:8080/empresas/biografia", {
         method: "PATCH",
         credentials: "include",
         headers: {
