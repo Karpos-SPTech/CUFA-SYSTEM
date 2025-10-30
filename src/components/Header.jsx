@@ -48,7 +48,7 @@ const Header = ({ hideNotifications }) => {
       }
 
       const response = await fetch(
-        `http://10.0.140.104/empresas/${empresaId}`,
+        `http://localhost:8080/empresas/${empresaId}`,
         {
           method: "GET",
           credentials: "include",
@@ -209,7 +209,7 @@ const Header = ({ hideNotifications }) => {
       };
 
       const response = await fetch(
-        `http://10.0.140.104/empresas/${empresaData.id}`,
+        `http://localhost:8080/empresas/${empresaData.id}`,
         {
           method: "PATCH",
           credentials: "include",
@@ -253,7 +253,7 @@ const Header = ({ hideNotifications }) => {
 
   const handleLogout = () => {
      try {
-      const response = fetch("http://10.0.140.104/empresas/logout", {
+      const response = fetch("http://localhost:8080/empresas/logout", {
         method: "POST",
         credentials: "include",
       });

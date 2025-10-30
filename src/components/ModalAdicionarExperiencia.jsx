@@ -9,7 +9,7 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
 
   const [loading, setLoading] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState(''); 
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const handleSubmit = async (e) => {
@@ -52,8 +52,9 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
     console.log("Enviando dados da experiência:", experienceData);
 
     try {
-      const response = await fetch(`http://10.0.140.104/experiencias`, {
+      const response = await fetch(`http://localhost:8080/experiencias`, {
         method: 'POST',
+        credentials: "include",
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${userToken}`
@@ -90,7 +91,7 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
       setDtInicio('');
       setDtFim('');
 
-      onClose(); 
+      onClose();
 
       if (onExperienceAdded) {
         onExperienceAdded(responseData);

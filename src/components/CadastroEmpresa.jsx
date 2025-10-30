@@ -138,10 +138,10 @@ export default function CadastroEmpresa() {
       return false;
     }
     return true;
-  };  const handleSubmit = async (e) => {
+  }; const handleSubmit = async (e) => {
     e.preventDefault();
     setMensagem(""); // Limpa mensagens existentes
-    
+
     try {
       // Primeiro valida o formulário
       const isValid = await validarCadastroEmpresa();
@@ -172,15 +172,16 @@ export default function CadastroEmpresa() {
         dtCadastro: new Date().toISOString().split('T')[0]
       };
 
-      const response = await fetch("http://10.0.140.104/empresas", {
+      const response = await fetch("http://localhost:8080/empresas", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dados),
       });
-      
+
       const responseData = await response.text();
       let responseJson;
-      
+
       try {
         responseJson = JSON.parse(responseData);
       } catch (e) {
@@ -501,8 +502,8 @@ export default function CadastroEmpresa() {
           <Box mt={2}>
             <Alert
               severity={mensagem.includes("sucesso") ? "success" : "error"}
-              sx={{ 
-                fontWeight: "bold", 
+              sx={{
+                fontWeight: "bold",
                 color: mensagem.includes("sucesso") ? "var(--dark-green)" : "#d32f2f"
               }}
             >

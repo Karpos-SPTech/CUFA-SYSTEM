@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -6,12 +6,9 @@ import {
   Button,
   Stack,
   InputAdornment,
-  IconButton,
   Alert,
 } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const AtualizarSenhaPage = () => {
   const [novaSenha, setNovaSenha] = useState("");
@@ -32,12 +29,8 @@ const AtualizarSenhaPage = () => {
       setMensagem("As senhas não coincidem.");
       return false;
     }
-    setMensagem(""); // Limpa se estiver tudo certo
+    setMensagem("");
     return true;
-  };
-
-  const handleToggleSenha = () => {
-    setMostrarSenha((prev) => !prev);
   };
 
   const handleSubmit = (event) => {
@@ -45,7 +38,6 @@ const AtualizarSenhaPage = () => {
 
     if (!validarAtualizacaoSenha()) return;
 
-    // Enviar nova senha ao backend
     console.log("Nova senha definida com sucesso:", novaSenha);
     alert("Senha atualizada com sucesso!");
   };

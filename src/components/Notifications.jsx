@@ -26,7 +26,9 @@ const Notifications = () => {
     const fetchVagas = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://10.0.140.104/publicacao/all");
+        const response = await fetch("http://localhost:8080/publicacao/all", {
+          credentials: "include"
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

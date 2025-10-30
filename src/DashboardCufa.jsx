@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { Box, Grid } from "@mui/material";
-import SidebarDashboard from "./components/SidebarDashboard";
-import DashboardSummaryCard from "./components/DashboardSummaryCard";
-import DashboardPieChart from "./components/DashboardPieChart";
-import DashboardBarChart from "./components/DashboardBarChart";
+import SidebarDashboard from "./components/DashboardCufa-Components/SidebarDashboard";
+import DashboardSummaryCard from "./components/DashboardCufa-Components/DashboardSummaryCard";
+import DashboardPieChart from "./components/DashboardCufa-Components/DashboardPieChart";
+import DashboardBarChart from "./components/DashboardCufa-Components/DashboardBarChart";
 import PersonIcon from "@mui/icons-material/Person";
 import MessageIcon from "@mui/icons-material/Email";
-import HeaderDashboard from "./components/HeaderDashboard";
+import HeaderDashboard from "./components/DashboardCufa-Components/HeaderDashboard";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import BusinessIcon from "@mui/icons-material/Business";
 import DashboardUsuario from "./components/DashboardUsuario";
-import DashboardEmpresa from "./components/DashboardEmpresa";
+import DashboardEmpresa from "./components/DashboardCufa-Components/DashboardEmpresa";
 import TelaEmpresa from "./TelaEmpresa";
 
 export default function DashboardCufa({ initialView = "Painel" }) {
