@@ -45,7 +45,7 @@ const InfoCardEmpresa = () => {
         }
 
         const response = await fetch(
-          `http://localhost:8080/empresas/${empresaId}`,
+          `http://localhost:8080/api/empresas/${empresaId}`,
           {
             method: "GET",
             credentials: "include",

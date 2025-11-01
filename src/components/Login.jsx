@@ -44,7 +44,7 @@ export default function Login() {
     const loginData = { email, senha };
 
     try {
-      let response = await fetch("http://localhost:8080/usuarios/login", {
+      let response = await fetch("http://localhost:8080/api/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData)
@@ -63,7 +63,7 @@ export default function Login() {
       }
 
       // ... (restante do seu código para login de empresas/funcionários)
-      response = await fetch("http://localhost:8080/empresas/login", {
+      response = await fetch("http://localhost:8080/api/empresas/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
@@ -80,7 +80,7 @@ export default function Login() {
         return;
       }
 
-      response = await fetch("http://localhost:8080/funcionarios/login", {
+      response = await fetch("http://localhost:8080/api/funcionarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData)

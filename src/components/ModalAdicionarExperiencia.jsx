@@ -52,7 +52,7 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
     console.log("Enviando dados da experiência:", experienceData);
 
     try {
-      const response = await fetch(`http://localhost:8080/experiencias`, {
+      const response = await fetch(`http://localhost:8080/api/experiencias`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

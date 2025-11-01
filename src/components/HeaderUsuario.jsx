@@ -176,7 +176,7 @@ const Header = ({ hideNotifications }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -294,7 +294,7 @@ const Header = ({ hideNotifications }) => {
     console.log("Dados do formulário para atualização (PUT):", filteredDataToSubmit);
 
     try {
-      const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

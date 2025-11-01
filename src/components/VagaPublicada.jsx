@@ -40,7 +40,7 @@ const VagaPublicada = () => {
       if (!empresaId) throw new Error("ID da empresa não encontrado");
 
       const response = await fetch(
-        `http://localhost:8080/publicacoes?page=${page}&size=10`,
+        `http://localhost:8080/api/publicacoes?page=${page}&size=10`,
         {
           method: "GET",
           credentials: "include",
@@ -110,7 +110,7 @@ const VagaPublicada = () => {
   const handleDeletarPublicacao = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/publicacoes/${deleteDialog.publicacaoId}`,
+        `http://localhost:8080/api/publicacoes/${deleteDialog.publicacaoId}`,
         {
           method: "DELETE",
           credentials: "include",

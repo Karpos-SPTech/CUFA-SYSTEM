@@ -33,7 +33,7 @@ export default function CardExperiencia() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/experiencias/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/experiencias/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json', // Este cabeçalho é para a REQUISIÇÃO, não para a RESPOSTA
@@ -132,7 +132,7 @@ export default function CardExperiencia() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/experiencias/${id}`, {
+      const response = await fetch(`http://localhost:8080/api/experiencias/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${userToken}`

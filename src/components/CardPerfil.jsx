@@ -40,7 +40,7 @@ export default function CardPerfil({ profileImg, hover, onMouseEnter, onMouseLea
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/usuarios/${userId}`, {
+        const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

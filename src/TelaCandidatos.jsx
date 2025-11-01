@@ -20,7 +20,7 @@ const TelaCandidatos = () => {
     const fetchCandidatos = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/candidaturas/${vagaId}?page=${page}&size=${size}`,
+          `http://localhost:8080/api/candidaturas/${vagaId}?page=${page}&size=${size}`,
           {
             method: 'GET',
             credentials: 'include',
