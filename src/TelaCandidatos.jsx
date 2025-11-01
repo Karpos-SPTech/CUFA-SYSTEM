@@ -20,12 +20,20 @@ const TelaCandidatos = () => {
 
     const fetchCandidatos = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://3.84.239.87/candidaturas/${vagaId}`, {
-          method: 'GET',
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
+        const response = await fetch(
+          `http://localhost:8080/api/candidaturas/${vagaId}?page=${page}&size=${size}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Erro ao buscar dados da API');
+        }
 
         if (!response.ok) throw new Error('Erro ao buscar dados da API');
         const data = await response.json();

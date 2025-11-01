@@ -40,7 +40,7 @@ export default function CardSobre() {
       }
 
       try {
-        const response = await fetch(`http://3.84.239.87/usuarios`, {
+        const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export default function CardSobre() {
     }
 
     try {
-      const response = await fetch(`http://3.84.239.87/usuarios`, {
+      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
         method: 'PUT', // Usamos PUT para atualizar o recurso
         credentials: "include",
         headers: {'Content-Type': 'application/json'},

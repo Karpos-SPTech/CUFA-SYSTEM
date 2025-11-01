@@ -20,7 +20,7 @@ const EstatisticasCandidatos = () => {
         if (!empresaId) throw new Error("ID da empresa não encontrado");
 
         // Primeiro, buscar todas as vagas da empresa
-        const response = await fetch("http://3.84.239.87/publicacoes", {
+        const response = await fetch("http://localhost:8080/api/publicacoes", {
           method: "GET",
           credentials: "include",
           headers: {
@@ -40,7 +40,7 @@ const EstatisticasCandidatos = () => {
         
         let todosCandidatos = [];
         for (const vaga of vagas) {
-          const candidatosResponse = await fetch(`http://3.84.239.87/candidaturas/${vaga.idPublicacao}`, {
+          const candidatosResponse = await fetch(`http://localhost:8080/api/candidaturas/${vaga.idPublicacao}`, {
             method: "GET",
             credentials: "include",
             headers: {

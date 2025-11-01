@@ -85,14 +85,17 @@ const VagaPublicada = () => {
       const empresaId = localStorage.getItem("empresaId");
       if (!empresaId) throw new Error("ID da empresa não encontrado");
 
-      const response = await fetch("http://3.84.239.87/publicacoes", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/publicacoes?page=${page}&size=10`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) throw new Error(`Erro ao buscar publicações: ${response.status}`);
 
@@ -115,14 +118,21 @@ const VagaPublicada = () => {
   const handleCloseDeleteDialog = () => setDeleteDialog({ open: false, publicacaoId: null, titulo: '' });
   const handleDeletarPublicacao = async () => {
     try {
-      const response = await fetch(`http://3.84.239.87/publicacoes/${deleteDialog.publicacaoId}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/publicacoes/${deleteDialog.publicacaoId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erro ao deletar publicação: ${response.status}`);
+      }
 
       if (!response.ok) throw new Error(`Erro ao deletar publicação: ${response.status}`);
       fetchPublicacao();

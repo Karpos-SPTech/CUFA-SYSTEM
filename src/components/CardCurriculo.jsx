@@ -47,7 +47,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     }
 
     try {
-      const response = await fetch(`http://3.84.239.87/usuarios`, {
+      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
         method: "GET",
         credentials: 'include'
       });
@@ -102,7 +102,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     formData.append("file", file);
 
     try {
-      const response = await fetch(`http://3.84.239.87/curriculos/upload`, {
+      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}/curriculo/upload`, {
         method: "POST",
         body: formData,
         credentials: 'include'
@@ -152,7 +152,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     }
 
     try {
-      const response = await fetch(`http://3.84.239.87/curriculos/delete`, {
+      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}/curriculo/delete`, {
         method: "DELETE",
         credentials: 'include'
       });

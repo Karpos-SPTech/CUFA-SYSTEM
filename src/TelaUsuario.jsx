@@ -22,7 +22,7 @@ const TelaUsuario = () => {
       setError(null);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://3.84.239.87/publicacoes/all', {
+        const response = await fetch('http://localhost:8080/api/publicacoes/all', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

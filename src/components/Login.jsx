@@ -44,7 +44,7 @@ export default function Login() {
     const loginData = { email, senha };
 
     try {
-      let response = await fetch("http://3.84.239.87/usuarios/login", {
+      let response = await fetch("http://localhost:8080/api/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
@@ -64,7 +64,7 @@ export default function Login() {
       }
 
       // ... (restante do seu código para login de empresas/funcionários)
-      response = await fetch("/empresas/login", {
+      response = await fetch("http://localhost:8080/api/empresas/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
@@ -80,6 +80,23 @@ export default function Login() {
         navigate("/telaEmpresa");
         return;
       }
+
+      response = await fetch("http://localhost:8080/api/funcionarios/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData)
+      });
+
+      if (response.ok) {
+        const funcionario = await response.json();
+        console.log("Funcionário logado com sucesso:", funcionario);
+        // Se quiser guardar o ID do funcionário
+        localStorage.setItem("funcionarioId", funcionario.id);
+        localStorage.setItem("funcionarioId", funcionario.token); // Exemplo para funcionário
+        navigate("/telaEmpresa");
+        return;
+      }
+
 
       setMensagem("Email ou senha incorretos.");
 

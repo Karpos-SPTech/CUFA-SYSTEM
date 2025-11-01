@@ -26,11 +26,7 @@ const Notifications = () => {
     const fetchVagas = async () => {
       setLoading(true);
       try {
-<<<<<<< HEAD
-        const response = await fetch("http://3.84.239.87/publicacoes/all");
-=======
-        const response = await fetch("/publicacao/all");
->>>>>>> 67060ced117b7b9c1b879f81792cd365544718e5
+        const response = await fetch("http://localhost:8080/api/publicacoes/all");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
