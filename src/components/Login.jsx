@@ -64,7 +64,7 @@ export default function Login() {
       }
 
       // ... (restante do seu código para login de empresas/funcionários)
-      response = await fetch("http://3.84.239.87/empresas/login", {
+      response = await fetch("/empresas/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),

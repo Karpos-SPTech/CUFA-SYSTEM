@@ -40,7 +40,11 @@ const InfoCardEmpresa = () => {
     const fetchEmpresaData = async () => {
       try {
         const response = await fetch(
+<<<<<<< HEAD
           `http://3.84.239.87/empresas`,
+=======
+          `/empresas/${empresaId}`,
+>>>>>>> 67060ced117b7b9c1b879f81792cd365544718e5
           {
             method: "GET",
             credentials: "include",

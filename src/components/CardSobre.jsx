@@ -42,8 +42,10 @@ export default function CardSobre() {
       try {
         const response = await fetch(`http://3.84.239.87/usuarios`, {
           method: 'GET',
-          credentials: 'include',
-          headers: {'Content-Type': 'application/json'},
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userToken}`
+          },
         });
 
         if (!response.ok) {

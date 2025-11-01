@@ -66,7 +66,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
 
     try {
       // Faz a requisição PUT para o endpoint com o ID da experiência
-      const response = await fetch(`http://3.84.239.87/experiencias`, {
+      const response = await fetch(`/experiencias/${experiencia.id}`, {
         method: 'PUT', // Método HTTP PUT para atualização
         credentials: 'include',
         headers: {'Content-Type': 'application/json'},
@@ -171,12 +171,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
               value={dtInicio}
               onChange={e => setDtInicio(e.target.value)}
               fullWidth
-              required
               InputLabelProps={{ shrink: true }}
-              inputProps={{
-                max: today,
-                min: "1900-01-01"
-              }}
               sx={{ mb: 2 }}
               disabled={loading}
               helperText="Selecione a data de início da experiência"

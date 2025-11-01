@@ -89,7 +89,7 @@ export default function CardVagas({ vaga, onSave, saved }) {
       }
 
       try {
-        const response = await fetch(`http://localhost/candidatura/verificar/${vaga.idPublicacao}`, {
+        const response = await fetch(`/candidatura/verificar/${userId}/${vaga.idPublicacao}`, {
           method: "GET",
           credentials: "include",
           headers: {

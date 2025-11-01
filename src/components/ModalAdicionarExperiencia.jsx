@@ -165,12 +165,6 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
               value={dtInicio}
               onChange={e => setDtInicio(e.target.value)}
               fullWidth
-              required
-              InputLabelProps={{ shrink: true }}
-              inputProps={{
-                max: today,
-                min: "1900-01-01"
-              }}
               sx={{ mb: 2 }}
               disabled={loading}
               helperText="Selecione a data de início da experiência"
@@ -182,10 +176,6 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
               onChange={e => setDtFim(e.target.value)}
               fullWidth
               InputLabelProps={{ shrink: true }}
-              inputProps={{
-                max: today,
-                min: dtInicio || "1900-01-01"
-              }}
               sx={{ mb: 2 }}
               disabled={loading}
               helperText="Deixe em branco se for sua experiência atual"

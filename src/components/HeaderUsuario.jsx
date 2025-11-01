@@ -176,7 +176,7 @@ const Header = ({ hideNotifications }) => {
     }
 
     try {
-      const response = await fetch(`http://3.84.239.87/usuarios`, {
+      const response = await fetch(`/usuarios/${userId}`, {
         method: 'GET',
         credentials: "include",
         headers: {'Content-Type': 'application/json'},
@@ -292,7 +292,7 @@ const Header = ({ hideNotifications }) => {
     console.log("Dados do formulário para atualização (PUT):", filteredDataToSubmit);
 
     try {
-      const response = await fetch(`http://3.84.239.87/usuarios`, {
+      const response = await fetch(`/usuarios/${userId}`, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(filteredDataToSubmit),
@@ -331,9 +331,16 @@ const Header = ({ hideNotifications }) => {
 
   // Função para lidar com o logout
   const handleLogout = () => {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('token');
-    navigate('/');
+     try {
+      const response = fetch("/usuarios/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+    } catch (err) {
+      console.error("Erro de rede ao tentar logout:", err);
+    }
+    navigate("/");
   };
 
   return (

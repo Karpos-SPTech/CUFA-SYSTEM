@@ -35,7 +35,6 @@ export default function CardExperiencia() {
     try {
       const response = await fetch(`http://3.84.239.87/experiencias`, {
         method: 'GET',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json', // Este cabeçalho é para a REQUISIÇÃO, não para a RESPOSTA
         },

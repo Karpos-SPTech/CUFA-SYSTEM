@@ -31,7 +31,7 @@ const SobreEmpresa = () => {
   const fetchBiografia = async () => {
     try {
       const response = await fetch(
-        `http://3.84.239.87/empresas`,
+        `/empresas/${empresaId}`,
         {
           method: "GET",
           credentials: "include",
