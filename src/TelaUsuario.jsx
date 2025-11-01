@@ -56,8 +56,8 @@ const TelaUsuario = () => {
       if (!userId || !token) return;
 
       try {
-        const response = await fetch(`http://localhost:8080/candidatura/usuario/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await fetch(`http://3.84.239.87/candidaturas/usuario`, {
+          credentials: 'include',
         });
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

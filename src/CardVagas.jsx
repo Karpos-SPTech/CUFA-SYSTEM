@@ -91,9 +91,9 @@ export default function CardVagas({ vaga, onSave, saved }) {
       try {
         const response = await fetch(`http://localhost:8080/api/candidaturas/verificar/${userId}/${vaga.idPublicacao}`, {
           method: "GET",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -148,7 +148,6 @@ export default function CardVagas({ vaga, onSave, saved }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(candidaturaData),
       });

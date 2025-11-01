@@ -30,11 +30,6 @@ const SobreEmpresa = () => {
 
   const fetchBiografia = async () => {
     try {
-      const empresaId = localStorage.getItem("empresaId");
-      if (!empresaId) {
-        throw new Error("ID da empresa não encontrado");
-      }
-
       const response = await fetch(
         `http://localhost:8080/api/empresas/${empresaId}`,
         {

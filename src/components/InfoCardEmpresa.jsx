@@ -39,13 +39,9 @@ const InfoCardEmpresa = () => {
   useEffect(() => {
     const fetchEmpresaData = async () => {
       try {
-        const empresaId = localStorage.getItem("empresaId");
-        if (!empresaId) {
-          throw new Error("ID da empresa não encontrado");
-        }
-
         const response = await fetch(
           `http://localhost:8080/api/empresas/${empresaId}`,
+          `http://3.84.239.87/empresas`,
           {
             method: "GET",
             credentials: "include",

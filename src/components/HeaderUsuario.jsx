@@ -178,10 +178,8 @@ const Header = ({ hideNotifications }) => {
     try {
       const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userToken}`
-        },
+        credentials: "include",
+        headers: {'Content-Type': 'application/json'},
       });
 
       if (!response.ok) {
@@ -296,10 +294,7 @@ const Header = ({ hideNotifications }) => {
     try {
       const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userToken}`
-        },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(filteredDataToSubmit),
       });
 
@@ -336,9 +331,16 @@ const Header = ({ hideNotifications }) => {
 
   // Função para lidar com o logout
   const handleLogout = () => {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('token');
-    navigate('/');
+     try {
+      const response = fetch("/usuarios/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+    } catch (err) {
+      console.error("Erro de rede ao tentar logout:", err);
+    }
+    navigate("/");
   };
 
   return (

@@ -49,9 +49,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     try {
       const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
         method: "GET",
-        headers: {
-          "Authorization": `Bearer ${userToken}`
-        }
+        credentials: 'include'
       });
 
       if (!response.ok) {
@@ -107,10 +105,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
       const response = await fetch(`http://localhost:8080/api/usuarios/${userId}/curriculo/upload`, {
         method: "POST",
         body: formData,
-        headers: {
-          "Authorization": `Bearer ${userToken}`
-          // Content-Type para FormData é automaticamente definido pelo navegador
-        }
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -159,9 +154,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     try {
       const response = await fetch(`http://localhost:8080/api/usuarios/${userId}/curriculo/delete`, {
         method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${userToken}`
-        }
+        credentials: 'include'
       });
 
       if (response.ok) {
