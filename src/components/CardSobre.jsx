@@ -40,11 +40,11 @@ export default function CardSobre() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
+        const response = await fetch(`http://localhost:8080/api/usuarios/`, {
           method: 'GET',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userToken}`
           },
         });
 
@@ -92,11 +92,11 @@ export default function CardSobre() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
-        method: 'PUT', // Usamos PUT para atualizar o recurso
+      const response = await fetch(`http://localhost:8080/api/usuarios/`, {
+        method: 'PUT', 
         credentials: "include",
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ biografia: biografiaDraft }) // Enviamos apenas a biografia
+        body: JSON.stringify({ biografia: biografiaDraft })
       });
 
       if (!response.ok) {

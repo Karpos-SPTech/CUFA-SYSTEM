@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, Typography, Avatar, Box, Divider, Stack, Button, CircularProgress } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  Box,
+  Divider,
+  Stack,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import SendIcon from '@mui/icons-material/Send'; // Outra opção de ícone para "candidatado"
+import SendIcon from "@mui/icons-material/Send"; // Outra opção de ícone para "candidatado"
 
 export default function CardEsquerda({
   showSaved,
@@ -19,9 +29,9 @@ export default function CardEsquerda({
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('profileImg');
+    const saved = localStorage.getItem("profileImg");
     if (saved) setProfileImg(saved);
-    const cover = localStorage.getItem('coverImg');
+    const cover = localStorage.getItem("coverImg");
     if (cover) setCoverImg(cover);
   }, []);
 
@@ -30,25 +40,37 @@ export default function CardEsquerda({
       setLoading(true);
       setError(null);
 
-      const userId = localStorage.getItem('userId');
-      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
 
       if (!userId || !token) {
-        setError(new Error("ID do usuário ou token não encontrado. Por favor, faça login."));
+        setError(
+          new Error(
+            "ID do usuário ou token não encontrado. Por favor, faça login."
+          )
+        );
         setLoading(false);
         return;
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {'Content-Type': 'application/json'},
-        });
+        const response = await fetch(
+          `http://localhost:8080/api/usuarios/${userId}`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
 
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+        }
+
+        const text = await response.text();
+        if (!text) {
+          throw new Error("Resposta vazia do servidor.");
         }
 
         const data = await response.json();
@@ -66,26 +88,56 @@ export default function CardEsquerda({
 
   if (loading) {
     return (
-      <Box sx={{ maxWidth: 350, display: 'flex', justifyContent: 'center', alignItems: 'center', height: '300px' }}>
+      <Box
+        sx={{
+          maxWidth: 350,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "300px",
+        }}
+      >
         <CircularProgress color="success" />
-        <Typography sx={{ ml: 2, color: '#006916' }}>Carregando perfil...</Typography>
+        <Typography sx={{ ml: 2, color: "#006916" }}>
+          Carregando perfil...
+        </Typography>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box sx={{ maxWidth: 350, p: 2, border: '1px solid red', borderRadius: 3, textAlign: 'center' }}>
+      <Box
+        sx={{
+          maxWidth: 350,
+          p: 2,
+          border: "1px solid red",
+          borderRadius: 3,
+          textAlign: "center",
+        }}
+      >
         <Typography color="error">Erro: {error.message}</Typography>
-        <Typography variant="body2" color="text.secondary">Não foi possível carregar os dados do perfil.</Typography>
+        <Typography variant="body2" color="text.secondary">
+          Não foi possível carregar os dados do perfil.
+        </Typography>
       </Box>
     );
   }
 
   if (!userData) {
     return (
-      <Box sx={{ maxWidth: 350, p: 2, border: '1px solid gray', borderRadius: 3, textAlign: 'center' }}>
-        <Typography color="text.secondary">Dados do perfil não disponíveis.</Typography>
+      <Box
+        sx={{
+          maxWidth: 350,
+          p: 2,
+          border: "1px solid gray",
+          borderRadius: 3,
+          textAlign: "center",
+        }}
+      >
+        <Typography color="text.secondary">
+          Dados do perfil não disponíveis.
+        </Typography>
       </Box>
     );
   }
@@ -99,12 +151,24 @@ export default function CardEsquerda({
           borderRadius: 3,
           boxShadow: 3,
           overflow: "visible",
-          background: '#fff',
-          position: 'relative',
+          background: "#fff",
+          position: "relative",
         }}
       >
         {/* Capa de perfil */}
-        <Box sx={{ width: '100%', height: 120, position: 'relative', background: coverImg ? `url(${coverImg}) center/cover no-repeat` : "linear-gradient(180deg, #4CAF50 0%, #fff 80%)", borderTopLeftRadius: 12, borderTopRightRadius: 12, overflow: 'hidden' }} />
+        <Box
+          sx={{
+            width: "100%",
+            height: 120,
+            position: "relative",
+            background: coverImg
+              ? `url(${coverImg}) center/cover no-repeat`
+              : "linear-gradient(180deg, #4CAF50 0%, #fff 80%)",
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            overflow: "hidden",
+          }}
+        />
         <Box sx={{ display: "flex", justifyContent: "center", mt: -5 }}>
           <Avatar
             sx={{
@@ -147,7 +211,12 @@ export default function CardEsquerda({
           <Typography
             variant="h6"
             component="div"
-            sx={{ fontWeight: "bold", color: "green", mb: 1, textTransform: "uppercase" }}
+            sx={{
+              fontWeight: "bold",
+              color: "green",
+              mb: 1,
+              textTransform: "uppercase",
+            }}
           >
             {nome || "Nome do Usuário"}
           </Typography>
@@ -155,7 +224,9 @@ export default function CardEsquerda({
             {biografia || "Nenhuma biografia informada."}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {(cidade && estado) ? `${cidade}, ${estado}` : "Localização não informada."}
+            {cidade && estado
+              ? `${cidade}, ${estado}`
+              : "Localização não informada."}
           </Typography>
         </CardContent>
       </Card>
@@ -179,9 +250,9 @@ export default function CardEsquerda({
             <Button
               size="small"
               onClick={toggleShowSaved}
-              sx={{ ml: 1, color: '#006916', fontWeight: 600 }}
+              sx={{ ml: 1, color: "#006916", fontWeight: 600 }}
             >
-              {showSaved ? 'Ver todos' : `Ver salvos (${savedCount})`}
+              {showSaved ? "Ver todos" : `Ver salvos (${savedCount})`}
             </Button>
           </Stack>
         </CardContent>
@@ -206,9 +277,9 @@ export default function CardEsquerda({
             <Button
               size="small"
               onClick={toggleShowApplied}
-              sx={{ ml: 1, color: '#006916', fontWeight: 600 }}
+              sx={{ ml: 1, color: "#006916", fontWeight: 600 }}
             >
-              {showApplied ? 'Ver todos' : `Ver candidaturas (${appliedCount})`}
+              {showApplied ? "Ver todos" : `Ver candidaturas (${appliedCount})`}
             </Button>
           </Stack>
         </CardContent>

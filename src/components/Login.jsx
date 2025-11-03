@@ -13,7 +13,6 @@ import {
   Divider,
   Alert,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import emailIcon from "../assets/Icon-Email.png";
 import passwordIcon from "../assets/Icon-Senha.png";
 
@@ -48,16 +47,16 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
-        credentials: "include"
+        credentials: "include",
       });
 
       if (response.ok) {
-        const user = await response.json();
-        console.log("Usuário logado com sucesso:", user);
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : {};
+        console.log("Usuário logado com sucesso:", data);
 
-        // Armazena o ID do usuário no localStorage
-        localStorage.setItem("userId", user.id);
-        localStorage.setItem("token", user.token); // <--- Adição aqui
+        localStorage.setItem("userId", data.id);
+        localStorage.setItem("token", data.token);
 
         navigate("/telaUsuario");
         return;
@@ -68,7 +67,7 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
-        credentials: "include"
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -84,7 +83,7 @@ export default function Login() {
       response = await fetch("http://localhost:8080/api/funcionarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginData)
+        body: JSON.stringify(loginData),
       });
 
       if (response.ok) {
@@ -97,14 +96,11 @@ export default function Login() {
         return;
       }
 
-
       setMensagem("Email ou senha incorretos.");
-
     } catch (error) {
       console.error("Erro ao realizar o login:", error);
       setMensagem("Erro ao tentar fazer login. Tente novamente.");
     }
-
   };
 
   // O retorno do JSX deve estar FORA da função handleSubmit
@@ -205,10 +201,7 @@ export default function Login() {
                   />
                 </InputAdornment>
               ),
-              endAdornment: (
-                <InputAdornment position="end">
-                </InputAdornment>
-              ),
+              endAdornment: <InputAdornment position="end"></InputAdornment>,
               sx: {
                 height: "50px",
                 borderRadius: "15px",
