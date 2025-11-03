@@ -39,57 +39,71 @@ export default function CardPerfil({
   const defaultNameMessage = "Nome do Usuário"; // Mensagem padrão para o nome
 
   useEffect(() => {
-  const fetchProfileData = async () => {
-    setLoadingProfile(true);
-    setProfileError(null);
+    const fetchProfileData = async () => {
+      setLoadingProfile(true);
+      setProfileError(null);
 
-    try {
-      const response = await fetch("http://localhost:8080/api/usuarios/", {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
+      try {
+        const response = await fetch("http://localhost:8080/api/usuarios/", {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Usuário não autenticado. Faça login novamente.");
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error("Usuário não autenticado. Faça login novamente.");
+          }
+          const text = await response.text();
+          let errorMessage = `Erro HTTP: ${response.status}`;
+          if (text) {
+            try {
+              const errData = JSON.parse(text);
+              errorMessage = errData.message || errorMessage;
+            } catch {
+              errorMessage = text;
+            }
+          }
+          throw new Error(errorMessage);
         }
-        const text = await response.text();
-        let errorMessage = `Erro HTTP: ${response.status}`;
-        if (text) {
-          try {
-            const errData = JSON.parse(text);
-            errorMessage = errData.message || errorMessage;
-          } catch {
-            errorMessage = text;
+
+        let data = {};
+        const contentLength = response.headers.get("content-length");
+        const contentType = response.headers.get("content-type") || "";
+
+        if (response.status === 204 || contentLength === "0") {
+          data = {};
+        } else {
+          const text = await response.text();
+          if (text) {
+            try {
+              data = JSON.parse(text);
+            } catch (parseErr) {
+              console.warn("Resposta recebida não é JSON:", text);
+              data = {};
+            }
+          } else {
+            data = {};
           }
         }
-        throw new Error(errorMessage);
+
+        console.log("Dados do perfil recebidos:", data);
+
+        setProfileData({
+          nome: data.nome ?? "",
+          estado: data.estado ?? "",
+          cidade: data.cidade ?? "",
+        });
+      } catch (err) {
+        console.error("Erro ao buscar dados do perfil:", err);
+        setProfileError(err);
+      } finally {
+        setLoadingProfile(false);
       }
+    };
 
-      const text = await response.text();
-      if (!text) {
-        throw new Error("Resposta vazia do servidor.");
-      }
-
-      const data = JSON.parse(text);
-      console.log("Dados do perfil recebidos:", data);
-
-      setProfileData({
-        nome: data.nome ?? "",
-        estado: data.estado ?? "",
-        cidade: data.cidade ?? "",
-      });
-    } catch (err) {
-      console.error("Erro ao buscar dados do perfil:", err);
-      setProfileError(err);
-    } finally {
-      setLoadingProfile(false);
-    }
-  };
-
-  fetchProfileData();
-}, []); // Executa apenas uma vez ao montar o componente
+    fetchProfileData();
+  }, []); // Executa apenas uma vez ao montar o componente
 
   // Upload capa
   const handleCoverUpload = (e) => {

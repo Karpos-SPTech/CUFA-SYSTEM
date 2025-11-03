@@ -1,36 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, Typography, IconButton, Modal, TextField, Button, Box, CircularProgress, Snackbar, Alert } from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
+import {
+  Card,
+  CardContent,
+  Typography,
+  IconButton,
+  Modal,
+  TextField,
+  Button,
+  Box,
+  CircularProgress,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 
 export default function CardSobre() {
-  const [biografia, setBiografia] = useState(''); // O estado principal para a biografia
+  const [biografia, setBiografia] = useState(""); // O estado principal para a biografia
   const [openEdit, setOpenEdit] = useState(false); // Para controlar o modal de edição
-  const [biografiaDraft, setBiografiaDraft] = useState(''); // O rascunho enquanto edita
+  const [biografiaDraft, setBiografiaDraft] = useState(""); // O rascunho enquanto edita
   const [loading, setLoading] = useState(true); // Estado de carregamento
   const [error, setError] = useState(null); // Estado de erro
   const [isSaving, setIsSaving] = useState(false); // Estado para o salvamento
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   // Mensagem padrão para a biografia
   const defaultBiografiaMessage = "Nenhuma biografia informada.";
 
   // Função utilitária para camel case (primeira letra de cada palavra maiúscula)
   function toCamelCase(str) {
-    if (!str) return '';
-    return str
-      .toLowerCase()
-      .replace(/\b\w/g, (char) => char.toUpperCase());
+    if (!str) return "";
+    return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchBiografia = async () => {
       setLoading(true);
       setError(null);
 
-      const userId = localStorage.getItem('userId');
-      const userToken = localStorage.getItem('token');
+      const userId = localStorage.getItem("userId");
+      const userToken = localStorage.getItem("token");
 
       if (!userId || !userToken) {
         setError(new Error("Usuário não autenticado. Por favor, faça login."));
@@ -41,30 +51,58 @@ export default function CardSobre() {
 
       try {
         const response = await fetch(`http://localhost:8080/api/usuarios/`, {
-          method: 'GET',
-          credentials: 'include',
+          method: "GET",
+          credentials: "include",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+          if (response.status === 401) {
+            throw new Error("Usuário não autenticado. Faça login novamente.");
+          }
+          const text = await response.text();
+          let errorMessage = `Erro HTTP: ${response.status}`;
+          if (text) {
+            try {
+              const errData = JSON.parse(text);
+              errorMessage = errData.message || errorMessage;
+            } catch {
+              errorMessage = text;
+            }
+          }
+          throw new Error(errorMessage);
         }
 
-        const data = await response.json();
-        console.log("Biografia recebida no CardSobre:", data.biografia);
+        // Trata resposta vazia / 204 antes de tentar parsear JSON
+        let data = {};
+        if (response.status === 204) {
+          data = {};
+        } else {
+          const text = await response.text();
+          if (text) {
+            try {
+              data = JSON.parse(text);
+            } catch (parseErr) {
+              console.warn("Resposta recebida não é JSON:", text);
+              data = {};
+            }
+          } else {
+            data = {};
+          }
+        }
+
+        console.log("Biografia recebida no CardSobre:", data?.biografia);
 
         // Define a biografia principal e o rascunho com o valor do backend
-        setBiografia(data.biografia ?? '');
-        setBiografiaDraft(data.biografia ?? '');
-
+        setBiografia(data?.biografia ?? "");
+        setBiografiaDraft(data?.biografia ?? "");
       } catch (err) {
         console.error("Erro ao buscar biografia:", err);
         setError(err);
         setSnackbarMessage(`Erro ao carregar biografia: ${err.message}`);
-        setSnackbarSeverity('error');
+        setSnackbarSeverity("error");
         setSnackbarOpen(true);
       } finally {
         setLoading(false);
@@ -78,14 +116,16 @@ export default function CardSobre() {
     setIsSaving(true);
     setError(null);
 
-    const userId = localStorage.getItem('userId');
-    const userToken = localStorage.getItem('token');
+    const userId = localStorage.getItem("userId");
+    const userToken = localStorage.getItem("token");
 
     if (!userId || !userToken) {
-      setError(new Error("Sessão expirada. Não foi possível salvar a biografia."));
+      setError(
+        new Error("Sessão expirada. Não foi possível salvar a biografia.")
+      );
       setIsSaving(false);
       setSnackbarMessage("Sessão expirada. Por favor, faça login novamente.");
-      setSnackbarSeverity('error');
+      setSnackbarSeverity("error");
       setSnackbarOpen(true);
       setOpenEdit(false);
       return;
@@ -93,10 +133,10 @@ export default function CardSobre() {
 
     try {
       const response = await fetch(`http://localhost:8080/api/usuarios/`, {
-        method: 'PUT', 
+        method: "PUT",
         credentials: "include",
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ biografia: biografiaDraft })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ biografia: biografiaDraft }),
       });
 
       if (!response.ok) {
@@ -106,21 +146,19 @@ export default function CardSobre() {
 
       // Se a resposta for 204 No Content, não haverá body para parsear
       if (response.status !== 204) {
-         await response.json(); // Consumir o body, mesmo que seja vazio
+        await response.json(); // Consumir o body, mesmo que seja vazio
       }
-
 
       setBiografia(biografiaDraft); // Atualiza o estado principal com o rascunho salvo
       setOpenEdit(false); // Fecha o modal
       setSnackbarMessage("Biografia salva com sucesso!");
-      setSnackbarSeverity('success');
+      setSnackbarSeverity("success");
       setSnackbarOpen(true);
-
     } catch (err) {
       console.error("Erro ao salvar biografia:", err);
       setError(err);
       setSnackbarMessage(`Erro ao salvar biografia: ${err.message}`);
-      setSnackbarSeverity('error');
+      setSnackbarSeverity("error");
       setSnackbarOpen(true);
     } finally {
       setIsSaving(false);
@@ -128,7 +166,7 @@ export default function CardSobre() {
   };
 
   const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setSnackbarOpen(false);
@@ -136,30 +174,77 @@ export default function CardSobre() {
 
   return (
     <>
-      <Card className="perfil-usuario-card" sx={{ flex: 1, borderRadius: 5, boxShadow: 4, background: '#fff', minHeight: 180, position: 'relative', p: 0 }}>
+      <Card
+        className="perfil-usuario-card"
+        sx={{
+          flex: 1,
+          borderRadius: 5,
+          boxShadow: 4,
+          background: "#fff",
+          minHeight: 180,
+          position: "relative",
+          p: 0,
+        }}
+      >
         <CardContent sx={{ px: 5, py: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#006916', fontSize: 20 }}>Sobre</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 1,
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: "bold", color: "#006916", fontSize: 20 }}
+            >
+              Sobre
+            </Typography>
           </Box>
           {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 80 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: 80,
+              }}
+            >
               <CircularProgress size={24} color="success" />
-              <Typography sx={{ ml: 2, color: '#006916' }}>Carregando biografia...</Typography>
+              <Typography sx={{ ml: 2, color: "#006916" }}>
+                Carregando biografia...
+              </Typography>
             </Box>
           ) : error && !biografia ? ( // Mostra erro apenas se não houver biografia para exibir
-            <Typography variant="body2" color="error" sx={{ fontSize: 15, textAlign: 'center' }}>
+            <Typography
+              variant="body2"
+              color="error"
+              sx={{ fontSize: 15, textAlign: "center" }}
+            >
               {error.message}
             </Typography>
           ) : (
-            <Typography variant="body1" sx={{ color: '#333', fontSize: 17, whiteSpace: 'pre-wrap' }}>
+            <Typography
+              variant="body1"
+              sx={{ color: "#333", fontSize: 17, whiteSpace: "pre-wrap" }}
+            >
               {toCamelCase(biografia) || defaultBiografiaMessage}
             </Typography>
           )}
         </CardContent>
       </Card>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
