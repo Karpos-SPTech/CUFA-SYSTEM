@@ -20,12 +20,14 @@ const EstatisticasCandidatos = () => {
         if (!empresaId) throw new Error("ID da empresa não encontrado");
 
         // Primeiro, buscar todas as vagas da empresa
+        const token = localStorage.getItem("empresaToken") || localStorage.getItem("token");
         const response = await fetch("/publicacao", {
           method: "GET",
           credentials: "include",
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
         });
 
@@ -46,6 +48,7 @@ const EstatisticasCandidatos = () => {
             headers: {
               "Accept": "application/json",
               "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
           });
 

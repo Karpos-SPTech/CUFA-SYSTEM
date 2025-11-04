@@ -108,6 +108,7 @@ const MembroCard = () => {
         url: `/funcionarios/${empresaId}`,
       });
 
+      const token = localStorage.getItem("empresaToken") || localStorage.getItem("token");
       const response = await fetch(
         `/funcionarios/${empresaId}`,
         {
@@ -115,6 +116,7 @@ const MembroCard = () => {
           credentials: "include", // Importante: inclui os cookies na requisição
           headers: {
             "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
         }
       );
@@ -227,11 +229,13 @@ const MembroCard = () => {
         fkEmpresa: parseInt(empresaId),
       };
 
+      const token = localStorage.getItem("empresaToken") || localStorage.getItem("token");
       const response = await fetch("/funcionarios", {
         method: "POST",
         credentials: "include", // Importante: inclui os cookies na requisição
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(funcionarioData),
       });
@@ -270,11 +274,13 @@ const MembroCard = () => {
       setLoading(true);
       setError(null);
 
+      const token = localStorage.getItem("empresaToken") || localStorage.getItem("token");
       const response = await fetch(`/funcionarios/${id}`, {
         method: "DELETE",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
 

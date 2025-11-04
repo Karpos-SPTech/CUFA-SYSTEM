@@ -39,6 +39,11 @@ const InfoCardEmpresa = () => {
   useEffect(() => {
     const fetchEmpresaData = async () => {
       try {
+        const empresaId = localStorage.getItem("empresaId");
+        const token = localStorage.getItem("empresaToken") || localStorage.getItem("token");
+        if (!empresaId) {
+          throw new Error("ID da empresa não encontrado");
+        }
         const response = await fetch(
           `/empresas/${empresaId}`,
           {
@@ -46,6 +51,7 @@ const InfoCardEmpresa = () => {
             credentials: "include",
             headers: {
               "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
           }
         );

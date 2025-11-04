@@ -26,7 +26,12 @@ const Notifications = () => {
     const fetchVagas = async () => {
       setLoading(true);
       try {
-        const response = await fetch("/publicacao/all");
+        const token = localStorage.getItem("empresaToken") || localStorage.getItem("token");
+        const response = await fetch("/publicacao/all", {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

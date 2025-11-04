@@ -23,8 +23,8 @@ export default function CardExperiencia() {
     setLoading(true);
     setError(null);
 
-    const userId = localStorage.getItem('userId');
-    const userToken = localStorage.getItem('token'); // Corrigido para 'userToken'
+  const userId = localStorage.getItem('userId');
+  const userToken = localStorage.getItem('token');
 
     if (!userId || !userToken) {
       setError(new Error("ID do usuário ou token não encontrado. Por favor, faça login."));
@@ -37,7 +37,11 @@ export default function CardExperiencia() {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json', // Este cabeçalho é para a REQUISIÇÃO, não para a RESPOSTA
+          // Envia token de autenticação se o backend exigir Bearer Token
+          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
         },
+        // se o backend usa cookies de sessão, habilite credentials
+        // credentials: 'include',
       });
 
       if (!response.ok) {
@@ -134,6 +138,9 @@ export default function CardExperiencia() {
       const response = await fetch(`/experiencias/${id}`, {
         method: 'DELETE',
         credentials: 'include',
+        headers: {
+          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+        },
       });
 
       if (!response.ok) {

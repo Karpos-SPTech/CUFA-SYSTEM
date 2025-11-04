@@ -55,7 +55,10 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
       const response = await fetch(`/experiencias`, {
         method: 'POST',
         credentials: 'include',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+        },
         body: JSON.stringify(experienceData),
       });
 

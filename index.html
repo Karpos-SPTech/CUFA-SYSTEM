@@ -17,7 +17,19 @@
     </div>
   </div>
   <script type="module" src="/src/index.jsx"></script>
-  <script src="/vlibras-init.js"></script>
+  <!-- Carrega diretamente o plugin VLibras do CDN público para evitar que um arquivo local protegido gere 401/MIME incorreto -->
+  <script>
+    (function() {
+      var s = document.createElement('script');
+      s.src = 'https://vlibras.gov.br/app/vlibras-plugin.js';
+      s.async = true;
+      s.onload = function() {
+        try { new window.VLibras.Widget('https://vlibras.gov.br/app'); } catch(e) { console.error('Erro ao iniciar VLibras:', e); }
+      };
+      s.onerror = function(e) { console.error('Erro ao carregar VLibras:', e); };
+      document.head.appendChild(s);
+    })();
+  </script>
 </body>
 
 </html>

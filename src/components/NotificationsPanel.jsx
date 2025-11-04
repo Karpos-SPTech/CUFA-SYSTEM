@@ -113,12 +113,14 @@ const NotificationsPanel = () => {
         const empresaId = localStorage.getItem("empresaId");
         if (!empresaId) throw new Error("ID da empresa não encontrado");
 
+        const token = localStorage.getItem("empresaToken") || localStorage.getItem("token");
         const response = await fetch("/publicacao", {
           method: "GET",
           credentials: "include",
           headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
         });
 
@@ -138,6 +140,7 @@ const NotificationsPanel = () => {
             headers: {
               "Accept": "application/json",
               "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
           });
 

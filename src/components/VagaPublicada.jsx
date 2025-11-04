@@ -85,12 +85,14 @@ const VagaPublicada = () => {
       const empresaId = localStorage.getItem("empresaId");
       if (!empresaId) throw new Error("ID da empresa não encontrado");
 
+      const token = localStorage.getItem("empresaToken") || localStorage.getItem("token");
       const response = await fetch("/publicacao", {
         method: "GET",
         credentials: "include",
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
 
@@ -115,12 +117,14 @@ const VagaPublicada = () => {
   const handleCloseDeleteDialog = () => setDeleteDialog({ open: false, publicacaoId: null, titulo: '' });
   const handleDeletarPublicacao = async () => {
     try {
+      const token = localStorage.getItem("empresaToken") || localStorage.getItem("token");
       const response = await fetch(`/publicacao/${deleteDialog.publicacaoId}`, {
         method: "DELETE",
         credentials: "include",
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
 

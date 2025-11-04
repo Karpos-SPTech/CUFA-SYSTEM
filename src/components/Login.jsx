@@ -77,6 +77,12 @@ export default function Login() {
         // Se quiser guardar o ID da empresa também
         localStorage.setItem("empresaId", empresa.id);
         localStorage.setItem("empresaNome", empresa.nome); // Exemplo para empresa
+        // Salva token da empresa para uso nas requisições
+        if (empresa.token) {
+          localStorage.setItem("empresaToken", empresa.token);
+          // também salva em 'token' para compatibilidade com chamadas que usam esse key
+          localStorage.setItem("token", empresa.token);
+        }
         navigate("/telaEmpresa");
         return;
       }
