@@ -17,7 +17,9 @@ const TelaEmpresa = () => {
     const fetchData = async () => {
       try {
         const response = await fetch("http://localhost:8080/api/empresas", {
+          method: "GET",
           credentials: "include",
+          headers: { "Content-Type": "application/json" }
         });
 
         if (!response.ok) {

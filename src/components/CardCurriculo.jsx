@@ -14,9 +14,6 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-  const userId = localStorage.getItem('userId');
-  const userToken = localStorage.getItem('token');
-
   const extractOriginalFileNameFromUrl = (url) => {
     if (!url) return '';
     try {
@@ -40,16 +37,12 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
   const fetchCurriculoUrl = async () => {
     setLoading(true);
     setError(null);
-    if (!userId || !userToken) {
-      setError(new Error("Usuário não autenticado. Por favor, faça login."));
-      setLoading(false);
-      return;
-    }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/curriculos/download/{$userData.curriculoUrl}`, {
         method: "GET",
-        credentials: 'include'
+        credentials: 'include',
+        headers: { "Content-Type": "application/json" }
       });
 
       if (!response.ok) {
@@ -76,7 +69,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
 
   useEffect(() => {
     fetchCurriculoUrl();
-  }, [userId, userToken]);
+  });
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -89,12 +82,6 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
       return;
     }
 
-    if (!userToken || !userId) {
-      setSnackbarMessage("Usuário não autenticado.");
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
 
     setIsUploading(true);
 
@@ -102,7 +89,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     formData.append("file", file);
 
     try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}/curriculo/upload`, {
+      const response = await fetch(`http://localhost:8080/api/curriculos/upload`, {
         method: "POST",
         body: formData,
         credentials: 'include'
@@ -152,7 +139,7 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/${userId}/curriculo/delete`, {
+      const response = await fetch(`http://localhost:8080/api/curriculos`, {
         method: "DELETE",
         credentials: 'include'
       });

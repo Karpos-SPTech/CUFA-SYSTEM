@@ -50,7 +50,7 @@ export default function CardSobre() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/api/usuarios/`, {
+        const response = await fetch(`http://localhost:8080/api/usuarios`, {
           method: "GET",
           credentials: "include",
           headers: {
@@ -132,7 +132,7 @@ export default function CardSobre() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/`, {
+      const response = await fetch(`http://localhost:8080/api/usuarios`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

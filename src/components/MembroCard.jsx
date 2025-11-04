@@ -105,11 +105,11 @@ const MembroCard = () => {
 
       console.log("Fazendo request com:", {
         empresaId,
-        url: `http://localhost:8080/api/funcionarios/${empresaId}`,
+        url: `http://localhost:8080/api/funcionarios`,
       });
 
       const response = await fetch(
-        `http://localhost:8080/api/funcionarios/${empresaId}`,
+        `http://localhost:8080/api/funcionarios`,
         {
           method: "GET",
           credentials: "include", // Importante: inclui os cookies na requisição

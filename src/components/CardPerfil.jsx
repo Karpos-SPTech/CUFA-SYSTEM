@@ -47,7 +47,7 @@ export default function CardPerfil({
         const response = await fetch("http://localhost:8080/api/usuarios/", {
           method: "GET",
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" }
         });
 
         if (!response.ok) {

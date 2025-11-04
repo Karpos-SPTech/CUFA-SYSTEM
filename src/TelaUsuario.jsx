@@ -16,16 +16,18 @@ const TelaUsuario = () => {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [showApplied, setShowApplied] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const candidatosPorPagina = 6;
+
   useEffect(() => {
     const fetchJobs = async () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8080/api/publicacoes/all', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await fetch('http://localhost:8080/api/publicacoes?page=${page}&size=${size}', {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" }
         });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -56,7 +58,8 @@ const TelaUsuario = () => {
       if (!userId || !token) return;
 
       try {
-        const response = await fetch(`http://3.84.239.87/candidaturas/usuario`, {
+        const response = await fetch(`http://localhost:8080/api/candidaturas/usuario`, {
+          method: 'GET',
           credentials: 'include',
         });
 

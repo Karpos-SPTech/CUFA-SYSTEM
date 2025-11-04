@@ -89,7 +89,7 @@ export default function CardVagas({ vaga, onSave, saved }) {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/api/candidaturas/verificar/${userId}/${vaga.idPublicacao}`, {
+        const response = await fetch(`http://localhost:8080/api/candidaturas/verificar/${vaga.idPublicacao}`, {
           method: "GET",
           credentials: "include",
           headers: {
@@ -146,6 +146,7 @@ export default function CardVagas({ vaga, onSave, saved }) {
 
       const response = await fetch("http://localhost:8080/api/candidaturas", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
