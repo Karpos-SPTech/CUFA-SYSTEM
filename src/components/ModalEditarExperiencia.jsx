@@ -55,7 +55,6 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
 
     // Prepara os dados da experiência atualizados no formato JSON esperado pelo backend
     const updatedExperienceData = {
-      id: experiencia.id, // O ID da experiência que está sendo atualizada
       cargo: cargo,
       empresa: empresa,
       dtInicio: dtInicio,

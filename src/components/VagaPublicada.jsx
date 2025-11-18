@@ -40,7 +40,6 @@ const VagaPublicada = () => {
   const indexUltimaVaga = currentPage * vagasPorPagina;
   const indexPrimeiraVaga = indexUltimaVaga - vagasPorPagina;
   const vagasAtuais = publicacoes.slice(indexPrimeiraVaga, indexUltimaVaga);
-
   const formatarTempoPublicacao = (dtPublicacao) => {
     const publicacao = new Date(dtPublicacao);
     const agora = new Date();
@@ -82,12 +81,7 @@ const VagaPublicada = () => {
 
   const fetchPublicacao = async () => {
     try {
-      const empresaId = localStorage.getItem("empresaId");
-      if (!empresaId) throw new Error("ID da empresa não encontrado");
-
-      const response = await fetch(
-        `http://localhost:8080/api/publicacoes?page=${page}&size=10`,
-        {
+        const response = await fetch("http://localhost:8080/api/publicacoes/empresa", {
           method: "GET",
           credentials: "include",
           headers: {

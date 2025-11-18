@@ -243,14 +243,14 @@ export default function CardVagas({ vaga, onSave, saved }) {
 
         <Box sx={{ background: "#f3f6ee", borderRadius: 3, p: 4, mb: 2 }}>
           {secoesDaVaga.descricaoGeral && (
-            <>
+            <Box>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
                 Sobre a vaga
               </Typography>
               <Typography variant="body2" sx={{ color: "#666" }}>
                 {secoesDaVaga.descricaoGeral}
               </Typography>
-            </>
+            </Box>
           )}
 
           {secoesDaVaga.funcoes.length > 0 && (
@@ -298,7 +298,7 @@ export default function CardVagas({ vaga, onSave, saved }) {
             Verificando status de candidatura...
           </Typography>
         ) : (
-          <>
+          <Box>
             <Button
               variant="contained"
               fullWidth
@@ -315,7 +315,7 @@ export default function CardVagas({ vaga, onSave, saved }) {
             >
               {botaoCandidaturaTexto}
             </Button>
-          </>
+          </Box>
         )}
       </Card>
 

@@ -179,7 +179,7 @@ const Header = ({ hideNotifications }) => {
       const response = await fetch(`http://localhost:8080/api/usuarios`, {
         method: 'GET',
         credentials: "include",
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json'}
       });
 
       if (!response.ok) {
@@ -193,19 +193,11 @@ const Header = ({ hideNotifications }) => {
       const data = await response.json();
       console.log("Dados do perfil recebidos (GET):", data);
 
-      // --- CONVERTE dataNascimento do formato YYYY-MM-DD para DD-MM-YYYY para exibição ---
-      let displayDtNascimento = data.dtNascimento ?? '';
-      if (displayDtNascimento && displayDtNascimento.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        const parts = displayDtNascimento.split('-');
-        displayDtNascimento = `${parts[2]}-${parts[1]}-${parts[0]}`; // Reordena para dd-mm-yyyy
-      }
-      // --- FIM DA CONVERSÃO ---
-
       setFormData({
         nome: data.nome ?? '',
         cpf: data.cpf ?? '',
         telefone: data.telefone ?? '',
-        dataNascimento: displayDtNascimento,
+        dataNascimento: data.dtNascimento,
         estado: data.estado ?? '',
         cidade: data.cidade ?? '',
         biografia: data.biografia ?? '',
@@ -272,11 +264,10 @@ const Header = ({ hideNotifications }) => {
 
     // Cria o objeto com os dados a serem enviados (incluindo escolaridade e data convertida)
     const dataToSubmit = {
-      nome: formData.nome,
       cpf: formData.cpf,
       telefone: formData.telefone,
       escolaridade: escolaridade,
-      dtNascimento: dataNascimentoParaEnvio, // Usa a data formatada para envio
+      dtNascimento: formData.dataNascimento, 
       estadoCivil: estadoCivil,
       estado: formData.estado,
       cidade: formData.cidade,

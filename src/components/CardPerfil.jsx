@@ -30,6 +30,7 @@ export default function CardPerfil({
     nome: "",
     estado: "",
     cidade: "",
+    email: ""
   });
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [profileError, setProfileError] = useState(null);
@@ -44,7 +45,7 @@ export default function CardPerfil({
       setProfileError(null);
 
       try {
-        const response = await fetch("http://localhost:8080/api/usuarios/", {
+        const response = await fetch("http://localhost:8080/api/usuarios", {
           method: "GET",
           credentials: "include",
           headers: { "Content-Type": "application/json" }
@@ -89,10 +90,17 @@ export default function CardPerfil({
 
         console.log("Dados do perfil recebidos:", data);
 
+        if (data.email) {
+          localStorage.setItem("userEmail", data.email);
+        }
+
+        const storedEmail = localStorage.getItem("userEmail") || "";
+
         setProfileData({
           nome: data.nome ?? "",
           estado: data.estado ?? "",
           cidade: data.cidade ?? "",
+          email: storedEmail
         });
       } catch (err) {
         console.error("Erro ao buscar dados do perfil:", err);
@@ -349,6 +357,14 @@ export default function CardPerfil({
               >
                 {toCamelCase(profileData.nome) || defaultNameMessage}
               </Typography>
+
+              <Typography
+                variant="body2"
+                sx={{ color: "#006916", fontWeight: 500 }}
+              >
+                {profileData.email}
+              </Typography>
+
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 {/* Localização (Cidade, Estado) */}
                 <Typography

@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ModalAdicionarExperiencia from './ModalAdicionarExperiencia';
 import ModalEditarExperiencia from './ModalEditarExperiencia';
 
-export default function CardExperiencia() {
+export default function CardExperiencia(experiencia) {
   const [experiencias, setExperiencias] = useState([]);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -22,15 +22,6 @@ export default function CardExperiencia() {
   const fetchExperiences = async () => {
     setLoading(true);
     setError(null);
-
-    const userId = localStorage.getItem('userId');
-    const userToken = localStorage.getItem('token'); // Corrigido para 'userToken'
-
-    if (!userId || !userToken) {
-      setError(new Error("ID do usuário ou token não encontrado. Por favor, faça login."));
-      setLoading(false);
-      return;
-    }
 
     try {
       const response = await fetch(`http://localhost:8080/api/experiencias`, {
@@ -118,45 +109,44 @@ export default function CardExperiencia() {
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Tem certeza que deseja excluir esta experiência?");
-    if (!confirmDelete) {
-      return;
-    }
+  const confirmDelete = window.confirm("Tem certeza que deseja excluir esta experiência?");
+  if (!confirmDelete) return;
 
-    const userToken = localStorage.getItem('token');
-    if (!userToken) {
-      setSnackbarMessage('Sessão expirada. Faça login novamente.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
+  const userToken = localStorage.getItem('token');
+  if (!userToken) {
+    setSnackbarMessage('Sessão expirada. Faça login novamente.');
+    setSnackbarSeverity('error');
+    setSnackbarOpen(true);
+    return;
+  }
 
-    try {
-      const response = await fetch(`http://localhost:8080/api/experiencias`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
+  try {
+    const response = await fetch(`http://localhost:8080/api/experiencias/${id}`, { // <- usar o parâmetro id
+      method: 'DELETE',
+      credentials: 'include',
+    });
 
-      if (!response.ok) {
-        let errorData = {};
-        if (response.headers.get('Content-Type')?.includes('application/json')) {
-            errorData = await response.json();
-        }
-        throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
+    if (!response.ok) {
+      let errorData = {};
+      if (response.headers.get('Content-Type')?.includes('application/json')) {
+          errorData = await response.json();
       }
-      
-      fetchExperiences();
-      setSnackbarMessage('Experiência excluída com sucesso!');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
-
-    } catch (err) {
-      console.error("Erro ao excluir experiência:", err);
-      setSnackbarMessage(`Erro ao excluir experiência: ${err.message}`);
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+      throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
     }
-  };
+
+    fetchExperiences();
+    setSnackbarMessage('Experiência excluída com sucesso!');
+    setSnackbarSeverity('success');
+    setSnackbarOpen(true);
+
+  } catch (err) {
+    console.error("Erro ao excluir experiência:", err);
+    setSnackbarMessage(`Erro ao excluir experiência: ${err.message}`);
+    setSnackbarSeverity('error');
+    setSnackbarOpen(true);
+  }
+};
+
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === 'clickaway') {

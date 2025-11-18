@@ -3,7 +3,7 @@ import HeaderUsuario from './components/HeaderUsuario';
 import CardVagas from './CardVagas';
 import CardEsquerda from './components/CardEsquerda';
 import CardDireita from './components/CardDireita';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 
 const TelaUsuario = () => {
   const [jobs, setJobs] = useState([]);
@@ -17,38 +17,57 @@ const TelaUsuario = () => {
   const [showApplied, setShowApplied] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const candidatosPorPagina = 6;
+  const [totalPages, setTotalPages] = useState(1); 
+  const candidatosPorPagina = 10;
+
+  const [userEmail, setUserEmail] = useState(null);
 
   useEffect(() => {
-    const fetchJobs = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch('http://localhost:8080/api/publicacoes?page=${page}&size=${size}', {
+    const email = localStorage.getItem('userEmail');
+    if (email) {
+      setUserEmail(email);
+    }
+  }, []);
+
+  useEffect(() => {
+  const fetchJobs = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/publicacoes?page=${currentPage}&size=10`,
+        {
           method: "GET",
           credentials: "include",
           headers: { "Content-Type": "application/json" }
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+      );
 
-        // ✅ Ordena do mais recente para o mais antigo
-        const ordenadas = data.sort(
-          (a, b) => new Date(b.dtPublicacao) - new Date(a.dtPublicacao)
-        );
-        setJobs(ordenadas);
-
-      } catch (e) {
-        setError(e);
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
-    fetchJobs();
-  }, []);
+      const data = await response.json();
+
+      // data.publicacoes é o array real
+      const ordenadas = data.publicacoes.sort(
+        (a, b) => new Date(b.dtPublicacao) - new Date(a.dtPublicacao)
+      );
+
+      setJobs(ordenadas);
+      setTotalPages(data.totalDePaginas);
+
+    } catch (e) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchJobs();
+}, [currentPage]);
+
   
   useEffect(() => {
     const fetchAppliedJobs = async () => {
@@ -61,6 +80,7 @@ const TelaUsuario = () => {
         const response = await fetch(`http://localhost:8080/api/candidaturas/usuario`, {
           method: 'GET',
           credentials: 'include',
+          headers: { "Content-Type": "application/json" }
         });
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -106,6 +126,10 @@ const TelaUsuario = () => {
     setSelectedDateFilter(filterValue);
   };
 
+  const handlePageChange = (page) => {
+  setCurrentPage(page);
+};
+
   // Reutilizável para qualquer array de vagas
   const filtrarVagas = (vagas) => {
     return vagas.filter((vaga) => {
@@ -144,7 +168,7 @@ const TelaUsuario = () => {
 
   return (
     <div className="tela-usuario-main">
-      <HeaderUsuario />
+      <HeaderUsuario userEmail={userEmail} />
       <div style={{
         display: 'flex',
         justifyContent: 'center',
@@ -205,7 +229,9 @@ const TelaUsuario = () => {
           {loading ? (
             <Typography color="primary" fontWeight={600}>Carregando vagas...</Typography>
           ) : error ? (
-            <Typography color="error" fontWeight={600}>Erro ao carregar vagas: {error.message}</Typography>
+            <Typography color="error" fontWeight={600}>
+              Erro ao carregar vagas: {error.message}
+            </Typography>
           ) : showSaved ? (
             filtrarVagas(savedJobs).length > 0 ? (
               filtrarVagas(savedJobs).map((vaga) => (
@@ -228,18 +254,44 @@ const TelaUsuario = () => {
               <Typography color="green" fontWeight={600}>Nenhuma vaga candidatada com os filtros selecionados.</Typography>
             )
           ) : (
-            filteredJobs.length > 0 ? (
-              filteredJobs.map((vaga) => (
-                <CardVagas
-                  key={vaga.idPublicacao}
-                  vaga={vaga}
-                  onSave={handleToggleSaveJob}
-                  saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)}
-                />
-              ))
-            ) : (
-              <Typography color="green" fontWeight={600}>Nenhuma vaga disponível com os filtros selecionados.</Typography>
-            )
+            <>
+            <div>
+              {filteredJobs.length > 0 ? (
+                filteredJobs.map((vaga) => (
+                  <CardVagas
+                    key={vaga.idPublicacao}
+                    vaga={vaga}
+                    onSave={handleToggleSaveJob}
+                    saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)}
+                  />
+                ))
+              ) : (
+                <Typography color="green" fontWeight={600}>
+                  Nenhuma vaga disponível com os filtros selecionados.
+                </Typography>
+              )}
+          </div>
+              {/* PAGINAÇÃO */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, gap: 1 }}>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Button
+                    key={i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                    sx={{
+                      backgroundColor: currentPage === i + 1 ? '#006916' : '#f5f5f5',
+                      color: currentPage === i + 1 ? '#fff' : '#006916',
+                      border: '1px solid #006916',
+                      borderRadius: '5px',
+                      fontWeight: 'bold',
+                      minWidth: 35,
+                      '&:hover': { backgroundColor: '#005713', color: '#fff' }
+                    }}
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+              </Box>
+            </>
           )}
         </div>
 

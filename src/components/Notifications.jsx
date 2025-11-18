@@ -23,47 +23,52 @@ const Notifications = () => {
   };
 
   useEffect(() => {
-    const fetchVagas = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("http://localhost:8080/api/publicacoes/all");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-
-        // Ordena do mais recente para o mais antigo
-        const vagasOrdenadas = data.sort(
-          (a, b) => new Date(b.dtPublicacao) - new Date(a.dtPublicacao)
-        );
-
-        // Mapeia para notificações
-        const formattedNotifications = vagasOrdenadas.map((vaga) => ({
-          avatar: vaga.logoUrl || null,
-          name: vaga.nomeEmpresa || "Empresa Desconhecida",
-          message: (
-            <>
-              Nova vaga disponível para{" "}
-              <span style={{ color: "#006916", fontWeight: 600 }}>
-                {vaga.titulo}
-              </span>
-              ! Pode ser a oportunidade que você está esperando.
-            </>
-          ),
-          id: vaga.idPublicacao,
-        }));
-
-        setNotifications(formattedNotifications);
-        setUnreadCount(formattedNotifications.length);
-      } catch (error) {
-        console.error("Erro ao buscar vagas:", error);
-      } finally {
-        setLoading(false);
+  const fetchVagas = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:8080/api/publicacoes?page=1&size=50");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
 
-    fetchVagas();
-  }, []);
+      const data = await response.json();
+
+      // AQUI ESTÁ A LISTA DE VAGAS
+      const vagas = data.publicacoes || [];
+
+      // Ordenar por data
+      const vagasOrdenadas = vagas.sort(
+        (a, b) => new Date(b.dtPublicacao) - new Date(a.dtPublicacao)
+      );
+
+      const formattedNotifications = vagasOrdenadas.map((vaga) => ({
+        avatar: vaga.logoUrl || null,
+        name: vaga.nomeEmpresa || "Empresa Desconhecida",
+        message: (
+          <>
+            Nova vaga disponível para{" "}
+            <span style={{ color: "#006916", fontWeight: 600 }}>
+              {vaga.titulo}
+            </span>
+            !
+          </>
+        ),
+        id: vaga.idPublicacao,
+      }));
+
+      setNotifications(formattedNotifications);
+      setUnreadCount(formattedNotifications.length);
+
+    } catch (error) {
+      console.error("Erro ao buscar vagas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchVagas();
+}, []);
+
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>

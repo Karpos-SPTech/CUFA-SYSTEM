@@ -1,87 +1,60 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Card, CardContent, Typography, Box, IconButton, CircularProgress, Snackbar, Alert } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-import DownloadIcon from '@mui/icons-material/Download';
+import React, { useEffect, useState } from "react";
+import {
+  Card, CardContent, Typography, Box,
+  IconButton, CircularProgress, Snackbar, Alert
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
 
 export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick }) {
-  const [curriculoUrl, setCurriculoUrl] = useState('');
-  const [curriculoFileNameDisplay, setCurriculoFileNameDisplay] = useState('');
-
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(null);
+  const [curriculoFileName, setCurriculoFileName] = useState(""); // nome UUID+original
+  const [loading, setLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState(null);
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
-  const extractOriginalFileNameFromUrl = (url) => {
-    if (!url) return '';
-    try {
-      const parts = url.split('/');
-      const fullFileNameWithUuid = parts[parts.length - 1];
-
-      const uuidLength = 36;
-      const separatorLength = 1;
-      const prefixLength = uuidLength + separatorLength;
-
-      if (fullFileNameWithUuid && fullFileNameWithUuid.length > prefixLength && fullFileNameWithUuid.charAt(uuidLength) === '-') {
-        return fullFileNameWithUuid.substring(prefixLength);
-      }
-      return fullFileNameWithUuid;
-    } catch (e) {
-      console.error("Erro ao extrair nome original da URL:", e);
-      return url;
-    }
+  const getOriginalName = (fileName) => {
+    if (!fileName) return "";
+    return fileName.replace(/^[0-9a-fA-F-]+-/, "");
   };
 
-  const fetchCurriculoUrl = async () => {
-    setLoading(true);
-    setError(null);
-
+  const fetchCurriculo = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/curriculos/download/{$userData.curriculoUrl}`, {
+      const resp = await fetch("http://localhost:8080/api/curriculos", {
         method: "GET",
-        credentials: 'include',
-        headers: { "Content-Type": "application/json" }
+        credentials: "include",
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
-      }
+      if (!resp.ok) throw new Error("Erro ao buscar currículo");
 
-      const userData = await response.json();
-      const fetchedCurriculoUrl = userData.curriculoUrl;
-
-      setCurriculoUrl(fetchedCurriculoUrl || '');
-      setCurriculoFileNameDisplay(extractOriginalFileNameFromUrl(fetchedCurriculoUrl));
+      const data = await resp.json();
+      setCurriculoFileName(data.filename || "");
 
     } catch (err) {
-      console.error("Erro ao buscar currículo URL:", err);
       setError(err);
-      setSnackbarMessage(`Erro ao buscar currículo: ${err.message}`);
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCurriculoUrl();
-  });
+    fetchCurriculo();
+  }, []);
 
+  // Upload
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      setSnackbarMessage('O arquivo deve ter no máximo 5MB.');
-      setSnackbarSeverity('error');
+      setSnackbarMessage("O arquivo deve ter no máximo 5MB.");
+      setSnackbarSeverity("error");
       setSnackbarOpen(true);
       return;
     }
-
 
     setIsUploading(true);
 
@@ -89,195 +62,166 @@ export default function CardCurriculo({ curriculoInputRef, handleCurriculoClick 
     formData.append("file", file);
 
     try {
-      const response = await fetch(`http://localhost:8080/api/curriculos/upload`, {
+      const response = await fetch("http://localhost:8080/api/curriculos/upload", {
         method: "POST",
         body: formData,
-        credentials: 'include'
+        credentials: "include",
       });
 
-      if (response.ok) {
-        const newCurriculoUrl = await response.text();
-        setCurriculoUrl(newCurriculoUrl);
-        setCurriculoFileNameDisplay(extractOriginalFileNameFromUrl(newCurriculoUrl));
-        setSnackbarMessage("Currículo enviado e associado com sucesso!");
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
-      } else {
-        const errorText = await response.text();
-        setSnackbarMessage(`Erro ao enviar currículo: ${errorText}`);
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
-      }
-    } catch (err) {
-      console.error("Erro de rede ao enviar currículo:", err);
-      setSnackbarMessage("Erro de rede ao enviar currículo.");
-      setSnackbarSeverity('error');
+      if (!response.ok) throw new Error(await response.text());
+
+      const data = await response.json();
+      setCurriculoFileName(data.filename);
+
+      setSnackbarMessage("Currículo enviado com sucesso!");
+      setSnackbarSeverity("success");
       setSnackbarOpen(true);
+
+    } catch (err) {
+      setSnackbarMessage(err.message);
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+
     } finally {
       setIsUploading(false);
       e.target.value = null;
     }
   };
 
-  const handleDelete = async () => {
-    if (!curriculoUrl) {
-      setSnackbarMessage("Nenhum currículo para excluir.");
-      setSnackbarSeverity('warning');
+  // Download
+  const handleDownload = async () => {
+    if (!curriculoFileName) {
+      setSnackbarMessage("Nenhum currículo para baixar.");
+      setSnackbarSeverity("warning");
       setSnackbarOpen(true);
-      return;
-    }
-    if (!userToken || !userId) {
-      setSnackbarMessage("Usuário não autenticado para excluir.");
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
-
-    const confirmDelete = window.confirm(`Tem certeza que deseja excluir o currículo "${curriculoFileNameDisplay}"?`);
-    if (!confirmDelete) {
       return;
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/curriculos`, {
-        method: "DELETE",
-        credentials: 'include'
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/curriculos/download/${curriculoFileName}`,
+        { method: "GET", credentials: "include" }
+      );
 
-      if (response.ok) {
-        setCurriculoUrl('');
-        setCurriculoFileNameDisplay('');
-        setSnackbarMessage("Currículo excluído com sucesso!");
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
-      } else {
-        const errorText = await response.text();
-        setSnackbarMessage(`Erro ao excluir currículo: ${errorText}`);
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
-      }
+      if (!response.ok) throw new Error("Erro no download");
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = getOriginalName(curriculoFileName); // 🔹 baixa com nome original
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Erro de rede ao excluir currículo:", err);
-      setSnackbarMessage("Erro de rede ao excluir currículo.");
-      setSnackbarSeverity('error');
+      setSnackbarMessage("Erro ao baixar currículo");
+      setSnackbarSeverity("error");
       setSnackbarOpen(true);
     }
   };
 
-const handleDownload = async () => {
-  if (!curriculoUrl) {
-    setSnackbarMessage("Nenhum currículo para baixar.");
-    setSnackbarSeverity('warning');
-    setSnackbarOpen(true);
-    return;
-  }
-
-  if (!userToken) {
-    setSnackbarMessage("Usuário não autenticado para baixar.");
-    setSnackbarSeverity('error');
-    setSnackbarOpen(true);
-    return;
-  }
-
-  try {
-    const response = await fetch(curriculoUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${userToken}`
-      }
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || `Erro HTTP: ${response.status}`);
-    }
-
-    const blob = await response.blob();
-    const downloadUrl = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.download = curriculoFileNameDisplay || 'curriculo.pdf';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(downloadUrl);
-  } catch (err) {
-    console.error("Erro ao fazer download do currículo:", err);
-    setSnackbarMessage(`Erro ao fazer download: ${err.message}`);
-    setSnackbarSeverity('error');
-    setSnackbarOpen(true);
-  }
-};
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
+  // Delete
+  const handleDelete = async () => {
+    if (!curriculoFileName) {
+      setSnackbarMessage("Nenhum currículo para excluir.");
+      setSnackbarSeverity("warning");
+      setSnackbarOpen(true);
       return;
     }
-    setSnackbarOpen(false);
+
+    const confirmDelete = window.confirm(
+      `Excluir o currículo "${getOriginalName(curriculoFileName)}"?`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const resp = await fetch("http://localhost:8080/api/curriculos", {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      if (!resp.ok) throw new Error(await resp.text());
+
+      setCurriculoFileName("");
+
+      setSnackbarMessage("Currículo excluído com sucesso!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+
+    } catch (err) {
+      setSnackbarMessage("Erro ao excluir currículo.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
   };
+
+  const handleSnackbarClose = () => setSnackbarOpen(false);
 
   return (
     <>
-      <Card className="perfil-usuario-card" sx={{ flex: 1, borderRadius: 5, boxShadow: 4, background: '#fff', minHeight: 180, position: 'relative', p: 0 }}>
-        <CardContent sx={{ px: 5, py: 3, display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#006916', mb: 1, fontSize: 20 }}>Currículo</Typography>
-          {!loading && !error && !curriculoUrl && (
-            <Typography variant="body2" sx={{ color: '#888', fontSize: 14, mt: 1, mb: 1 }}>
+      <Card sx={{ flex: 1, borderRadius: 5, boxShadow: 4 }}>
+        <CardContent sx={{ px: 5, py: 3 }}>
+
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#006916" }}>
+            Currículo
+          </Typography>
+
+          {loading ? (
+            <CircularProgress size={22} sx={{ mt: 1 }} />
+
+          ) : error ? (
+            <Typography color="error">{error.message}</Typography>
+
+          ) : curriculoFileName ? (
+            <Typography sx={{ mt: 1 }}>
+              {getOriginalName(curriculoFileName)}
+            </Typography>
+
+          ) : (
+            <Typography sx={{ mt: 1, color: "#888" }}>
               Nenhum currículo anexado.
             </Typography>
           )}
-          {loading ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-              <CircularProgress size={20} color="success" />
-              <Typography sx={{ ml: 1, color: '#006916' }}>Carregando currículo...</Typography>
-            </Box>
-          ) : error ? (
-            <Typography variant="body2" color="error" sx={{ fontSize: 14, mt: 1 }}>
-              Erro: {error.message}
-            </Typography>
-          ) : curriculoUrl && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%', mb: 1 }}>
-              <Typography variant="body2" sx={{ color: '#333', fontSize: 15, fontWeight: 500, maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 1 }} title={curriculoFileNameDisplay}>
-                {curriculoFileNameDisplay}
-              </Typography>
 
-            </Box>
-          )}
-          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 2 }}>
+          <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
             <input
-              id="curriculo-upload"
               type="file"
               accept="application/pdf,.doc,.docx"
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               ref={curriculoInputRef}
               onChange={handleFileUpload}
             />
+
             <button
               type="button"
-              style={{
-                background: '#006916', color: '#fff', border: 'none', borderRadius: 8, padding: '6px 18px',
-                fontWeight: 600, fontSize: 15, cursor: 'pointer', boxShadow: '0 2px 6px #00691622',
-                opacity: isUploading ? 0.7 : 1,
-                pointerEvents: isUploading ? 'none' : 'auto',
-              }}
               onClick={handleCurriculoClick}
               disabled={isUploading || loading}
+              style={{
+                background: "#006916",
+                color: "#fff",
+                padding: "6px 18px",
+                borderRadius: 8,
+                cursor: "pointer",
+              }}
             >
-              {isUploading ? <CircularProgress size={18} color="inherit" /> : (curriculoUrl ? 'Trocar currículo' : 'Anexar currículo')}
+              {isUploading ? "Enviando..." : curriculoFileName ? "Trocar currículo" : "Anexar currículo"}
             </button>
-            <IconButton size="small" sx={{ color: '#006916', background: '#e5eee3', boxShadow: 1 }} onClick={handleDownload}>
-              <DownloadIcon fontSize="small" />
-            </IconButton>
-            <IconButton size="small" sx={{ color: '#b71c1c', background: '#fbe9e7', boxShadow: 1 }} onClick={handleDelete}>
-              <DeleteIcon fontSize="small" />
+
+            <IconButton onClick={handleDownload} disabled={!curriculoFileName}>
+              <DownloadIcon />
             </IconButton>
 
+            <IconButton onClick={handleDelete} disabled={!curriculoFileName}>
+              <DeleteIcon />
+            </IconButton>
           </Box>
         </CardContent>
       </Card>
 
       <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

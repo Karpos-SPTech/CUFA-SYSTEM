@@ -55,9 +55,6 @@ export default function Login() {
         const data = text ? JSON.parse(text) : {};
         console.log("Usuário logado com sucesso:", data);
 
-        localStorage.setItem("userId", data.id);
-        localStorage.setItem("token", data.token);
-
         navigate("/telaUsuario");
         return;
       }
@@ -73,9 +70,7 @@ export default function Login() {
       if (response.ok) {
         const empresa = await response.json();
         console.log("Empresa logada com sucesso:", empresa);
-        // Se quiser guardar o ID da empresa também
-        localStorage.setItem("empresaId", empresa.id);
-        localStorage.setItem("empresaNome", empresa.nome); // Exemplo para empresa
+
         navigate("/telaEmpresa");
         return;
       }
@@ -84,14 +79,14 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
+        
+        credentials: "include"
       });
 
       if (response.ok) {
         const funcionario = await response.json();
         console.log("Funcionário logado com sucesso:", funcionario);
-        // Se quiser guardar o ID do funcionário
-        localStorage.setItem("funcionarioId", funcionario.id);
-        localStorage.setItem("funcionarioId", funcionario.token); // Exemplo para funcionário
+
         navigate("/telaEmpresa");
         return;
       }

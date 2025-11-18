@@ -110,10 +110,7 @@ const NotificationsPanel = () => {
   useEffect(() => {
     const fetchVagas = async () => {
       try {
-        const empresaId = localStorage.getItem("empresaId");
-        if (!empresaId) throw new Error("ID da empresa não encontrado");
-
-        const response = await fetch("http://localhost:8080/api/publicacoes", {
+        const response = await fetch("http://localhost:8080/api/publicacoes/empresa", {
           method: "GET",
           credentials: "include",
           headers: {

@@ -36,55 +36,36 @@ export default function CardEsquerda({
   }, []);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      setLoading(true);
-      setError(null);
+  const fetchUserData = async () => {
+    setLoading(true);
+    setError(null);
 
-      const userId = localStorage.getItem("userId");
-      const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("http://localhost:8080/api/usuarios", {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
 
-      if (!userId || !token) {
-        setError(
-          new Error(
-            "ID do usuário ou token não encontrado. Por favor, faça login."
-          )
-        );
-        setLoading(false);
-        return;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || `Erro HTTP: ${response.status}`);
       }
 
-      try {
-        const response = await fetch(
-          `http://localhost:8080/api/usuarios`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+      const data = await response.json(); // ✔️ Apenas uma leitura
+      setUserData(data);
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || `Erro HTTP: ${response.status}`);
-        }
+    } catch (err) {
+      console.error("Erro ao buscar dados do usuário:", err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        const text = await response.text();
-        if (!text) {
-          throw new Error("Resposta vazia do servidor.");
-        }
+  fetchUserData();
+}, []);
 
-        const data = await response.json();
-        setUserData(data);
-      } catch (err) {
-        console.error("Erro ao buscar dados do usuário:", err);
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, []);
 
   if (loading) {
     return (
