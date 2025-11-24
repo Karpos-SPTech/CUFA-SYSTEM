@@ -39,17 +39,13 @@ const InfoCardEmpresa = () => {
   useEffect(() => {
     const fetchEmpresaData = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8080/api/empresas`,
-          `http://3.84.239.87/empresas`,
-          {
-            method: "GET",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`http://localhost:8080/api/empresas`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Erro ao buscar dados da empresa");

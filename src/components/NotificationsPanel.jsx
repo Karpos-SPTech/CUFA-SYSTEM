@@ -110,7 +110,7 @@ const NotificationsPanel = () => {
   useEffect(() => {
     const fetchVagas = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/publicacoes/empresa", {
+        const response = await fetch("http://localhost:8080//publicacoes/empresa", {
           method: "GET",
           credentials: "include",
           headers: {

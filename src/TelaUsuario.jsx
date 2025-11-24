@@ -235,7 +235,7 @@ const TelaUsuario = () => {
           ) : showSaved ? (
             filtrarVagas(savedJobs).length > 0 ? (
               filtrarVagas(savedJobs).map((vaga) => (
-                <CardVagas key={vaga.idPublicacao} vaga={vaga} onSave={handleToggleSaveJob} saved />
+                <CardVagas key={vaga.id} vaga={vaga} onSave={handleToggleSaveJob} saved />
               ))
             ) : (
               <Typography color="green" fontWeight={600}>Nenhuma vaga salva com os filtros selecionados.</Typography>
@@ -244,10 +244,10 @@ const TelaUsuario = () => {
             filtrarVagas(appliedJobs).length > 0 ? (
               filtrarVagas(appliedJobs).map((vaga) => (
                 <CardVagas
-                  key={vaga.idPublicacao}
+                  key={vaga.id}
                   vaga={vaga}
                   onSave={handleToggleSaveJob}
-                  saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)}
+                  saved={!!savedJobs.find(j => j.id === vaga.id)}
                 />
               ))
             ) : (
@@ -259,10 +259,10 @@ const TelaUsuario = () => {
               {filteredJobs.length > 0 ? (
                 filteredJobs.map((vaga) => (
                   <CardVagas
-                    key={vaga.idPublicacao}
+                    key={vaga.id}
                     vaga={vaga}
                     onSave={handleToggleSaveJob}
-                    saved={!!savedJobs.find(j => j.idPublicacao === vaga.idPublicacao)}
+                    saved={!!savedJobs.find(j => j.id === vaga.id)}
                   />
                 ))
               ) : (

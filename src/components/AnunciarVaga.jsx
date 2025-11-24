@@ -8,12 +8,12 @@ import {
   Button,
   Alert,
   IconButton,
-  Select, // Importe Select
-  MenuItem, // Importe MenuItem
-  InputLabel, // Importe InputLabel para o Select
-  FormControl, // Importe FormControl para o Select
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
-import CampaignIcon from '@mui/icons-material/Campaign';
+import CampaignIcon from "@mui/icons-material/Campaign";
 import CloseIcon from "@mui/icons-material/Close";
 import empresaImageManager from "../utils/empresaImageManager";
 
@@ -31,21 +31,23 @@ const ButtonOption = ({ icon, label }) => (
       },
     }}
   >
-    <Box
-      component="img"
-      src={icon}
-      alt={label}
-      sx={{ width: 28, height: 28 }}
-    />
+    <Box component="img" src={icon} alt={label} sx={{ width: 28, height: 28 }} />
     <span>{label}</span>
   </Box>
 );
 
-const AnunciarVaga = ({ isEdit = false, open: propOpen, onClose, publicacaoParaEditar, onSave }) => {
+const AnunciarVaga = ({
+  isEdit = false,
+  open: propOpen,
+  onClose,
+  publicacaoParaEditar,
+  onSave,
+}) => {
   const [open, setOpen] = useState(propOpen || false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [empresaLogo, setEmpresaLogo] = useState(null);
+
   const initialDescription = `Descrição da vaga:
 (Descreva brevemente sobre a vaga e a empresa)
 
@@ -68,25 +70,31 @@ Frase atrativa:
     tipoContrato: "",
     dtExpiracao: "",
   });
+
   const [loading, setLoading] = useState(false);
 
+  /** Carregar dados quando for edição */
   useEffect(() => {
-    // Se for edição e tiver publicação para editar, preenche o formulário
     if (isEdit && publicacaoParaEditar) {
       setPublicacao({
         titulo: publicacaoParaEditar.titulo || "",
         descricao: publicacaoParaEditar.descricao || "",
         tipoContrato: publicacaoParaEditar.tipoContrato || "",
-        dtExpiracao: publicacaoParaEditar.dtExpiracao ?
-          new Date(publicacaoParaEditar.dtExpiracao).toISOString().slice(0, 16) : "",
+        dtExpiracao: publicacaoParaEditar.dtExpiracao
+          ? new Date(publicacaoParaEditar.dtExpiracao)
+              .toISOString()
+              .slice(0, 16)
+          : "",
       });
     }
   }, [isEdit, publicacaoParaEditar]);
 
+  /** Abrir modal */
   useEffect(() => {
     setOpen(propOpen);
   }, [propOpen]);
 
+  /** Carregar logo */
   useEffect(() => {
     const savedLogo = empresaImageManager.getProfileImage();
     if (savedLogo) setEmpresaLogo(savedLogo);
@@ -103,7 +111,7 @@ Frase atrativa:
     setOpen(false);
     setError("");
     setSuccess("");
-    // Only reset form data if not in edit mode
+
     if (!isEdit) {
       setPublicacao({
         titulo: "",
@@ -112,6 +120,7 @@ Frase atrativa:
         dtExpiracao: "",
       });
     }
+
     if (onClose) onClose();
   };
 
@@ -120,6 +129,9 @@ Frase atrativa:
     setPublicacao((prev) => ({ ...prev, [name]: value }));
   };
 
+  /** ================================
+   *  SALVAR/EDITAR PUBLICAÇÃO
+   *  ================================ */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -127,39 +139,48 @@ Frase atrativa:
     setLoading(true);
 
     try {
-      const empresaId = localStorage.getItem("empresaId");
-      if (!empresaId) throw new Error("ID da empresa não encontrado");
-
       const novaPublicacao = {
-        ...publicacao,
-        fkEmpresa: parseInt(empresaId),
+        titulo: publicacao.titulo,
+        descricao: publicacao.descricao,
+        tipoContrato: publicacao.tipoContrato,
+        dtExpiracao: publicacao.dtExpiracao
+          ? `${publicacao.dtExpiracao}:00`
+          : null,
       };
 
-      const url = isEdit ?
-        `http://localhost:8080/api/publicacoes/${publicacaoParaEditar.idPublicacao}` :
-        "http://localhost:8080/api/publicacoes";
+      const url = isEdit
+        ? `http://localhost:8080/api/publicacoes/${publicacaoParaEditar.idPublicacao}`
+        : "http://localhost:8080/api/publicacoes";
 
       const response = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(novaPublicacao),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.message || `Erro ao ${isEdit ? 'editar' : 'cadastrar'} publicação`);
+      /** ======================
+       *  EVITAR ERRO DE JSON
+       *  ====================== */
+      let data = null;
+      try {
+        data = await response.json();
+      } catch (_) {
+        data = null; // corpo vazio é permitido
       }
 
-      setSuccess(`Publicação ${isEdit ? 'editada' : 'cadastrada'} com sucesso!`);
-      if (onSave) onSave(); // Isso vai chamar fetchPublicacao no componente pai
+      if (!response.ok) {
+        throw new Error(data?.message || "Erro ao salvar publicação");
+      }
+
+      setSuccess(`Publicação ${isEdit ? "editada" : "cadastrada"} com sucesso!`);
+
+      if (onSave) onSave();
+
       handleClose();
     } catch (err) {
-      console.error(`Erro ao ${isEdit ? 'editar' : 'cadastrar'} publicação:`, err);
-      setError(err.message || `Erro ao ${isEdit ? 'editar' : 'salvar'} publicação`);
+      console.error(err);
+      setError(err.message || "Erro ao salvar publicação");
     } finally {
       setLoading(false);
     }
@@ -170,7 +191,7 @@ Frase atrativa:
       <Paper sx={{ p: 2, borderRadius: 2, mb: 2 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center" gap={1}>
-            <CampaignIcon sx={{ color: '#006916', fontSize: 30 }} />
+            <CampaignIcon sx={{ color: "#006916", fontSize: 30 }} />
             <Typography fontWeight={600}>Anunciar nova vaga</Typography>
           </Box>
           <Button
@@ -204,8 +225,14 @@ Frase atrativa:
             <CloseIcon />
           </IconButton>
 
-          <Typography variant="h5" color="#006916" fontWeight={600} textAlign={"center"} gutterBottom>
-            {isEdit ? 'Editar Publicação' : 'Nova Publicação'}
+          <Typography
+            variant="h5"
+            color="#006916"
+            fontWeight={600}
+            textAlign={"center"}
+            gutterBottom
+          >
+            {isEdit ? "Editar Publicação" : "Nova Publicação"}
           </Typography>
 
           {error && (
@@ -228,49 +255,25 @@ Frase atrativa:
               fullWidth
               margin="dense"
               required
-              placeholder="Ex: Desenvolvedor Front-end Júnior"
             />
+
             <TextField
               name="descricao"
               label="Descrição da Vaga"
               required
               value={publicacao.descricao}
               onChange={(e) => {
-                const linhas = e.target.value.split('\n');
-                const linhaAtual = e.target.selectionStart;
-                let linhaNumero = 0;
-                let posicaoAtual = 0;
-
-                // Encontra a linha atual baseado na posição do cursor
-                while (posicaoAtual <= linhaAtual && linhaNumero < linhas.length) {
-                  posicaoAtual += linhas[linhaNumero].length + 1;
-                  linhaNumero++;
-                }
-                linhaNumero--; // Ajusta o índice
-
-                // Se a linha atual está vazia ou é um placeholder, limpa ela
-                if (linhas[linhaNumero] && linhas[linhaNumero].includes('(')) {
-                  linhas[linhaNumero] = '';
-                }
-
-                const novoValor = linhas.join('\n');
-                setPublicacao(prev => ({ ...prev, descricao: novoValor }));
+                setPublicacao((prev) => ({
+                  ...prev,
+                  descricao: e.target.value,
+                }));
               }}
               fullWidth
               margin="dense"
               multiline
               rows={10}
-              InputProps={{
-                sx: {
-                  fontFamily: 'monospace',
-                  '& .MuiOutlinedInput-input': {
-                    whiteSpace: 'pre-line'
-                  }
-                }
-              }}
             />
 
-            {/* Início da alteração: Substituindo TextField por Select */}
             <FormControl fullWidth margin="dense" required>
               <InputLabel id="tipoContrato-label">Tipo de Contrato</InputLabel>
               <Select
@@ -286,7 +289,6 @@ Frase atrativa:
                 <MenuItem value="Estágio">Estágio</MenuItem>
               </Select>
             </FormControl>
-            {/* Fim da alteração */}
 
             <TextField
               name="dtExpiracao"
