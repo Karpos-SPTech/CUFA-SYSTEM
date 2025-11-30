@@ -16,8 +16,7 @@ const EstatisticasCandidatos = () => {
   useEffect(() => {
     const fetchCandidatos = async () => {
       try {
-        const empresaId = localStorage.getItem("empresaId");
-        if (!empresaId) throw new Error("ID da empresa não encontrado");
+      
 
         // Primeiro, buscar todas as vagas da empresa
         const response = await fetch("http://localhost:8080/api/publicacoes/empresa", {
