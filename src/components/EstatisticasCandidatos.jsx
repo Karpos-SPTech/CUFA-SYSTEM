@@ -36,7 +36,7 @@ const EstatisticasCandidatos = () => {
         
         let todosCandidatos = [];
         for (const vaga of vagas) {
-          const candidatosResponse = await fetch(`http://localhost:8080/api/candidaturas/${vaga.idPublicacao}`, {
+          const candidatosResponse = await fetch(`http://localhost:8080/api/candidaturas/${vaga.publicacaoId}`, {
             method: "GET",
             credentials: "include",
             headers: {'Content-Type': 'application/json'}

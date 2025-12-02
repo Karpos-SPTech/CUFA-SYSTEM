@@ -39,16 +39,6 @@ export default function CardSobre() {
       setLoading(true);
       setError(null);
 
-      const userId = localStorage.getItem("userId");
-      const userToken = localStorage.getItem("token");
-
-      if (!userId || !userToken) {
-        setError(new Error("Usuário não autenticado. Por favor, faça login."));
-        setLoading(false);
-        // Em um cenário real, você pode querer redirecionar para o login aqui
-        return;
-      }
-
       try {
         const response = await fetch(`http://localhost:8080/api/usuarios`, {
           method: "GET",
@@ -116,21 +106,6 @@ export default function CardSobre() {
     setIsSaving(true);
     setError(null);
 
-    const userId = localStorage.getItem("userId");
-    const userToken = localStorage.getItem("token");
-
-    if (!userId || !userToken) {
-      setError(
-        new Error("Sessão expirada. Não foi possível salvar a biografia.")
-      );
-      setIsSaving(false);
-      setSnackbarMessage("Sessão expirada. Por favor, faça login novamente.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      setOpenEdit(false);
-      return;
-    }
-
     try {
       const response = await fetch(`http://localhost:8080/api/usuarios`, {
         method: "PUT",
@@ -145,9 +120,7 @@ export default function CardSobre() {
       }
 
       // Se a resposta for 204 No Content, não haverá body para parsear
-      if (response.status !== 204) {
-        await response.json(); // Consumir o body, mesmo que seja vazio
-      }
+      if (response.status !== 204) { await response.json();}
 
       setBiografia(biografiaDraft); // Atualiza o estado principal com o rascunho salvo
       setOpenEdit(false); // Fecha o modal

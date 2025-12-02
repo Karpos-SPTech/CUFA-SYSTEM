@@ -21,7 +21,7 @@ const TelaCandidatos = () => {
     const fetchCandidatos = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/candidaturas/${vagaId}?page=${page}&size=${size}`,
+          `http://localhost:8080/api/candidaturas/${vagaId}?page=${1}&size=${5}`,
           {
             method: 'GET',
             credentials: 'include',
@@ -31,12 +31,10 @@ const TelaCandidatos = () => {
           }
         );
 
-        if (!response.ok) {
-          throw new Error('Erro ao buscar dados da API');
-        }
-
         if (!response.ok) throw new Error('Erro ao buscar dados da API');
         const data = await response.json();
+
+        console.log("Resposta do backend:", data)
 
         // Mapeia os dados da vaga
         setVagaInfo({
@@ -50,13 +48,13 @@ const TelaCandidatos = () => {
 
         // Mapeia os candidatos
         const candidatosMapeados = data.candidatos.map((candidato, index) => ({
-          id: index + 1,
+          id: candidato.id || candidato.usuarioId,
           nome: candidato.nome,
           idade: candidato.idade,
           email: candidato.email,
           telefone: candidato.telefone,
           resumo: candidato.biografia,
-          experiencia: candidato.experiencias.map(exp => (
+          experiencia: (candidato.experiencias || []).map(exp => (
             `${exp.cargo} no(a) ${exp.empresa}\nDe: ${exp.dtInicio} - Até: ${exp.dtFim || 'Atual'}`
           )),
           curriculo: candidato.curriculoUrl,

@@ -110,7 +110,7 @@ const NotificationsPanel = () => {
   useEffect(() => {
     const fetchVagas = async () => {
       try {
-        const response = await fetch("http://localhost:8080//publicacoes/empresa", {
+        const response = await fetch("http://localhost:8080/api/publicacoes/empresa", {
           method: "GET",
           credentials: "include",
           headers: {
@@ -129,7 +129,7 @@ const NotificationsPanel = () => {
         // Buscar os candidatos de cada vaga
         const todasNotificacoes = [];
         for (const vaga of data) {
-          const candidatosResponse = await fetch(`http://localhost:8080/api/candidaturas/${vaga.idPublicacao}`, {
+          const candidatosResponse = await fetch(`http://localhost:8080/api/candidaturas/${vaga.publicacaoId}`, {
             method: "GET",
             credentials: "include",
             headers: {
@@ -151,7 +151,7 @@ const NotificationsPanel = () => {
                   id: candidato.id || Math.random(),
                   candidato: candidato,
                   vaga: vaga.titulo,
-                  vagaId: vaga.idPublicacao,
+                  vagaId: vaga.publicacaoId,
                   dataCandidatura: dataCandidatura
                 });
               });

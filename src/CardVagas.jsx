@@ -111,14 +111,14 @@ export default function CardVagas({ vaga, onSave, saved }) {
     const checkUserCandidacy = async () => {
       const userId = localStorage.getItem("userId");
 
-      if (!userId || !vaga?.idPublicacao) {
+      if (!userId || !vaga?.publicacaoId) {
         setCheckingCandidacy(false);
         return;
       }
 
       try {
         const response = await fetch(
-          `http://localhost:8080/api/candidaturas/verificar/${vaga.idPublicacao}`,
+          `http://localhost:8080/api/candidaturas/verificar/${vaga.publicacaoId}`,
           {
             method: "GET",
             credentials: "include",
@@ -141,12 +141,16 @@ export default function CardVagas({ vaga, onSave, saved }) {
     };
 
     checkUserCandidacy();
-  }, [vaga?.idPublicacao]);
+  }, [vaga?.publicacaoId]);
 
   const handleCandidatar = async () => {
-    const idPublicacao = vaga?.idPublicacao;
-    const fkEmpresa = vaga?.empresa?.id;
-    const payload = { idPublicacao, fkEmpresa };
+    const publicacaoId = vaga?.publicacaoId;
+    const empresaId = vaga?.empresaId;
+    const payload = { publicacaoId, empresaId };
+
+
+    console.log(vaga);
+    console.log(vaga.publicacaoId);
 
     try {
       const response = await fetch("http://localhost:8080/api/candidaturas", {

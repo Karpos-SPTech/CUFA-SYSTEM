@@ -87,8 +87,6 @@ const CPFMaskCustom = React.forwardRef(function CPFMaskCustom(props, ref) {
   );
 });
 
-
-
 const Header = ({ hideNotifications }) => {
   const navigate = useNavigate();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -166,15 +164,6 @@ const Header = ({ hideNotifications }) => {
     setLoadingProfile(true);
     setProfileError(null);
 
-    const userId = localStorage.getItem('userId');
-    const userToken = localStorage.getItem('token'); // Corrigido para 'userToken'
-
-    if (!userId || !userToken) {
-      setProfileError(new Error("ID do usuário ou token não encontrado. Por favor, faça login."));
-      setLoadingProfile(false);
-      return;
-    }
-
     try {
       const response = await fetch(`http://localhost:8080/api/usuarios`, {
         method: 'GET',
@@ -229,18 +218,6 @@ const Header = ({ hideNotifications }) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
-
-    const userId = localStorage.getItem('userId');
-    const userToken = localStorage.getItem('token');
-
-    if (!userId || !userToken) {
-      setSubmitError(new Error("ID do usuário ou token não encontrado. Por favor, faça login."));
-      setIsSubmitting(false);
-      setSnackbarMessage("Sessão expirada. Por favor, faça login novamente.");
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
 
     // --- CONVERTE dataNascimento do formato DD-MM-YYYY para YYYY-MM-DD para envio ---
     let dataNascimentoParaEnvio = formData.dataNascimento;
@@ -321,18 +298,16 @@ const Header = ({ hideNotifications }) => {
     }
   };
 
-  // Função para lidar com o logout
-  const handleLogout = () => {
-     try {
-      const response = fetch("/usuarios/logout", {
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:8080/api/usuarios/logout", {
         method: "POST",
         credentials: "include",
       });
-
+      navigate("/");
     } catch (err) {
       console.error("Erro de rede ao tentar logout:", err);
     }
-    navigate("/");
   };
 
   return (

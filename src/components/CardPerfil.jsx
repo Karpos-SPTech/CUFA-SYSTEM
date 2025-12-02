@@ -72,7 +72,7 @@ export default function CardPerfil({
         const contentLength = response.headers.get("content-length");
         const contentType = response.headers.get("content-type") || "";
 
-        if (response.status === 204 || contentLength === "0") {
+        if (contentLength === "0") {
           data = {};
         } else {
           const text = await response.text();
@@ -94,13 +94,11 @@ export default function CardPerfil({
           localStorage.setItem("userEmail", data.email);
         }
 
-        const storedEmail = localStorage.getItem("userEmail") || "";
-
         setProfileData({
           nome: data.nome ?? "",
           estado: data.estado ?? "",
           cidade: data.cidade ?? "",
-          email: storedEmail
+          email: data.email ?? ""
         });
       } catch (err) {
         console.error("Erro ao buscar dados do perfil:", err);
@@ -161,13 +159,6 @@ export default function CardPerfil({
               : "linear-gradient(90deg, #e5eee3 0%, #b6e2c2 100%)",
           }}
         >
-          <input
-            type="file"
-            accept="image/*"
-            id="cover-upload"
-            style={{ display: "none" }}
-            onChange={handleCoverUpload}
-          />
           <IconButton
             component="label"
             htmlFor="cover-upload"
@@ -180,11 +171,11 @@ export default function CardPerfil({
               zIndex: 2,
             }}
           >
-            <EditIcon />
             <input
               type="file"
               accept="image/*"
-              hidden
+              id="cover-upload"
+              style={{ display: "none" }}
               onChange={handleCoverUpload}
             />
           </IconButton>

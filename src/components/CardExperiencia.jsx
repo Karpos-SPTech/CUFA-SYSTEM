@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ModalAdicionarExperiencia from './ModalAdicionarExperiencia';
 import ModalEditarExperiencia from './ModalEditarExperiencia';
 
-export default function CardExperiencia(experiencia) {
+export default function CardExperiencia() {
   const [experiencias, setExperiencias] = useState([]);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -104,6 +104,7 @@ export default function CardExperiencia(experiencia) {
   };
 
   const handleEditClick = (exp) => {
+    console.log("Experiência clicada para editar:", exp);
     setExperienciaEditando(exp);
     setOpenEditModal(true);
   };
@@ -111,15 +112,7 @@ export default function CardExperiencia(experiencia) {
   const handleDelete = async (id) => {
   const confirmDelete = window.confirm("Tem certeza que deseja excluir esta experiência?");
   if (!confirmDelete) return;
-
-  const userToken = localStorage.getItem('token');
-  if (!userToken) {
-    setSnackbarMessage('Sessão expirada. Faça login novamente.');
-    setSnackbarSeverity('error');
-    setSnackbarOpen(true);
-    return;
-  }
-
+  console.log(experiencias);
   try {
     const response = await fetch(`http://localhost:8080/api/experiencias/${id}`, { // <- usar o parâmetro id
       method: 'DELETE',

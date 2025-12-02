@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, TextField, Button, CircularProgress, Snackbar, Alert } from '@mui/material'; // Adicionado CircularProgress, Snackbar, Alert
 
 export default function ModalEditarExperiencia({ open, onClose, experiencia, onEdit }) {
+  const [id, setId] = useState(null);
   const [cargo, setCargo] = useState('');
   const [empresa, setEmpresa] = useState('');
   const [dtInicio, setDtInicio] = useState('');
@@ -15,6 +16,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
   // useEffect para preencher os campos do formulário quando a prop 'experiencia' ou 'open' muda
   useEffect(() => {
     if (experiencia) {
+      setId(experiencia.id || null);
       setCargo(experiencia.cargo || '');
       setEmpresa(experiencia.empresa || '');
       setDtInicio(experiencia.dtInicio || '');
@@ -25,6 +27,14 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
   // Função para lidar com o envio do formulário de edição
   const handleSubmit = async (e) => {
     e.preventDefault(); // Previne o comportamento padrão de recarregar a página
+    console.log("ID da experiência a ser editada:", experiencia);  
+
+    if (!experiencia?.id) {
+      setSnackbarMessage('Erro: ID da experiência não definido.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+      return;
+    }
 
     // Validação básica dos campos
     if (!cargo || !empresa || !dtInicio) { // dtFim pode ser opcional
@@ -44,15 +54,6 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
 
     setLoading(true); // Ativa o estado de carregamento
 
-    const userToken = localStorage.getItem('token');
-    if (!userToken) {
-      setSnackbarMessage('Sessão expirada ou usuário não autenticado. Faça login novamente.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      setLoading(false);
-      return;
-    }
-
     // Prepara os dados da experiência atualizados no formato JSON esperado pelo backend
     const updatedExperienceData = {
       cargo: cargo,
@@ -65,7 +66,7 @@ export default function ModalEditarExperiencia({ open, onClose, experiencia, onE
 
     try {
       // Faz a requisição PUT para o endpoint com o ID da experiência
-      const response = await fetch(`http://localhost:8080/api/experiencias/${experiencia.id}`, {
+      const response = await fetch(`http://localhost:8080/api/experiencias/${id}`, {
         method: 'PUT', // Método HTTP PUT para atualização
         credentials: 'include',
         headers: {'Content-Type': 'application/json'},

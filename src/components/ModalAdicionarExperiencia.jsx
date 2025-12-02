@@ -32,21 +32,11 @@ export default function ModalAdicionarExperiencia({ open, onClose, onExperienceA
 
     setLoading(true);
 
-    const userToken = localStorage.getItem('token');
-
-    if (!userToken) {
-      setSnackbarMessage('Sessão expirada ou usuário não autenticado. Faça login novamente.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      setLoading(false);
-      return;
-    }
-
     const experienceData = {
       cargo: cargo,
       empresa: empresa,
       dtInicio: dtInicio,
-      dtFim: dtFim || null, // Send null if dtFim is empty
+      dtFim: dtFim || null,
     };
 
     console.log("Enviando dados da experiência:", experienceData);

@@ -98,32 +98,22 @@ const MembroCard = () => {
       setLoading(true);
       setError(null);
 
-      const empresaId = localStorage.getItem("empresaId");
-      if (!empresaId) {
-        throw new Error("ID da empresa não encontrado");
-      }
-
-      console.log("Fazendo request com:", {
-        empresaId,
-        url: `http://localhost:8080/api/funcionarios`,
-      });
-
       const response = await fetch(
         `http://localhost:8080/api/funcionarios`,
         {
           method: "GET",
-          credentials: "include", // Importante: inclui os cookies na requisição
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
 
-      let errorData;
       let responseData;
 
       try {
         responseData = await response.json();
+        console.log("RESPONSE DATA CRU:", responseData);
       } catch (e) {
         console.error("Erro ao parsear resposta:", e);
         throw new Error(`Erro ao processar resposta do servidor: ${response.status}`);
@@ -145,14 +135,15 @@ const MembroCard = () => {
         throw new Error("Resposta inválida do servidor");
       }
 
-      // Função auxiliar para validar o cargo
-      const getCargo = (cargoValue) => {
-        if (!cargoValue) return "USUARIO";
-        const cargo =
-          typeof cargoValue === "object" ? cargoValue.nome : cargoValue;
-        // Verifica se o cargo é um dos valores válidos
-        return Object.values(cargosValidos).includes(cargo) ? cargo : "USUARIO";
-      };
+    const getCargo = (cargoValue) => {
+      const cargo =
+        typeof cargoValue === "object" ? cargoValue?.nome : cargoValue;
+
+      // se vier null, default é FUNCIONARIO
+      return Object.values(cargosValidos).includes(cargo)
+        ? cargo
+        : cargosValidos.FUNCIONARIO;
+    };
 
       const membrosFormatados = funcionarios.map((funcionario) => ({
         id: funcionario.id,
@@ -196,7 +187,7 @@ const MembroCard = () => {
       nome: "",
       email: "",
       senha: "",
-      cargo: cargosValidos.USUARIO,
+      cargo: cargosValidos.FUNCIONARIO,
     });
   };
 
@@ -214,22 +205,16 @@ const MembroCard = () => {
     setError(null);
 
     try {
-      const empresaId = localStorage.getItem("empresaId");
-      if (!empresaId) {
-        throw new Error("ID da empresa não encontrado");
-      }
-
       const funcionarioData = {
         nome: formData.nome,
         email: formData.email,
         senha: formData.senha,
-        cargo: formData.cargo,
-        fkEmpresa: parseInt(empresaId),
+        cargo: cargosValidos[formData.cargo] || "FUNCIONARIO"
       };
 
       const response = await fetch("http://localhost:8080/api/funcionarios", {
         method: "POST",
-        credentials: "include", // Importante: inclui os cookies na requisição
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -239,6 +224,7 @@ const MembroCard = () => {
       let responseData;
       try {
         responseData = await response.json();
+        console.log("RESPONSE DATA CRU:", responseData);
       } catch (e) {
         if (!response.ok) {
           throw new Error(`Erro ao cadastrar funcionário: ${response.status}`);
@@ -264,7 +250,6 @@ const MembroCard = () => {
     }
   };
 
-  // Função para deletar membro
   const handleDeleteMember = async (id) => {
     try {
       setLoading(true);
@@ -273,17 +258,13 @@ const MembroCard = () => {
       const response = await fetch(`http://localhost:8080/api/funcionarios/${id}`, {
         method: "DELETE",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
 
       if (!response.ok) {
         throw new Error(`Erro ao deletar funcionário: ${response.status}`);
       }
 
-      // Atualiza a lista de funcionários após deletar
-      fetchFuncionarios();
+      await fetchFuncionarios();
     } catch (err) {
       console.error("Erro ao deletar funcionário:", err);
       setError(err.message || "Erro ao deletar funcionário. Por favor, tente novamente.");
@@ -299,6 +280,8 @@ const MembroCard = () => {
 
   const handleConfirmDelete = () => {
     if (memberToDelete) {
+      console.log("Membro recebido:", memberToDelete);
+      
       handleDeleteMember(memberToDelete.id);
     }
     setDeleteConfirmOpen(false);
