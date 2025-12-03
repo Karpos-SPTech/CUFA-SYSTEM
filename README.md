@@ -1,22 +1,17 @@
-🚀 Guia de Deploy (Implantação)Este guia detalha o processo de preparação e implantação do CUFA-SYSTEM, um projeto Front-end desenvolvido com React e Vite.⚙️ Pré-requisitosPara realizar o deploy da aplicação, você precisará ter o seguinte ambiente configurado:Node.js e npm: Versão 18 ou superior.Git: Para clonar o repositório.Servidor Web: Um serviço para hospedar os arquivos estáticos (Ex: Nginx, Apache, ou um serviço de hosting como Vercel/Netlify).🔧 Configuração de Ambiente1. Clonar o RepositórioNo servidor onde você fará o build (construção) da aplicação:Bashgit clone https://github.com/Karpos-SPTech/CUFA-SYSTEM.git
+🌐 CUFA-SYSTEM: Guia de Implantação (Deploy)Este documento detalha o processo de como configurar, construir e implantar a aplicação Front-end CUFA-SYSTEM, desenvolvida com React e Vite.⚙️ Pré-requisitosAntes de iniciar o processo de deploy, garanta que os seguintes itens estejam instalados no seu ambiente de build ou no seu servidor:FerramentaVersão RecomendadaPropósitoNode.js18 ou superiorAmbiente de execução para JavaScript.npm ou YarnMais recenteGerenciador de pacotes para dependências.GitQualquerControle de versão e clonagem do repositório.🚀 Processo de DeploySiga os passos abaixo para preparar e publicar a aplicação.1. Clonar e Instalar DependênciasPrimeiro, clone o repositório e instale todas as dependências necessárias do projeto:Bash# Clone o repositório
+git clone https://github.com/Karpos-SPTech/CUFA-SYSTEM.git
+
+# Acesse a pasta do projeto
 cd CUFA-SYSTEM
-2. Instalar DependênciasInstale todas as dependências do projeto usando o npm:Bashnpm install
-3. Configurar Variáveis de AmbienteO React/Vite geralmente utiliza variáveis de ambiente para definir configurações específicas de produção, como a URL base da API do backend.As variáveis devem ser definidas em um arquivo .env.production na raiz do projeto ou como variáveis de ambiente no seu sistema de hosting (Vercel, Netlify, etc.).Exemplo de .env.production (Se aplicável):Snippet de código# Variável de ambiente para a API do backend
-VITE_API_URL=https://api.seubackend.com/
 
-# Adicione outras variáveis de ambiente necessárias
-# Exemplo: VITE_SECRET_KEY=sua_chave_aqui
-Importante: O Vite exige que as variáveis de ambiente comecem com VITE_ para serem expostas ao código do Front-end.📦 Build da Aplicação (Gerando o Bundle Estático)O Vite compila todo o código React, JSX, e CSS em um conjunto otimizado de arquivos HTML, JavaScript e CSS, que são chamados de arquivos estáticos (static bundle).Execute o comando de build:Bashnpm run build
-Ao finalizar, o diretório de produção será gerado:Diretório de Saída: dist/O conteúdo dentro da pasta dist/ é o que precisa ser copiado para o seu servidor web ou hosting de Front-end.▶️ Hospedagem e Execução da AplicaçãoO processo de execução envolve servir o conteúdo da pasta dist/.Opção A: Hosting Estático (Recomendado para Produção)Utilize serviços especializados que simplificam a hospedagem de aplicações Front-end:ServiçoInstruções BásicasVercelConecte o repositório. Configure o comando de build como npm run build e o diretório de saída como dist.NetlifyConecte o repositório. Configure o comando de build como npm run build e o diretório de publicação como dist.GitHub PagesVocê pode usar o gh-pages ou configurar o GitHub Actions para fazer o build e publicar a pasta dist.Opção B: Servidor Web Tradicional (Nginx/Apache)Se você estiver usando um servidor web tradicional, o conteúdo da pasta dist/ deve ser movido para o diretório raiz de hospedagem do seu servidor (Ex: /var/www/html/).Exemplo de Configuração Nginx (Snippet):A configuração deve garantir que todas as solicitações não-estáticas (como navegações diretas a /dashboard ou /perfil) sejam roteadas para o index.html da pasta dist/ (conhecido como fallback para Single Page Applications - SPA).Nginxserver {
-    listen 80;
-    server_name seu-dominio.com;
-    
-    root /caminho/completo/para/CUFA-SYSTEM/dist;
-    index index.html;
-
-    location / {
-        try_files $uri /index.html;
-    }
+# Instale as dependências
+npm install
+2. Configuração de Variáveis de AmbienteO Front-end precisa saber onde encontrar a API do Back-end. Essa configuração deve ser feita em um arquivo de variáveis de ambiente de produção.Crie um arquivo chamado .env.production na raiz do projeto.Defina a variável VITE_API_URL apontando para a URL pública do seu Back-end.Exemplo de .env.production:Snippet de código# URL base para todas as chamadas à API do Back-end.
+# O Vite exige que as variáveis de ambiente comecem com VITE_
+VITE_API_URL=https://api.seudominio.com.br/
+Nota: Certifique-se de usar https se o seu Back-end estiver configurado com SSL. A porta 8080 (ou outra porta de desenvolvimento) deve ser evitada aqui, a menos que esteja por trás de um proxy reverso.3. Build da Aplicação (Otimização)O Vite irá compilar, otimizar e agrupar todos os arquivos (React, JavaScript, CSS, Assets) em uma estrutura estática pronta para ser servida.Execute o comando de build definido no package.json:Bashnpm run build
+Ao final deste processo, será gerada uma pasta chamada dist/ na raiz do projeto. O conteúdo desta pasta é o que será implantado.4. Implantação e HospedagemA pasta dist/ contém os arquivos estáticos (.html, .js, .css) e deve ser servida por um servidor web.Opção A: Hosting Dedicado (Recomendado para SPAs)A maneira mais eficiente de hospedar o Front-end é através de serviços otimizados para Single Page Applications (SPAs).ServiçoDiretório de PublicaçãoInstruçõesVerceldistConecte o repositório, defina o comando de build como npm run build e o diretório de saída como dist.NetlifydistSemelhante ao Vercel. Garanta que o fallback (index.html) esteja configurado automaticamente.Opção B: Servidor Web (Nginx/Apache)Se você estiver usando seu próprio servidor, mova o conteúdo da pasta dist/ para o diretório raiz do seu servidor web (Ex: /var/www/html/).Configuração Crucial para Nginx (SPAs):Como o React utiliza roteamento interno, o servidor precisa ser configurado para que todas as rotas (ex: /dashboard, /perfil) façam o fallback para o arquivo index.html. Adicione a seguinte regra ao seu bloco location no Nginx:Nginx# Snippet essencial para Nginx
+location / {
+    try_files $uri $uri/ /index.html;
 }
-Após configurar e mover os arquivos, recarregue o Nginx para aplicar as mudanças:Bashsudo systemctl reload nginx
-A aplicação estará acessível através da URL configurada no seu servidor (http://seu-dominio.com).
+Após configurar, recarregue seu serviço Nginx/Apache.💡 Próximos PassosAcesse o domínio onde a aplicação foi implantada. Verifique se as chamadas de API (configuradas no .env.production) estão funcionando corretamente com o seu CUFA-BACKEND-KOTLIN.
